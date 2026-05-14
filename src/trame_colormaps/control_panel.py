@@ -13,6 +13,37 @@ Template bindings reference ``config.*`` via ``provide_as("config")``.
 from trame.widgets import html
 from trame.widgets import vuetify3 as v3
 
+
+class ControlPanel:
+    """Self-contained control panel for a colorbar.
+
+    Owns no state of its own — renders UI bound to the given config
+    and fires ``update_color_preset`` on preset selection.
+
+    Args:
+        config: ColormapConfig (or compatible StateDataModel).
+        update_color_preset: Callback for preset changes.
+    """
+
+    def __init__(self, config, update_color_preset):
+        self._config = config
+        self._update_color_preset = update_color_preset
+
+    def render(self):
+        """Emit the control panel DOM."""
+        _render_control_panel(self._config, self._update_color_preset)
+
+
+def create_control_panel(config, update_color_preset):
+    """Create the colormap control panel menu content.
+
+    Args:
+        config: ColormapConfig (or compatible StateDataModel).
+        update_color_preset: Callback for preset changes.
+    """
+    _render_control_panel(config, update_color_preset)
+
+
 _BTNS = [
     {
         "icon": "config.color_blind ? 'mdi-shield-check-outline' : 'mdi-palette'",
@@ -59,36 +90,6 @@ def _icon_btn(b):
             activator="parent",
             location="bottom",
         )
-
-
-class ControlPanel:
-    """Self-contained control panel for a colorbar.
-
-    Owns no state of its own — renders UI bound to the given config
-    and fires ``update_color_preset`` on preset selection.
-
-    Args:
-        config: ColormapConfig (or compatible StateDataModel).
-        update_color_preset: Callback for preset changes.
-    """
-
-    def __init__(self, config, update_color_preset):
-        self._config = config
-        self._update_color_preset = update_color_preset
-
-    def render(self):
-        """Emit the control panel DOM."""
-        _render_control_panel(self._config, self._update_color_preset)
-
-
-def create_control_panel(config, update_color_preset):
-    """Create the colormap control panel menu content.
-
-    Args:
-        config: ColormapConfig (or compatible StateDataModel).
-        update_color_preset: Callback for preset changes.
-    """
-    _render_control_panel(config, update_color_preset)
 
 
 def _render_control_panel(config, update_color_preset):
@@ -142,23 +143,27 @@ def _render_control_panel(config, update_color_preset):
             )
 
         # --- Custom range inputs ---
-        _tf_kwargs_min = dict(
-            v_model="config.color_value_min",
-            hide_details=True,
-            label="Min",
-            classes="mt-2",
-            error=("!config.color_value_min_valid",),
-        )
-        _tf_kwargs_max = dict(
-            v_model="config.color_value_max",
-            hide_details=True,
-            label="Max",
-            classes="mt-2",
-            error=("!config.color_value_max_valid",),
-        )
         with v3.VCardItem(v_show="config.override_range", classes="py-0 mb-2"):
-            v3.VTextField(density="compact", variant="outlined", flat=True, **_tf_kwargs_min)
-            v3.VTextField(density="compact", variant="outlined", flat=True, **_tf_kwargs_max)
+            v3.VTextField(
+                v_model="config.color_value_min",
+                label="Min",
+                error=("!config.color_value_min_valid",),
+                density="compact",
+                variant="outlined",
+                flat=True,
+                hide_details=True,
+                classes="mt-2",
+            )
+            v3.VTextField(
+                v_model="config.color_value_max",
+                label="Max",
+                error=("!config.color_value_max_valid",),
+                density="compact",
+                variant="outlined",
+                flat=True,
+                hide_details=True,
+                classes="mt-2",
+            )
 
         # --- Preset list ---
         _click_args = "[entry.name, config.invert, config.use_log_scale, config.discrete_log, config.n_discrete_colors, config.n_colors]"

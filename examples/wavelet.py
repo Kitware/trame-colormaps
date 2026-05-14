@@ -234,7 +234,7 @@ with SinglePageLayout(server, full_height=True) as layout:
         )):
             with html.Div(v_show="show_up", style="grid-area:up;"):
                 colorbar_up.render()
-            with html.Div(v_if="show_left", style="grid-area:left;width:3rem;position:relative;"):
+            with html.Div(v_if="show_left", style="grid-area:left;width:1rem;position:relative;"):
                 with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                     colorbar_left.render()
             with html.Div(style="grid-area:middle;min-width:0;min-height:0;"):
@@ -246,7 +246,7 @@ with SinglePageLayout(server, full_height=True) as layout:
                 )
                 ctrl.view_update = view.update
                 ctrl.view_reset_camera = view.reset_camera
-            with html.Div(v_if="show_right", style="grid-area:right;width:3rem;position:relative;"):
+            with html.Div(v_if="show_right", style="grid-area:right;width:1rem;position:relative;"):
                 with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                     colorbar_right.render()
             with html.Div(v_show="show_down", style="grid-area:down;"):

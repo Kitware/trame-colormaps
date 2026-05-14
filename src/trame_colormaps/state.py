@@ -40,7 +40,7 @@ class ColormapConfig(dataclass.StateDataModel):
     - ``override_range``: When True, use the manual strings instead of
       the data-derived range.
 
-    **Derived** — written by the controller, consumed by widgets:
+    **Derived** — written by the controller, consumed by UI:
 
     - ``color_range``: Active (min, max) as floats, either from data or
       parsed from the manual strings.
@@ -77,7 +77,7 @@ class ColormapConfig(dataclass.StateDataModel):
     color_value_max: str = dataclass.Sync(str, "1")
     override_range: bool = dataclass.Sync(bool, False)
 
-    # --- Derived (written by controller, read by widgets) ---
+    # --- Derived (written by controller, read by UI) ---
     color_value_min_valid: bool = dataclass.Sync(bool, True)
     color_value_max_valid: bool = dataclass.Sync(bool, True)
     color_range: list[float] = dataclass.Sync(tuple[float, float], (0, 1))

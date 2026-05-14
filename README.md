@@ -26,21 +26,16 @@ placed in a footer.
 
 ## Public API
 
-Three symbols are exported from `trame_colormaps/__init__.py`:
+All public symbols are exported from `trame_colormaps/__init__.py`:
 
 | Symbol | Source | Purpose |
 |--------|--------|--------|
 | `Colorbar` | `colorbar.py` | **Recommended.** Self-contained colorbar: owns config, controller, and UI. |
+| `create_colorbar` | `colorbar.py` | Colorbar for composed configs (when colormap fields live in a larger StateDataModel) |
 | `ColormapController` | `controller.py` | Per-view CTF manager: creates CTF, wires mapper, manages presets/range/ticks |
 | `ColormapConfig` | `state.py` | Reactive state model with all colormap fields (standalone use) |
-
-Additionally, `widgets/` provides lower-level building blocks:
-
-| Symbol | Source | Purpose |
-|--------|--------|--------|
-| `create_colorbar` | `widgets/colorbar.py` | Colorbar strip + popup control panel (legacy function-based API) |
-| `create_control_panel` | `widgets/control_panel.py` | Standalone control panel (preset picker, scale, range, discrete) |
-| `ControlPanel` | `widgets/control_panel.py` | Class-based control panel (used internally by `Colorbar`) |
+| `ControlPanel` | `control_panel.py` | Class-based control panel (used internally by `Colorbar`) |
+| `create_control_panel` | `control_panel.py` | Standalone control panel (preset picker, scale, range, discrete) |
 
 ## Preset Data Sources
 
@@ -143,7 +138,7 @@ The adaptive spacing uses the symlog-transformed position of each candidate tick
 |---------|---------|--------|
 | **vtk** (`vtkmodules`) | `core/presets.py`, `core/transforms.py`, `controller.py` | `vtkColorTransferFunction` for color sampling, `vtkPNGWriter`/`vtkImageData` for colorbar image generation |
 | **numpy** | `core/ticks.py`, `core/transforms.py` | Tick computation, LUT transforms |
-| **trame** | `state.py`, `widgets/` | `StateDataModel` for reactive config, Vuetify 3 widgets for UI |
+| **trame** | `state.py`, `colorbar.py`, `control_panel.py` | `StateDataModel` for reactive config, Vuetify 3 widgets for UI |
 | **trame-dataclass** | `state.py` | `StateDataModel` base class; `provide_as` scoped slot |
 
 ## Module Structure
@@ -162,10 +157,7 @@ src/trame_colormaps/
 │   ├── paraview_colormaps.json   # 199 ParaView built-in presets
 │   ├── crameri_colormaps.json    # 60 Crameri scientific colour maps
 │   └── default_presets.json      # Active preset list with color-blind-safe flags
-└── widgets/
-    ├── __init__.py      # Re-exports: create_colorbar, create_control_panel
-    ├── colorbar.py      # Colorbar strip with tick marks and range labels
-    └── control_panel.py # Preset picker, scale mode, range, discrete settings
+└── control_panel.py # Preset picker, scale mode, range, discrete settings
 ```
 
 ## Layer Separation
@@ -175,7 +167,7 @@ src/trame_colormaps/
 | **Core** (pure VTK/numpy) | `core/presets.py`, `core/ticks.py`, `core/transforms.py` | VTK, numpy |
 | **State** (Trame reactive model) | `state.py` | trame |
 | **Controller** (orchestration) | `controller.py` | Core + State + VTK |
-| **Widgets** (UI) | `widgets/colorbar.py`, `widgets/control_panel.py` | trame (Vuetify 3) |
+| **Widgets** (UI) | `colorbar.py`, `control_panel.py` | trame (Vuetify 3) |
 
 The core layer has zero Trame dependency and can be used independently
 for headless colormap operations.
@@ -233,7 +225,7 @@ provides the canonical definition with defaults.
 | `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
 | `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
 | `override_range` | `bool` | `False` | Use manual range instead of data range |
-| **Derived (written by controller, read by widgets)** ||||
+| **Derived (written by controller, read by UI)** ||||
 | `color_range` | `tuple[float, float]` | `(0, 1)` | Active min/max color range |
 | `color_value_min_valid` | `bool` | `True` | Whether `color_value_min` parses as a valid float |
 | `color_value_max_valid` | `bool` | `True` | Whether `color_value_max` parses as a valid float |
@@ -262,12 +254,34 @@ The `Colorbar` class bundles config, controller, and UI into a single object.
 ```python
 from trame_colormaps import Colorbar
 
+
+def get_data_array():
+    """Return the VTK data array the colorbar should map.
+
+    Called by the controller whenever it needs to recompute the color
+    range (e.g. on preset change, data update, or manual range reset).
+    """
+    ds = my_source.GetOutput()
+    if ds is None:
+        return None
+    return ds.GetPointData().GetScalars()
+
+
+def do_render():
+    """Trigger a view update after the controller changes the LUT.
+
+    Called automatically after every color change (preset swap, range
+    edit, scale toggle, etc.) so the 3D view stays in sync.
+    """
+    ctrl.view_update()
+
+
 # Create a colorbar (each instance gets its own config and controller)
 colorbar = Colorbar(
     server=server,
     variable_name="RTData",
     mapper=my_mapper,
-    data_array_fn=lambda: get_data_array(),
+    data_array_fn=get_data_array,
     render_fn=do_render,
     orientation="horizontal",   # or "vertical"
     scalar_mode="default",      # "default", "point", or "cell"
@@ -318,15 +332,28 @@ with layout:
 | `controller` | The `ColormapController` instance |
 | `panel` | The `ControlPanel` instance |
 
-### Low-level: `ColormapController` + `create_colorbar`
+### Composed config: `ColormapController` + `create_colorbar`
 
-For more control, use the controller and widget functions directly:
+Use `create_colorbar` when colormap fields are composed into a larger
+application config rather than using a standalone `ColormapConfig`.
+The caller creates the controller and wires the mapper:
 
 ```python
-from trame_colormaps import ColormapController, ColormapConfig
-from trame_colormaps.widgets import create_colorbar
+from trame.app import dataclass
+from trame_colormaps import ColormapController, ColormapConfig, create_colorbar
 
-config = ColormapConfig(server)
+class ViewConfiguration(dataclass.StateDataModel):
+    # Application-specific fields
+    variable: str = dataclass.Sync(str)
+    order: int = dataclass.Sync(int, 0)
+    size: int = dataclass.Sync(int, 6)
+
+    # Colormap fields (same as ColormapConfig)
+    preset: str = dataclass.Sync(str, "Cool to Warm")
+    invert: bool = dataclass.Sync(bool, False)
+    # ... all other ColormapConfig fields ...
+
+config = ViewConfiguration(server, variable="Temperature")
 controller = ColormapController(
     server=server,
     variable_name="Temperature",
