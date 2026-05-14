@@ -48,7 +48,13 @@ COLOR_BLIND_SAFE = {
     "Cividis",
 }
 
-OUTPUT = Path(__file__).resolve().parents[2] / "src" / "trame_colormaps" / "presets" / "paraview_colormaps.json"
+OUTPUT = (
+    Path(__file__).resolve().parents[2]
+    / "src"
+    / "trame_colormaps"
+    / "presets"
+    / "paraview_colormaps.json"
+)
 
 
 def main():
@@ -64,7 +70,14 @@ def main():
 
         preset = {}
         # Carry over standard fields
-        for key in ("ColorSpace", "Name", "NanColor", "DefaultMap", "Creator", "RGBPoints"):
+        for key in (
+            "ColorSpace",
+            "Name",
+            "NanColor",
+            "DefaultMap",
+            "Creator",
+            "RGBPoints",
+        ):
             if key in entry:
                 preset[key] = entry[key]
 

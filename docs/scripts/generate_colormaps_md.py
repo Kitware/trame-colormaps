@@ -65,7 +65,13 @@ def ctf_to_png_file(ctf, filepath, width=512, height=40):
 
 def safe_filename(name):
     """Convert preset name to a safe filename."""
-    return name.replace(" ", "_").replace("/", "-").replace("(", "").replace(")", "").replace("'", "")
+    return (
+        name.replace(" ", "_")
+        .replace("/", "-")
+        .replace("(", "")
+        .replace(")", "")
+        .replace("'", "")
+    )
 
 
 def main():
@@ -79,33 +85,53 @@ def main():
         "",
         "Complete catalog of available colormaps with colorbar previews and metadata.",
         "",
-        f"**Total: {len(pv) + len(cr)} colormaps** ({len(pv)} ParaView built-in + {len(cr)} Crameri scientific)",
+        (
+            f"**Total: {len(pv) + len(cr)} colormaps**"
+            f" ({len(pv)} ParaView built-in"
+            f" + {len(cr)} Crameri scientific)"
+        ),
         "",
         "## ParaView Built-in Colormaps",
         "",
-        f"{len(pv)} colormaps from the [ParaView](https://github.com/Kitware/ParaView/blob/master/Remoting/Views/ColorMaps.json) project.",
+        (
+            f"{len(pv)} colormaps from the"
+            " [ParaView](https://github.com/Kitware/ParaView"
+            "/blob/master/Remoting/Views/ColorMaps.json)"
+            " project."
+        ),
         "",
     ]
 
-    for p in sorted(pv, key=lambda x: (x.get("ColorSpace", "RGB"), x.get("Creator", ""), x["Name"].lower())):
+    for p in sorted(
+        pv,
+        key=lambda x: (
+            x.get("ColorSpace", "RGB"),
+            x.get("Creator", ""),
+            x["Name"].lower(),
+        ),
+    ):
         fname = safe_filename(p["Name"]) + ".png"
         ctf = build_ctf(p)
         ctf_to_png_file(ctf, IMG_DIR / fname)
         creator = p.get("Creator", "")
         cs = p.get("ColorSpace", "RGB")
-        meta = f'**{p["Name"]}** — {cs}'
+        meta = f"**{p['Name']}** — {cs}"
         if creator:
-            meta += f' — {creator}'
-        lines.append(f'{meta}')
-        lines.append(f'')
+            meta += f" — {creator}"
+        lines.append(f"{meta}")
+        lines.append("")
         lines.append(f'<img src="images/colormaps/{fname}" width="500">')
-        lines.append(f'')
+        lines.append("")
 
     lines += [
         "",
         "## Crameri Scientific Colour Maps",
         "",
-        f'{len(cr)} colormaps from [Fabio Crameri](https://www.fabiocrameri.ch/colourmaps/) — perceptually uniform and color-blind safe.',
+        (
+            f"{len(cr)} colormaps from"
+            " [Fabio Crameri](https://www.fabiocrameri.ch/colourmaps/)"
+            " — perceptually uniform and color-blind safe."
+        ),
         "",
     ]
 
@@ -115,11 +141,11 @@ def main():
         ctf_to_png_file(ctf, IMG_DIR / fname)
         cat = p.get("Category", "")
         cs = p.get("ColorSpace", "RGB")
-        meta = f'**{p["Name"]}** — {cs} — {cat}'
-        lines.append(f'{meta}')
-        lines.append(f'')
+        meta = f"**{p['Name']}** — {cs} — {cat}"
+        lines.append(f"{meta}")
+        lines.append("")
         lines.append(f'<img src="images/colormaps/{fname}" width="500">')
-        lines.append(f'')
+        lines.append("")
 
     lines += [
         "",
@@ -130,7 +156,11 @@ def main():
 
     out = REPO_ROOT / "docs" / "colormaps.md"
     out.write_text("\n".join(lines))
-    print(f"Written {out.relative_to(REPO_ROOT)} ({len(lines)} lines, {len(pv) + len(cr)} images in docs/images/colormaps/)")
+    print(
+        f"Written {out.relative_to(REPO_ROOT)}"
+        f" ({len(lines)} lines,"
+        f" {len(pv) + len(cr)} images in docs/images/colormaps/)"
+    )
 
 
 if __name__ == "__main__":

@@ -7,7 +7,9 @@ with linear, log, and symlog scales.
 import numpy as np
 
 
-def get_nice_ticks(vmin, vmax, n, scale="linear", linthresh=None, min_gap=None, desired_n=None):
+def get_nice_ticks(
+    vmin, vmax, n, scale="linear", linthresh=None, min_gap=None, desired_n=None
+):
     """Compute nicely spaced tick values for a given range and scale.
 
     Args:
@@ -199,7 +201,8 @@ def compute_color_ticks(
 
     Tick positions are computed in the space matching the scale:
     - linear: position = (val - vmin) / (vmax - vmin) * 100
-    - symlog: position = (symlog(val) - symlog(vmin)) / (symlog(vmax) - symlog(vmin)) * 100
+    - symlog: position = (symlog(val) - symlog(vmin))
+      / (symlog(vmax) - symlog(vmin)) * 100
 
     The colorbar image is always the linear preset, so symlog ticks
     appear at different positions than linear ticks for the same values.
@@ -220,8 +223,9 @@ def compute_color_ticks(
         return []
 
     raw_n = n if scale == "linear" else n * 2
-    ticks = get_nice_ticks(vmin, vmax, raw_n, scale, linthresh=linthresh,
-                           min_gap=min_gap, desired_n=n)
+    ticks = get_nice_ticks(
+        vmin, vmax, raw_n, scale, linthresh=linthresh, min_gap=min_gap, desired_n=n
+    )
     data_range = vmax - vmin
 
     if scale == "symlog":

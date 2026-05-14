@@ -10,8 +10,8 @@ from vtkmodules.util.numpy_support import vtk_to_numpy
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 
 from trame_colormaps.core.presets import (
-    COLORBAR_CACHE,
     COLOR_BLIND_SAFE,
+    COLORBAR_CACHE,
     get_rgb_points,
     lut_to_img_h,
     lut_to_img_v,
@@ -52,8 +52,14 @@ class ColormapController:
     """
 
     def __init__(
-        self, server, variable_name, mapper, data_array_fn, render_fn,
-        config=None, scalar_mode="cell",
+        self,
+        server,
+        variable_name,
+        mapper,
+        data_array_fn,
+        render_fn,
+        config=None,
+        scalar_mode="cell",
     ):
         self.config = config if config is not None else ColormapConfig(server)
 

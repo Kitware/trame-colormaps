@@ -9,9 +9,9 @@ import itertools
 from trame.widgets import html
 from trame.widgets import vuetify3 as v3
 
+from trame_colormaps.control_panel import ControlPanel, create_control_panel
 from trame_colormaps.controller import ColormapController
 from trame_colormaps.state import ColormapConfig
-from trame_colormaps.control_panel import ControlPanel, create_control_panel
 
 # Each Colorbar gets a unique ID so its menu state key is distinct.
 # The registry tracks all instances so opening one panel can close the others.
@@ -51,7 +51,9 @@ class Colorbar:
         self._id = next(_colorbar_counter)
         self._orientation = orientation
         self._server = server
-        self._popup_location = popup_location or ("top" if orientation == "horizontal" else "end")
+        self._popup_location = popup_location or (
+            "top" if orientation == "horizontal" else "end"
+        )
 
         self.config = config if config is not None else ColormapConfig(server)
         self.controller = ColormapController(
@@ -191,9 +193,7 @@ def _colorbar_content_h():
                 ),
             ):
                 html.Div(
-                    style=(
-                        "`width:1.5px;height:30%;background:${tick.color};`",
-                    ),
+                    style=("`width:1.5px;height:30%;background:${tick.color};`",),
                 )
                 html.Span(
                     "{{ tick.label }}",
@@ -243,9 +243,7 @@ def _colorbar_content_v():
                 ),
             ):
                 html.Div(
-                    style=(
-                        "`height:1.5px;width:30%;background:${tick.color};`",
-                    ),
+                    style=("`height:1.5px;width:30%;background:${tick.color};`",),
                 )
                 html.Span(
                     "{{ tick.label }}",

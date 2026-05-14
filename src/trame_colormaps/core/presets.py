@@ -41,9 +41,7 @@ def _init_registry():
     crameri = load("crameri_colormaps.json")
     registry = {p["Name"]: p for p in builtin + crameri}
     all_names = set(registry.keys())
-    color_blind = {
-        n for n, p in registry.items() if p.get("ColorBlindSafe", False)
-    }
+    color_blind = {n for n, p in registry.items() if p.get("ColorBlindSafe", False)}
     defaults_path = _PRESET_DIR / "default_presets.json"
     defaults = (
         json.loads(defaults_path.read_text())
@@ -258,7 +256,7 @@ def generate_colormaps(samples=255):
             ctf_inv.SetColorSpaceToRGB()
 
         for i in range(n_points):
-            x = x_min + (x_max - (points[i * 4])) 
+            x = x_min + (x_max - (points[i * 4]))
             r, g, b = points[i * 4 + 1], points[i * 4 + 2], points[i * 4 + 3]
             ctf_inv.AddRGBPoint(x, r, g, b)
 
@@ -419,7 +417,7 @@ def map_to_log_space(ctf):
     for i in range(n):
         t = (pts[i * 4] - x_min) / old_range
         log_x = log_min + t * (log_max - log_min)
-        new_pts.extend([10.0 ** log_x, pts[i * 4 + 1], pts[i * 4 + 2], pts[i * 4 + 3]])
+        new_pts.extend([10.0**log_x, pts[i * 4 + 1], pts[i * 4 + 2], pts[i * 4 + 3]])
     set_rgb_points(ctf, new_pts)
 
 

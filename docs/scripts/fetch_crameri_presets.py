@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Fetch and process Fabio Crameri's scientific colour maps into our bundled JSON format.
+"""Fetch and process Fabio Crameri's scientific colour maps.
+
+Converts to our bundled JSON format.
 
 Source
 ------
@@ -38,8 +40,8 @@ Output is written to:
 
 import io
 import json
-import zipfile
 import urllib.request
+import zipfile
 from pathlib import Path
 
 # Latest stable release on Zenodo.  Update the record ID for newer versions.
@@ -52,62 +54,63 @@ SOURCE_CREATOR = "Fabio Crameri"
 # Reference: https://www.fabiocrameri.ch/ws/media-library/ce2eb6eee7c345f999e61c02e2733962/readme_scientificcolourmaps.pdf
 METADATA = {
     # Sequential
-    "batlow":   {"category": "sequential", "safe": True},
-    "batlowW":  {"category": "sequential", "safe": True},
-    "batlowK":  {"category": "sequential", "safe": True},
-    "devon":    {"category": "sequential", "safe": True},
-    "lajolla":  {"category": "sequential", "safe": True},
-    "bamako":   {"category": "sequential", "safe": True},
-    "davos":    {"category": "sequential", "safe": True},
-    "bilbao":   {"category": "sequential", "safe": True},
-    "nuuk":     {"category": "sequential", "safe": True},
-    "oslo":     {"category": "sequential", "safe": True},
-    "grayC":    {"category": "sequential", "safe": True},
-    "hawaii":   {"category": "sequential", "safe": True},
-    "lapaz":    {"category": "sequential", "safe": True},
-    "tokyo":    {"category": "sequential", "safe": True},
-    "buda":     {"category": "sequential", "safe": True},
-    "acton":    {"category": "sequential", "safe": True},
-    "turku":    {"category": "sequential", "safe": True},
-    "imola":    {"category": "sequential", "safe": True},
-    "navia":    {"category": "sequential", "safe": True},
-    "naviaW":   {"category": "sequential", "safe": True},
-    "managua":  {"category": "sequential", "safe": True},
-    "bukavu":   {"category": "multi-sequential", "safe": True},
-    "fes":      {"category": "multi-sequential", "safe": True},
+    "batlow": {"category": "sequential", "safe": True},
+    "batlowW": {"category": "sequential", "safe": True},
+    "batlowK": {"category": "sequential", "safe": True},
+    "devon": {"category": "sequential", "safe": True},
+    "lajolla": {"category": "sequential", "safe": True},
+    "bamako": {"category": "sequential", "safe": True},
+    "davos": {"category": "sequential", "safe": True},
+    "bilbao": {"category": "sequential", "safe": True},
+    "nuuk": {"category": "sequential", "safe": True},
+    "oslo": {"category": "sequential", "safe": True},
+    "grayC": {"category": "sequential", "safe": True},
+    "hawaii": {"category": "sequential", "safe": True},
+    "lapaz": {"category": "sequential", "safe": True},
+    "tokyo": {"category": "sequential", "safe": True},
+    "buda": {"category": "sequential", "safe": True},
+    "acton": {"category": "sequential", "safe": True},
+    "turku": {"category": "sequential", "safe": True},
+    "imola": {"category": "sequential", "safe": True},
+    "navia": {"category": "sequential", "safe": True},
+    "naviaW": {"category": "sequential", "safe": True},
+    "managua": {"category": "sequential", "safe": True},
+    "bukavu": {"category": "multi-sequential", "safe": True},
+    "fes": {"category": "multi-sequential", "safe": True},
     # Diverging
-    "broc":     {"category": "diverging", "safe": True},
-    "brocO":    {"category": "diverging", "safe": True},
-    "cork":     {"category": "diverging", "safe": True},
-    "corkO":    {"category": "diverging", "safe": True},
-    "vik":      {"category": "diverging", "safe": True},
-    "vikO":     {"category": "diverging", "safe": True},
-    "lisbon":   {"category": "diverging", "safe": True},
-    "tofino":   {"category": "diverging", "safe": True},
-    "berlin":   {"category": "diverging", "safe": True},
-    "roma":     {"category": "diverging", "safe": True},
-    "romaO":    {"category": "diverging", "safe": True},
-    "bam":      {"category": "diverging", "safe": True},
-    "bamO":     {"category": "diverging", "safe": True},
-    "vanimo":   {"category": "diverging", "safe": True},
+    "broc": {"category": "diverging", "safe": True},
+    "brocO": {"category": "diverging", "safe": True},
+    "cork": {"category": "diverging", "safe": True},
+    "corkO": {"category": "diverging", "safe": True},
+    "vik": {"category": "diverging", "safe": True},
+    "vikO": {"category": "diverging", "safe": True},
+    "lisbon": {"category": "diverging", "safe": True},
+    "tofino": {"category": "diverging", "safe": True},
+    "berlin": {"category": "diverging", "safe": True},
+    "roma": {"category": "diverging", "safe": True},
+    "romaO": {"category": "diverging", "safe": True},
+    "bam": {"category": "diverging", "safe": True},
+    "bamO": {"category": "diverging", "safe": True},
+    "vanimo": {"category": "diverging", "safe": True},
     # Cyclic
-    "oleron":   {"category": "cyclic", "safe": True},
-    "brocO":    {"category": "cyclic", "safe": True},
-    "corkO":    {"category": "cyclic", "safe": True},
-    "vikO":     {"category": "cyclic", "safe": True},
-    "romaO":    {"category": "cyclic", "safe": True},
-    "bamO":     {"category": "cyclic", "safe": True},
+    "oleron": {"category": "cyclic", "safe": True},
     # Categorical
     "glasgowS": {"category": "categorical", "safe": True},
 }
 
-OUTPUT = Path(__file__).resolve().parents[2] / "src" / "trame_colormaps" / "presets" / "crameri_colormaps.json"
+OUTPUT = (
+    Path(__file__).resolve().parents[2]
+    / "src"
+    / "trame_colormaps"
+    / "presets"
+    / "crameri_colormaps.json"
+)
 
 
 def parse_txt(text):
     """Parse a Crameri .txt file: 256 rows of 'R G B' (0–255) → 0–1 floats."""
     rgb_points = []
-    lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
+    lines = [s.strip() for s in text.strip().splitlines() if s.strip()]
     n = len(lines)
     for i, line in enumerate(lines):
         parts = line.split()
@@ -128,7 +131,8 @@ def main():
     with zipfile.ZipFile(zip_data) as zf:
         # Look for files like ScientificColourMaps8/batlow/batlow.txt
         txt_files = sorted(
-            n for n in zf.namelist()
+            n
+            for n in zf.namelist()
             if n.endswith(".txt")
             and n.count("/") == 2  # top/name/name.txt
             and not n.startswith("__")

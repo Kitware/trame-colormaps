@@ -14,27 +14,24 @@ Run:
     uv run python examples/wavelet.py
 """
 
+# Required for VTK rendering in trame
+import vtkmodules.vtkInteractionStyle  # noqa: F401
+import vtkmodules.vtkRenderingOpenGL2  # noqa: F401
 from trame.app import get_server
 from trame.ui.vuetify3 import SinglePageLayout
-from trame.widgets import html, vuetify3 as v3, vtk as vtk_widgets
-
+from trame.widgets import html
+from trame.widgets import vtk as vtk_widgets
+from trame.widgets import vuetify3 as v3
 from vtkmodules.vtkCommonDataModel import vtkPlane
 from vtkmodules.vtkFiltersCore import vtkClipPolyData, vtkContourFilter, vtkCutter
 from vtkmodules.vtkImagingCore import vtkRTAnalyticSource
 from vtkmodules.vtkRenderingCore import (
     vtkActor,
-    vtkColorTransferFunction,
-    vtkDataSetMapper,
     vtkPolyDataMapper,
-    vtkProperty,
     vtkRenderer,
     vtkRenderWindow,
     vtkRenderWindowInteractor,
 )
-
-# Required for VTK rendering in trame
-import vtkmodules.vtkInteractionStyle  # noqa: F401
-import vtkmodules.vtkRenderingOpenGL2  # noqa: F401
 
 from trame_colormaps import Colorbar
 
@@ -112,6 +109,7 @@ interactor.GetInteractorStyle().SetCurrentStyleToTrackballCamera()
 # ---------------------------------------------------------------------------
 # Colormap controller
 # ---------------------------------------------------------------------------
+
 
 def get_data_array():
     """Return the active scalar array from the wavelet output."""
@@ -225,16 +223,20 @@ with SinglePageLayout(server, full_height=True) as layout:
         )
 
     with layout.content:
-        with html.Div(style=(
-            "display:grid;"
-            "grid-template-rows:auto 1fr auto;"
-            "grid-template-columns:auto 1fr auto;"
-            "grid-template-areas:'up up up' 'left middle right' 'down down down';"
-            "height:100%;overflow:hidden;"
-        )):
+        with html.Div(
+            style=(
+                "display:grid;"
+                "grid-template-rows:auto 1fr auto;"
+                "grid-template-columns:auto 1fr auto;"
+                "grid-template-areas:'up up up' 'left middle right' 'down down down';"
+                "height:100%;overflow:hidden;"
+            )
+        ):
             with html.Div(v_show="show_up", style="grid-area:up;"):
                 colorbar_up.render()
-            with html.Div(v_if="show_left", style="grid-area:left;width:1rem;position:relative;"):
+            with html.Div(
+                v_if="show_left", style="grid-area:left;width:1rem;position:relative;"
+            ):
                 with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                     colorbar_left.render()
             with html.Div(style="grid-area:middle;min-width:0;min-height:0;"):
@@ -246,7 +248,9 @@ with SinglePageLayout(server, full_height=True) as layout:
                 )
                 ctrl.view_update = view.update
                 ctrl.view_reset_camera = view.reset_camera
-            with html.Div(v_if="show_right", style="grid-area:right;width:1rem;position:relative;"):
+            with html.Div(
+                v_if="show_right", style="grid-area:right;width:1rem;position:relative;"
+            ):
                 with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                     colorbar_right.render()
             with html.Div(v_show="show_down", style="grid-area:down;"):
