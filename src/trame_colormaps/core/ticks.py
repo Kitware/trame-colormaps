@@ -7,38 +7,6 @@ with linear, log, and symlog scales.
 import numpy as np
 
 
-def calculate_linthresh(data):
-    """Calculate the linear threshold for symlog scaling.
-
-    Excludes true zeros (values within ±tiny of the data dtype),
-    then returns min(abs(valid)).
-
-    Operates on the original array without copies.
-
-    Args:
-        data: numpy array of data values
-
-    Returns:
-        linthresh value (float), floored at dtype tiny to avoid zero
-    """
-    threshold = np.finfo(data.dtype).tiny
-
-    # Find min |x| > threshold without allocating a copy.
-    # Using where= runs as a tight vectorized C loop, roughly 2-3 orders
-    # of magnitude faster than a Python for loop.
-    min_pos = np.nanmin(data, where=data > threshold, initial=np.inf)
-    # For negatives: max(data) where data < -threshold gives closest to zero
-    max_neg = np.nanmax(data, where=data < -threshold, initial=-np.inf)
-    min_abs = min(min_pos, -max_neg)
-
-    if min_abs == np.inf:
-        linthresh = 1.0
-    else:
-        linthresh = max(float(min_abs), float(np.finfo(data.dtype).tiny))
-
-    return linthresh
-
-
 def get_nice_ticks(vmin, vmax, n, scale="linear", linthresh=None, min_gap=None, desired_n=None):
     """Compute nicely spaced tick values for a given range and scale.
 
@@ -255,10 +223,6 @@ def compute_color_ticks(
     ticks = get_nice_ticks(vmin, vmax, raw_n, scale, linthresh=linthresh,
                            min_gap=min_gap, desired_n=n)
     data_range = vmax - vmin
-
-    # Build mapping functions for non-linear tick positions
-    _symlog_fn = None
-    _log_min = _log_max = _log_range = None
 
     if scale == "symlog":
         if linthresh is None:

@@ -23,17 +23,43 @@ from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 _PRESET_DIR = Path(__file__).parent.parent / "presets"
 
 
-def _load_json_presets(filename):
-    """Load presets from a JSON file in the presets directory.
+def _init_registry():
+    """Load all presets and build the module-level registry constants.
 
     Returns:
-        list of dicts, each with at least "Name", "RGBPoints", "ColorSpace".
+        Tuple of (registry, all_names, color_blind_safe, default_presets).
     """
-    path = _PRESET_DIR / filename
-    if not path.exists():
-        return []
-    with open(path, "r") as f:
-        return json.load(f)
+
+    def load(filename):
+        path = _PRESET_DIR / filename
+        if not path.exists():
+            return []
+        with open(path, "r") as f:
+            return json.load(f)
+
+    builtin = load("paraview_colormaps.json")
+    crameri = load("crameri_colormaps.json")
+    registry = {p["Name"]: p for p in builtin + crameri}
+    all_names = set(registry.keys())
+    color_blind = {
+        n for n, p in registry.items() if p.get("ColorBlindSafe", False)
+    }
+    defaults_path = _PRESET_DIR / "default_presets.json"
+    defaults = (
+        json.loads(defaults_path.read_text())
+        if defaults_path.exists()
+        else sorted(all_names)
+    )
+    return registry, all_names, color_blind, defaults
+
+
+PRESET_REGISTRY, ALL_PRESETS, COLOR_BLIND_SAFE, DEFAULT_PRESETS = _init_registry()
+
+#: Module-level active preset list. Modified via set_active_presets().
+_active_presets = [n for n in DEFAULT_PRESETS if n in PRESET_REGISTRY]
+
+
+# --- CTF Builders ---
 
 
 def _build_ctf(preset):
@@ -62,45 +88,6 @@ def _build_ctf(preset):
         ctf.AddRGBPoint(points[i], points[i + 1], points[i + 2], points[i + 3])
 
     return ctf
-
-
-# --- Preset Discovery ---
-
-#: Raw preset data loaded from JSON files.
-_BUILTIN_PRESETS_DATA = _load_json_presets("paraview_colormaps.json")
-_CRAMERI_PRESETS_DATA = _load_json_presets("crameri_colormaps.json")
-
-#: Combined preset registry: dict mapping name -> preset dict.
-PRESET_REGISTRY = {}
-for _p in _BUILTIN_PRESETS_DATA:
-    PRESET_REGISTRY[_p["Name"]] = _p
-for _p in _CRAMERI_PRESETS_DATA:
-    PRESET_REGISTRY[_p["Name"]] = _p
-
-#: All known color preset names.
-ALL_PRESETS = set(PRESET_REGISTRY.keys())
-
-#: Presets marked as color-blind safe (from ColorBlindSafe field in JSON).
-COLOR_BLIND_SAFE = {
-    name for name, p in PRESET_REGISTRY.items() if p.get("ColorBlindSafe", False)
-}
-
-#: Built-in presets (from paraview_colormaps.json).
-BUILTIN_PRESETS = {p["Name"] for p in _BUILTIN_PRESETS_DATA}
-
-#: Crameri scientific colour map presets.
-CRAMERI_PRESETS = {p["Name"] for p in _CRAMERI_PRESETS_DATA}
-
-#: Default active preset list (loaded from default_presets.json).
-_DEFAULT_PRESETS_PATH = _PRESET_DIR / "default_presets.json"
-DEFAULT_PRESETS = (
-    json.loads(_DEFAULT_PRESETS_PATH.read_text())
-    if _DEFAULT_PRESETS_PATH.exists()
-    else sorted(ALL_PRESETS)
-)
-
-#: Module-level active preset list. Modified via set_active_presets().
-_active_presets = [n for n in DEFAULT_PRESETS if n in PRESET_REGISTRY]
 
 
 def get_active_presets():

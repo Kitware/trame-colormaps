@@ -18,7 +18,6 @@ from trame_colormaps.core.presets import (
     rescale_ctf,
 )
 from trame_colormaps.core.ticks import (
-    calculate_linthresh,
     compute_color_ticks,
     format_tick,
     tick_contrast_color,
@@ -30,6 +29,7 @@ from trame_colormaps.core.transforms import (
     apply_linear,
     apply_log,
     apply_symlog,
+    calculate_linthresh,
 )
 from trame_colormaps.state import ColormapConfig
 
