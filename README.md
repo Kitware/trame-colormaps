@@ -5,23 +5,14 @@ functions, colorbar rendering, and interactive preset controls in Trame apps.
 
 ## Screenshots
 
-### Vuetify 3 — horizontal and vertical colorbars with preset picker
+### Horizontal and vertical colorbars with preset picker
 
-![Wavelet V3](docs/images/wavelet_v3.png)
+![Wavelet](docs/images/wavelet.png)
 
-The wavelet example (`examples/wavelet_v3.py`) shows four colorbars around a 3D view:
+The wavelet example (`examples/wavelet.py`) shows four colorbars around a 3D view:
 two horizontal bars (top and bottom) and two vertical bars (left and right).
 Clicking any colorbar opens its control panel with preset picker, scale mode,
 and discrete settings. Only one panel can be open at a time.
-
-### Vuetify 2 — same layout with Vue 2 compatibility
-
-![Wavelet V2](docs/images/wavelet_v2.png)
-
-The Vue 2 example (`examples/wavelet_v2.py`) demonstrates the same four-region
-layout using Vuetify 2 components. The `Colorbar` class auto-detects the Vue
-version and renders the appropriate widgets. State synchronization between the
-config and server state is handled automatically via `v2_state_prefix()`.
 
 ### Real-world integration — horizontal footer colorbar
 
@@ -39,7 +30,7 @@ Three symbols are exported from `trame_colormaps/__init__.py`:
 
 | Symbol | Source | Purpose |
 |--------|--------|--------|
-| `Colorbar` | `colorbar.py` | **Recommended.** Self-contained colorbar: owns config, controller, and UI. Supports both Vue 2 and Vue 3. |
+| `Colorbar` | `colorbar.py` | **Recommended.** Self-contained colorbar: owns config, controller, and UI. |
 | `ColormapController` | `controller.py` | Per-view CTF manager: creates CTF, wires mapper, manages presets/range/ticks |
 | `ColormapConfig` | `state.py` | Reactive state model with all colormap fields (standalone use) |
 
@@ -152,8 +143,8 @@ The adaptive spacing uses the symlog-transformed position of each candidate tick
 |---------|---------|--------|
 | **vtk** (`vtkmodules`) | `core/presets.py`, `core/transforms.py`, `controller.py` | `vtkColorTransferFunction` for color sampling, `vtkPNGWriter`/`vtkImageData` for colorbar image generation |
 | **numpy** | `core/ticks.py`, `core/transforms.py` | Tick computation, LUT transforms |
-| **trame** | `state.py`, `widgets/` | `StateDataModel` for reactive config, Vuetify 2 and 3 widgets for UI |
-| **trame-dataclass** | `state.py`, `widgets/_compat.py` | `StateDataModel` base class; `provide_as` scoped slot (Vue 3) |
+| **trame** | `state.py`, `widgets/` | `StateDataModel` for reactive config, Vuetify 3 widgets for UI |
+| **trame-dataclass** | `state.py` | `StateDataModel` base class; `provide_as` scoped slot |
 
 ## Module Structure
 
@@ -173,7 +164,6 @@ src/trame_colormaps/
 │   └── default_presets.json      # Active preset list with color-blind-safe flags
 └── widgets/
     ├── __init__.py      # Re-exports: create_colorbar, create_control_panel
-    ├── _compat.py       # Vue version detection, Vuetify module selection, v2 state mirroring
     ├── colorbar.py      # Colorbar strip with tick marks and range labels
     └── control_panel.py # Preset picker, scale mode, range, discrete settings
 ```
@@ -185,7 +175,7 @@ src/trame_colormaps/
 | **Core** (pure VTK/numpy) | `core/presets.py`, `core/ticks.py`, `core/transforms.py` | VTK, numpy |
 | **State** (Trame reactive model) | `state.py` | trame |
 | **Controller** (orchestration) | `controller.py` | Core + State + VTK |
-| **Widgets** (UI) | `widgets/_compat.py`, `widgets/colorbar.py`, `widgets/control_panel.py` | trame (Vuetify 2 or 3, auto-detected) |
+| **Widgets** (UI) | `widgets/colorbar.py`, `widgets/control_panel.py` | trame (Vuetify 3) |
 
 The core layer has zero Trame dependency and can be used independently
 for headless colormap operations.
@@ -194,12 +184,10 @@ for headless colormap operations.
 
 `Colorbar.render()` produces the following DOM tree:
 
-### Vue 3 (Vuetify 3)
-
 ```
 html.Div  (top-level — flexbox row/column, bg-blue-grey-darken-2)
-├── v3.VMenu  (activator="parent" — click anywhere on the bar to open)
-│   └── ControlPanel → v3.VCard (360px popup)
+├── VMenu  (activator="parent" — click anywhere on the bar to open)
+│   └── ControlPanel → VCard (360px popup)
 │       ├── VCardItem: toggle buttons (color-blind, invert, scale, range, discrete)
 │       ├── VCardItem: discrete color count input (v-show when discrete)
 │       ├── VCardItem: min/max text fields (v-show when override_range)
@@ -209,7 +197,7 @@ html.Div  (top-level — flexbox row/column, bg-blue-grey-darken-2)
 ├── html.Div  (colorbar image container, position:relative)
 │   ├── html.Img  (LUT image — horizontal or vertical depending on orientation)
 │   └── html.Div  (tick overlay, position:absolute, pointer-events:none)
-│       └── html.Div v-for="tick in color_ticks"
+│       └── html.Div v-for="tick in config.color_ticks"
 │           ├── html.Div  (tick line)
 │           └── html.Span (tick label)
 └── html.Div  (max range label)
@@ -217,37 +205,15 @@ html.Div  (top-level — flexbox row/column, bg-blue-grey-darken-2)
 
 Template bindings use `config.*` via `config.provide_as("config")`.
 When one control panel opens, all others close automatically.
-
-### Vue 2 (Vuetify 2)
-
-```
-html.Div  (position:relative wrapper, height:100%)
-├── html.Div  (v-show=menu — absolutely positioned popup panel)
-│   └── ControlPanel → VCard (360px popup)
-│       ├── html.Div: toggle buttons with VTooltip wrappers
-│       ├── html.Div: discrete color count VTextField type=number
-│       ├── html.Div: min/max text fields
-│       ├── VDivider
-│       └── VList: searchable preset list with VListItemContent
-└── html.Div  (colorbar bar — click toggles menu + closes others)
-    ├── html.Div  (min range label)
-    ├── html.Div  (colorbar image + ticks, same as v3)
-    └── html.Div  (max range label)
-```
-
-Template bindings use `cb<N>_*` (top-level server state) because
-`trame-dataclass`'s `provide_as` scoped slot is Vue 3 only.
-`_compat.v2_state_prefix()` mirrors fields bidirectionally.
 The popup panel position is controlled by `popup_location`:
 `"top"` → above bar, `"bottom"` → below, `"start"` → left, `"end"` → right.
 
-The control panel reads `config.luts_normal` / `config.luts_inverted`
-(or `cb<N>_luts_normal` / `cb<N>_luts_inverted` in v2), which are
+The control panel reads `config.luts_normal` / `config.luts_inverted`,
 populated reactively by the controller when `active_presets` changes.
 
 ## Config Fields
 
-The `config` object passed to `ColormapController` and `ColormapColorbar`
+The `config` object passed to `ColormapController` and `Colorbar`
 must be a `trame.app.dataclass.StateDataModel` (or subclass) with the
 following fields. All fields are required. `ColormapConfig` in `state.py`
 provides the canonical definition with defaults.
@@ -292,7 +258,6 @@ by name — no inheritance required.
 ### Recommended: `Colorbar` (self-contained)
 
 The `Colorbar` class bundles config, controller, and UI into a single object.
-It works with both **Vuetify 2** and **Vuetify 3** — auto-detected at runtime.
 
 ```python
 from trame_colormaps import Colorbar
@@ -353,19 +318,6 @@ with layout:
 | `controller` | The `ColormapController` instance |
 | `panel` | The `ControlPanel` instance |
 
-#### Vue 2 notes
-
-For Vue 2, use `client_type="vue2"` when creating the server:
-
-```python
-server = get_server(client_type="vue2")
-```
-
-Each `Colorbar` instance mirrors its config fields to server state with a
-unique prefix (`cb0_preset`, `cb1_preset`, etc.) via `v2_state_prefix()`.
-State changes from the UI are synced back to the config and trigger
-controller updates automatically.
-
 ### Low-level: `ColormapController` + `create_colorbar`
 
 For more control, use the controller and widget functions directly:
@@ -421,7 +373,6 @@ colorbar.controller.set_data_array(
 
 ## Examples
 
-| File | Vue | Description |
-|------|-----|-------------|
-| `examples/wavelet_v3.py` | Vue 3 / Vuetify 3 | 4-region layout with toggle buttons for horizontal + vertical colorbars |
-| `examples/wavelet_v2.py` | Vue 2 / Vuetify 2 | Same layout, demonstrating Vue 2 compatibility |
+| File | Description |
+|------|-------------|
+| `examples/wavelet.py` | 4-region layout with horizontal + vertical colorbars |
