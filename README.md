@@ -3,6 +3,53 @@
 Self-contained colormap module for managing VTK color transfer
 functions, colorbar rendering, and interactive preset controls in Trame apps.
 
+## Installation
+
+```bash
+pip install trame-colormaps
+```
+
+Or with uv:
+
+```bash
+uv add trame-colormaps
+```
+
+## Development
+
+```bash
+git clone https://github.com/Kitware/trame-colormaps.git
+cd trame-colormaps
+uv pip install -e ".[dev]"
+pre-commit install
+```
+
+Run tests:
+
+```bash
+uv run pytest
+```
+
+Run the example app:
+
+```bash
+uv run python examples/wavelet.py
+```
+
+Lint and format:
+
+```bash
+uv run ruff check .
+uv run ruff format .
+```
+
+### Releasing
+
+1. Bump the version in `pyproject.toml`
+2. Commit and tag: `git tag v<version>`
+3. Push with tags: `git push --tags`
+4. GitHub Actions will build and publish to PyPI automatically
+
 ## Screenshots
 
 ### Horizontal and vertical colorbars with preset picker
