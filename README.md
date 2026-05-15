@@ -147,17 +147,17 @@ The adaptive spacing uses the symlog-transformed position of each candidate tick
 src/trame_colormaps/
 ├── __init__.py          # Re-exports: Colorbar, ColormapController, ColormapConfig
 ├── colorbar.py          # Colorbar — self-contained colorbar (config + controller + UI)
+├── control_panel.py     # Preset picker, scale mode, range, discrete settings
 ├── state.py             # ColormapConfig(StateDataModel) — reactive color state
 ├── controller.py        # ColormapController — owns LUT, wires mapper, manages presets/range/ticks
 ├── core/
 │   ├── presets.py       # Preset discovery, COLORBAR_CACHE, lut_to_img()
 │   ├── ticks.py         # Tick computation (linear, log, symlog)
 │   └── transforms.py   # LUT transforms (linear, log, symlog, discrete variants)
-├── presets/
-│   ├── paraview_colormaps.json   # 199 ParaView built-in presets
-│   ├── crameri_colormaps.json    # 60 Crameri scientific colour maps
-│   └── default_presets.json      # Active preset list with color-blind-safe flags
-└── control_panel.py # Preset picker, scale mode, range, discrete settings
+└── presets/
+    ├── paraview_colormaps.json   # 199 ParaView built-in presets
+    ├── crameri_colormaps.json    # 60 Crameri scientific colour maps
+    └── default_presets.json      # Active preset list with color-blind-safe flags
 ```
 
 ## Layer Separation
