@@ -21,8 +21,6 @@ from trame_colormaps.core.presets import (
     invert_ctf,
     lut_to_img_h,
     lut_to_img_v,
-    map_to_log_space,
-    rescale_ctf,
     set_rgb_points,
 )
 
@@ -74,42 +72,40 @@ def apply_linear(ctf, preset_name, invert=False):
         invert_ctf(ctf)
 
 
-def apply_discrete_linear(ctf, linear_rgb_points, n_sub=1, n_intervals=4):
-    """Build a discrete (stepped) linear LUT.
+def apply_discrete_linear(ctf, linear_rgb_points, n_sub=1, tick_vals=None):
+    """Build a discrete (stepped) linear LUT aligned with tick marks.
 
-    The data range is divided into *n_intervals* equal-percentage intervals.
-    Each interval is then split into *n_sub* equal sub-bands, each with a
-    flat color sampled from the continuous linear LUT at the sub-band
-    midpoint.  The boundary values are stored so tick computation can
-    place tick marks at the exact same positions.
+    Boundaries are [x_min, tick1, tick2, ..., x_max].  Each region
+    between adjacent boundaries is split into *n_sub* equal sub-bands,
+    each with a flat color sampled from the continuous linear LUT at
+    the sub-band midpoint.
 
     Args:
         ctf: vtkColorTransferFunction.
         linear_rgb_points: RGB control points from the linear LUT.
-        n_sub: Number of sub-bands per interval.
-        n_intervals: Number of equal-percentage intervals to divide the range into.
+        n_sub: Number of discrete color bands per region between ticks.
+        tick_vals: Sorted array of tick values (interior boundaries).
+            If None, falls back to a single region [x_min, x_max].
 
     Returns:
-        Tuple of (display_rgb_points, discrete_tick_data, lut_img) or
-        (None, None) if the data range is zero.
+        Tuple of (display_rgb_points, discrete_tick_data, lut_img_h, lut_img_v)
+        or (None, None, None, None) if the data range is zero.
     """
-
-    N_INTERVALS = n_intervals
     x_min, x_max = ctf.GetRange()
     data_range = x_max - x_min
     if data_range == 0:
-        return None, None
+        return None, None, None, None
 
-    # Evenly spaced boundaries (percentages of data range)
-    boundaries = [x_min + data_range * i / N_INTERVALS for i in range(N_INTERVALS + 1)]
-    # Store boundary values and their display positions (%) for tick alignment
-    discrete_tick_data = [
-        {"val": boundaries[i], "pos": i / N_INTERVALS * 100}
-        for i in range(1, N_INTERVALS)
-    ]
+    # Build boundaries from tick values: [x_min, tick1, ..., x_max]
+    boundaries = [x_min]
+    if tick_vals is not None and len(tick_vals) > 0:
+        for v in tick_vals:
+            if x_min < v < x_max:
+                boundaries.append(float(v))
+    boundaries.append(x_max)
 
     if len(boundaries) < 2:
-        return None, None
+        return None, None, None, None
 
     # Build a temporary linear CTF from the saved linear RGB points
     linear_ctf = vtkColorTransferFunction()
@@ -165,84 +161,168 @@ def apply_discrete_linear(ctf, linear_rgb_points, n_sub=1, n_intervals=4):
     # Set rendering points on the CTF
     set_rgb_points(ctf, render_rgb_points)
 
-    return display_rgb_points, discrete_tick_data, lut_img, lut_img_v
+    return display_rgb_points, None, lut_img, lut_img_v
 
 
-def apply_log(ctf, linthresh):
-    """Transform the already-prepared CTF to log scale.
+def apply_log(ctf, linthresh, linear_rgb_points=None, n_samples=256):
+    """Build a log CTF with two regions.
 
-    Uses linthresh (smallest positive non-zero data value) as the floor
-    when the range includes zero or negative values.
-    The colorbar image is captured before this call, so it stays linear.
+    [x_min, linthresh): flat color — clamped to the color at linthresh.
+    [linthresh, x_max]: log-mapped colors sampled from the linear colorbar.
 
     Args:
         ctf: vtkColorTransferFunction.
-        linthresh: Linear threshold (smallest positive non-zero data value).
+        linthresh: Floor for log mapping. Values below get clamped color.
+        linear_rgb_points: RGB control points from the linear LUT.
+        n_samples: Number of uniform samples in the log region.
+
+    Returns:
+        Tuple of (lut_img_h, lut_img_v) base64 PNG strings, or None if
+        the range is zero/invalid.
     """
     x_min, x_max = ctf.GetRange()
-    if x_max <= 0:
-        return
-    if x_min <= 0:
-        x_min = linthresh
-        rescale_ctf(ctf, x_min, x_max)
-    map_to_log_space(ctf)
+    data_range = x_max - x_min
+    if data_range == 0:
+        return None
+    if x_max <= linthresh:
+        return None
+
+    # Build a standalone linear CTF for safe color sampling
+    linear_ctf = vtkColorTransferFunction()
+    if linear_rgb_points:
+        src = linear_rgb_points
+    else:
+        src = get_rgb_points(ctf)
+    for i in range(0, len(src), 4):
+        linear_ctf.AddRGBPoint(src[i], src[i + 1], src[i + 2], src[i + 3])
+
+    # Symlog-style transform (same as tick positioning)
+    def _sl(v):
+        return np.sign(v) * np.log10(1.0 + np.abs(v) / linthresh)
+
+    sl_min = _sl(x_min)
+    sl_max = _sl(x_max)
+    sl_range = sl_max - sl_min
+    if sl_range == 0:
+        return None
+
+    rgb = [0.0, 0.0, 0.0]
+    new_rgb_points = []
+    display_rgb_points = []
+
+    # Sample the color at linthresh — this is the clamped color
+    lt_disp_frac = (_sl(linthresh) - sl_min) / sl_range
+    x_lt_lookup = x_min + lt_disp_frac * data_range
+    linear_ctf.GetColor(x_lt_lookup, rgb)
+    clamp_r, clamp_g, clamp_b = float(rgb[0]), float(rgb[1]), float(rgb[2])
+
+    # --- Region 1: [x_min, linthresh) — flat clamped color ---
+    if x_min < linthresh:
+        # Two points to create a flat band up to linthresh display position
+        new_rgb_points.extend([float(x_min), clamp_r, clamp_g, clamp_b])
+        display_rgb_points.extend([float(x_min), clamp_r, clamp_g, clamp_b])
+        d_lt = x_min + lt_disp_frac * data_range
+        new_rgb_points.extend(
+            [float(linthresh) - data_range * 1e-9, clamp_r, clamp_g, clamp_b]
+        )
+        display_rgb_points.extend([d_lt - data_range * 1e-9, clamp_r, clamp_g, clamp_b])
+
+    # --- Region 2: [linthresh, x_max] — log-mapped ---
+    log_min = np.log10(linthresh)
+    log_max = np.log10(x_max)
+    log_range = log_max - log_min
+    if log_range <= 0:
+        return None
+
+    for i in range(n_samples):
+        t = i / (n_samples - 1) if n_samples > 1 else 0.0
+        lg = log_min + t * log_range
+        v = 10.0**lg
+        v = max(linthresh, min(x_max, v))
+        # Sample color from linear colorbar at the symlog display position
+        disp_frac = (_sl(v) - sl_min) / sl_range
+        x_lookup = x_min + disp_frac * data_range
+        linear_ctf.GetColor(x_lookup, rgb)
+        r, g, b = float(rgb[0]), float(rgb[1]), float(rgb[2])
+        new_rgb_points.extend([float(v), r, g, b])
+        # Display position uses symlog transform to match tick positioning
+        d_pos = x_min + disp_frac * data_range
+        display_rgb_points.extend([float(d_pos), r, g, b])
+
+    # Generate colorbar image from display points
+    set_rgb_points(ctf, display_rgb_points)
+    lut_img = lut_to_img_h(ctf)
+    lut_img_v = lut_to_img_v(ctf)
+
+    # Store rendering points on the CTF
+    set_rgb_points(ctf, new_rgb_points)
+
+    return lut_img, lut_img_v
 
 
-def apply_discrete_log(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=256):
+def apply_discrete_log(ctf, linthresh, linear_rgb_points, n_sub=1, tick_vals=None):
     """Build a discrete (stepped) log-scale LUT.
 
-    Decade boundaries are powers of 10 from linthresh to x_max.
-    Each decade is split into *n_sub* equal sub-bands in log space,
-    each with a flat color sampled from the continuous linear LUT.
+    Below linthresh: one flat band clamped to the color at linthresh.
+    Above linthresh: decade bands from *tick_vals* (powers of 10), each
+    split into *n_sub* equal sub-bands with a flat color sampled from
+    the linear LUT.  Display positions use the symlog-style transform
+    so bands align exactly with tick marks.
 
     Args:
         ctf: vtkColorTransferFunction.
         linthresh: Linear threshold for the log floor.
         linear_rgb_points: RGB control points from the linear LUT.
         n_sub: Number of sub-bands per decade.
-        n_samples: Number of uniform samples for building the continuous log CTF.
+        tick_vals: Major tick values (powers of 10) to use as boundaries.
+            If None, decade boundaries are auto-computed.
 
     Returns:
-        Tuple of (display_rgb_points, discrete_tick_data, lut_img) or
-        (None, None, None) if the range is invalid.
+        Tuple of (display_rgb_points, discrete_tick_data, lut_img_h,
+        lut_img_v) or (None, None, None, None) if the range is invalid.
     """
     x_min, x_max = ctf.GetRange()
-    if x_max <= 0:
-        return None, None, None
-    # Clamp floor
-    x_min = max(x_min, linthresh)
-    data_range = x_max - x_min
-    if data_range == 0:
-        return None, None, None
+    if x_max <= x_min:
+        return None, None, None, None
+    lt = linthresh if linthresh is not None else 1.0
 
-    log_min = np.log10(x_min)
-    log_max = np.log10(x_max)
-    log_range = log_max - log_min
-    if log_range == 0:
-        return None, None, None
+    # Symlog-style transform (same as tick positioning)
+    def _sl(v):
+        return np.sign(v) * np.log10(1.0 + np.abs(v) / lt)
 
-    # Build decade boundaries
-    boundaries = [x_min]
-    e_lo = int(np.ceil(np.log10(x_min)))
-    e_hi = int(np.floor(np.log10(x_max)))
-    for e in range(e_lo, e_hi + 1):
-        val = 10.0**e
-        if x_min < val < x_max:
-            boundaries.append(val)
-    boundaries.append(x_max)
+    sl_min = _sl(x_min)
+    sl_max = _sl(x_max)
+    sl_range = sl_max - sl_min
+    if sl_range == 0:
+        return None, None, None, None
 
-    if len(boundaries) < 2:
-        return None, None, None
+    # Build decade boundaries: only above linthresh gets discrete bands.
+    # Below linthresh is one flat clamped band at the color of linthresh.
+    if tick_vals is not None and len(tick_vals) > 0:
+        interior = [v for v in tick_vals if lt < v < x_max and v != 0]
+    else:
+        # Fallback: auto-compute decade boundaries
+        lo_b = max(lt, 1e-30)
+        e_lo_b = int(np.floor(np.log10(lo_b)))
+        e_hi_b = int(np.floor(np.log10(max(abs(x_max), lo_b))))
+        interior = []
+        for e in range(e_lo_b, e_hi_b + 1):
+            val = 10.0**e
+            if lt < val < x_max:
+                interior.append(val)
+    # Decade boundaries: [linthresh, ..., x_max]
+    decade_boundaries = sorted(set([lt] + interior + [x_max]))
 
-    # Store boundary values and their display positions (%) for tick alignment
-    log_range_val = log_max - log_min
+    if len(decade_boundaries) < 2:
+        return None, None, None, None
+
+    # Store boundary tick data for external use
     discrete_tick_data = []
-    for bv in boundaries[1:-1]:
-        pct = (np.log10(bv) - log_min) / log_range_val * 100 if log_range_val else 0
+    for bv in decade_boundaries[1:-1]:
+        pct = (_sl(bv) - sl_min) / sl_range * 100
         discrete_tick_data.append({"val": bv, "pos": float(pct)})
 
-    # Build a continuous log CTF so discrete bands sample colours that
-    # match the continuous log rendering.
+    # Build a continuous linear CTF to sample colours from
     linear_ctf = vtkColorTransferFunction()
     for i in range(0, len(linear_rgb_points), 4):
         linear_ctf.AddRGBPoint(
@@ -251,65 +331,74 @@ def apply_discrete_log(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=256
             linear_rgb_points[i + 2],
             linear_rgb_points[i + 3],
         )
-    log_vals = np.linspace(log_min, log_max, n_samples)
-    log_ctf = vtkColorTransferFunction()
-    rgb_tmp = [0.0, 0.0, 0.0]
-    for lg in log_vals:
-        v = 10.0**lg
-        v = max(x_min, min(x_max, v))
-        t = (lg - log_min) / log_range
-        x_lookup = x_min + t * data_range
-        linear_ctf.GetColor(x_lookup, rgb_tmp)
-        log_ctf.AddRGBPoint(v, rgb_tmp[0], rgb_tmp[1], rgb_tmp[2])
 
+    data_range = x_max - x_min
     rgb = [0.0, 0.0, 0.0]
     eps_data = data_range * 1e-9
-    eps_lin = data_range * 1e-9
+    eps_disp = data_range * 1e-9
     display_rgb_points = []
     render_rgb_points = []
+
+    # --- Flat clamped band: [x_min, linthresh] at color of linthresh ---
+    # Sample the color at linthresh's display position
+    lt_disp = (_sl(lt) - sl_min) / sl_range
+    x_lt_lookup = x_min + lt_disp * data_range
+    linear_ctf.GetColor(x_lt_lookup, rgb)
+    r_lt, g_lt, b_lt = float(rgb[0]), float(rgb[1]), float(rgb[2])
+
+    # Flat band from x_min to linthresh display position
+    d_lt = x_min + lt_disp * data_range
+    display_rgb_points.extend([float(x_min), r_lt, g_lt, b_lt])
+    display_rgb_points.extend([d_lt - eps_disp, r_lt, g_lt, b_lt])
+    render_rgb_points.extend([float(x_min), r_lt, g_lt, b_lt])
+    render_rgb_points.extend([float(lt) - eps_data, r_lt, g_lt, b_lt])
+
+    # --- Discrete decade bands: [linthresh, ..., x_max] ---
     band_idx = 0
-    total_bands = (len(boundaries) - 1) * n_sub
-    for i in range(len(boundaries) - 1):
-        log_lo_decade = np.log10(boundaries[i])
-        log_hi_decade = np.log10(boundaries[i + 1])
+    total_bands = (len(decade_boundaries) - 1) * n_sub
+
+    for i in range(len(decade_boundaries) - 1):
+        b_lo = decade_boundaries[i]
+        b_hi = decade_boundaries[i + 1]
+        sl_lo = _sl(b_lo)
+        sl_hi = _sl(b_hi)
+
         for j in range(n_sub):
-            # Sub-band edges in log space
-            log_lo = log_lo_decade + (log_hi_decade - log_lo_decade) * j / n_sub
-            log_hi = log_lo_decade + (log_hi_decade - log_lo_decade) * (j + 1) / n_sub
-            log_mid = (log_lo + log_hi) / 2.0
-            # Sample color from continuous log CTF at sub-band midpoint
-            v_mid = 10.0**log_mid
-            v_mid = max(x_min, min(x_max, v_mid))
-            log_ctf.GetColor(v_mid, rgb)
+            # Sub-band edges in symlog space
+            t0 = j / n_sub
+            t1 = (j + 1) / n_sub
+            sub_sl_lo = sl_lo + (sl_hi - sl_lo) * t0
+            sub_sl_hi = sl_lo + (sl_hi - sl_lo) * t1
+            sub_sl_mid = (sub_sl_lo + sub_sl_hi) / 2.0
+
+            # Display positions as fraction of colorbar
+            disp_lo = (sub_sl_lo - sl_min) / sl_range
+            disp_hi = (sub_sl_hi - sl_min) / sl_range
+            disp_mid = (sub_sl_mid - sl_min) / sl_range
+
+            # Sample colour from linear CTF at display midpoint
+            x_lookup = x_min + disp_mid * data_range
+            linear_ctf.GetColor(x_lookup, rgb)
             r, g, b = float(rgb[0]), float(rgb[1]), float(rgb[2])
 
-            # Data-space boundaries for rendering
-            v_lo = 10.0**log_lo
-            v_hi = 10.0**log_hi
-            v_lo = max(x_min, min(x_max, v_lo))
-            v_hi = max(x_min, min(x_max, v_hi))
+            # Display-space positions
+            d_lo = x_min + disp_lo * data_range
+            d_hi = x_min + disp_hi * data_range
 
-            # Linear positions for display image
-            t_lo_pos = (log_lo - log_min) / log_range
-            t_hi_pos = (log_hi - log_min) / log_range
-            d_lo = x_min + t_lo_pos * data_range
-            d_hi = x_min + t_hi_pos * data_range
+            # Data-space positions for rendering
+            v_lo = b_lo + (b_hi - b_lo) * t0
+            v_hi = b_lo + (b_hi - b_lo) * t1
 
-            is_first = band_idx == 0
+            # First discrete band starts right after the clamped band
+            display_rgb_points.extend([d_lo + eps_disp, r, g, b])
+            render_rgb_points.extend([float(v_lo) + eps_data, r, g, b])
+
             is_last = band_idx == total_bands - 1
-
-            if is_first:
-                display_rgb_points.extend([d_lo, r, g, b])
-                render_rgb_points.extend([float(v_lo), r, g, b])
-            else:
-                display_rgb_points.extend([d_lo + eps_lin, r, g, b])
-                render_rgb_points.extend([float(v_lo) + eps_data, r, g, b])
-
             if is_last:
                 display_rgb_points.extend([d_hi, r, g, b])
                 render_rgb_points.extend([float(v_hi), r, g, b])
             else:
-                display_rgb_points.extend([d_hi - eps_lin, r, g, b])
+                display_rgb_points.extend([d_hi - eps_disp, r, g, b])
                 render_rgb_points.extend([float(v_hi) - eps_data, r, g, b])
 
             band_idx += 1

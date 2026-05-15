@@ -33,9 +33,6 @@ class TestColormapConfigDefaults:
     def test_n_discrete_colors_default(self, config):
         assert config.n_discrete_colors == 4
 
-    def test_n_intervals_default(self, config):
-        assert config.n_intervals == 4
-
     def test_n_ticks_default(self, config):
         assert config.n_ticks == 5
 

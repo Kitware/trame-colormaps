@@ -32,8 +32,8 @@ class ColormapConfig(dataclass.StateDataModel):
     - ``color_blind``: Filter the preset list to color-blind safe only.
     - ``use_log_scale``: Scale mode — ``"linear"``, ``"log"``, or ``"symlog"``.
     - ``discrete_log``: Enable discrete (stepped) color banding.
-    - ``n_discrete_colors``: Number of sub-bands per interval (1–20).
-    - ``n_intervals``: Number of equal intervals for discrete linear mode.
+    - ``n_discrete_colors``: Number of color bands between ticks (linear)
+      or per decade (log/symlog).
     - ``n_ticks``: Desired number of tick marks on the colorbar.
     - ``color_value_min`` / ``color_value_max``: Manual range strings
       entered in the text fields.
@@ -71,7 +71,6 @@ class ColormapConfig(dataclass.StateDataModel):
     use_log_scale: str = dataclass.Sync(str, "linear")
     discrete_log: bool = dataclass.Sync(bool, False)
     n_discrete_colors: int = dataclass.Sync(int, 4)
-    n_intervals: int = dataclass.Sync(int, 4)
     n_ticks: int = dataclass.Sync(int, 5)
     color_value_min: str = dataclass.Sync(str, "0")
     color_value_max: str = dataclass.Sync(str, "1")
