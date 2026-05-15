@@ -2,9 +2,9 @@
 
 import pytest
 from trame.app import get_server
+from trame_colormaps.state import ColormapConfig
 
 from trame_colormaps.core.presets import DEFAULT_PRESETS
-from trame_colormaps.state import ColormapConfig
 
 
 @pytest.fixture

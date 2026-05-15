@@ -30,7 +30,7 @@ dependencies = [
     "numpy",
     "trame>=3",
     "trame-dataclass>=2",
-    "trame-vuetify>=2",
+    "trame-vuetify>=3.2",
     "vtk>=9.6.1",
 ]
 
