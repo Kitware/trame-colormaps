@@ -138,7 +138,15 @@ class ColormapController:
         if scalar_mode in ("point", "cell"):
             self._mapper.SelectColorArray(variable_name)
         self.update_color_range()
-        self.update_color_preset()
+        self.update_color_preset(
+            self.config.preset,
+            self.config.invert,
+            self.config.use_log_scale,
+            self.config.discrete_log,
+            self.config.n_discrete_colors,
+            self.config.n_intervals,
+            self.config.n_ticks,
+        )
 
     def update_color_range(self):
         """Recompute the color range and re-apply the current preset.

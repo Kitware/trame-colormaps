@@ -19,9 +19,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "pytest",
     "ruff",
     "pre-commit",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
