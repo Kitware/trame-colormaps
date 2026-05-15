@@ -112,7 +112,8 @@ class TestApplyDiscreteLinear:
         apply_linear(ctf, PRESET_NAME)
         rescale_ctf(ctf, 0, 1)
         pts = get_rgb_points(ctf)
-        result = apply_discrete_linear(ctf, pts, n_sub=4, n_intervals=4)
+        tick_vals = np.linspace(0, 1, 6)[1:-1]  # 4 interior ticks
+        result = apply_discrete_linear(ctf, pts, n_sub=4, tick_vals=tick_vals)
         assert isinstance(result, tuple)
         assert len(result) == 4  # (display_pts, tick_data, img_h, img_v)
 
@@ -121,7 +122,8 @@ class TestApplyDiscreteLinear:
         apply_linear(ctf, PRESET_NAME)
         rescale_ctf(ctf, 0, 1)
         pts = get_rgb_points(ctf)
-        apply_discrete_linear(ctf, pts, n_sub=4, n_intervals=4)
+        tick_vals = np.linspace(0, 1, 6)[1:-1]
+        apply_discrete_linear(ctf, pts, n_sub=4, tick_vals=tick_vals)
         assert ctf.GetSize() > 0
 
     def test_different_n_sub(self):
@@ -130,13 +132,14 @@ class TestApplyDiscreteLinear:
         ctf1 = vtkColorTransferFunction()
         apply_linear(ctf1, PRESET_NAME)
         rescale_ctf(ctf1, 0, 1)
-        apply_discrete_linear(ctf1, pts, n_sub=2, n_intervals=4)
+        tick_vals = np.linspace(0, 1, 6)[1:-1]
+        apply_discrete_linear(ctf1, pts, n_sub=2, tick_vals=tick_vals)
         pts1 = get_rgb_points(ctf1)
 
         ctf2 = vtkColorTransferFunction()
         apply_linear(ctf2, PRESET_NAME)
         rescale_ctf(ctf2, 0, 1)
-        apply_discrete_linear(ctf2, pts, n_sub=8, n_intervals=4)
+        apply_discrete_linear(ctf2, pts, n_sub=8, tick_vals=tick_vals)
         pts2 = get_rgb_points(ctf2)
 
         assert pts1 != pts2

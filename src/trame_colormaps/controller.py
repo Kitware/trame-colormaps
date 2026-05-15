@@ -6,6 +6,7 @@ and rendering. Designed to be instantiated per-view and wired to a VTK mapper.
 
 import math
 
+import numpy as np
 from vtkmodules.util.numpy_support import vtk_to_numpy
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 
@@ -18,8 +19,9 @@ from trame_colormaps.core.presets import (
     rescale_ctf,
 )
 from trame_colormaps.core.ticks import (
-    compute_color_ticks,
+    format_log_tick,
     format_tick,
+    get_nice_ticks,
     tick_contrast_color,
 )
 from trame_colormaps.core.transforms import (
@@ -103,7 +105,6 @@ class ColormapController:
                 "use_log_scale",
                 "discrete_log",
                 "n_discrete_colors",
-                "n_intervals",
                 "n_ticks",
             ],
             self.update_color_preset,
@@ -144,7 +145,6 @@ class ColormapController:
             self.config.use_log_scale,
             self.config.discrete_log,
             self.config.n_discrete_colors,
-            self.config.n_intervals,
             self.config.n_ticks,
         )
 
@@ -186,7 +186,6 @@ class ColormapController:
             self.config.use_log_scale,
             self.config.discrete_log,
             self.config.n_discrete_colors,
-            self.config.n_intervals,
             self.config.n_ticks,
         )
 
@@ -197,7 +196,6 @@ class ColormapController:
         log_scale,
         discrete_log=False,
         n_discrete_colors=4,
-        n_intervals=4,
         n_ticks=5,
     ):
         """Apply a color preset with the specified scale and discrete settings.
@@ -207,8 +205,8 @@ class ColormapController:
             invert: Whether to invert the transfer function.
             log_scale: Scale mode — ``"linear"``, ``"log"``, or ``"symlog"``.
             discrete_log: Enable discrete (stepped) color banding.
-            n_discrete_colors: Number of sub-bands per interval (1–20).
-            n_intervals: Number of equal intervals for discrete linear mode.
+            n_discrete_colors: Number of color bands between ticks (linear)
+                or per decade (log/symlog).
             n_ticks: Desired number of tick marks on the colorbar.
         """
         self.config.preset = name
@@ -239,8 +237,10 @@ class ColormapController:
         n_sub = max(1, min(20, int(n_discrete_colors)))
 
         if log_scale == "linear" and discrete_log:
+            vmin, vmax = self.config.color_range
+            tick_vals = get_nice_ticks(vmin, vmax, n_ticks, scale="linear")
             result = apply_discrete_linear(
-                self._ctf, linear_rgb_points, n_sub, n_intervals=n_intervals
+                self._ctf, linear_rgb_points, n_sub, tick_vals=tick_vals
             )
             if result[0] is not None:
                 linear_rgb_points = result[0]
@@ -248,17 +248,33 @@ class ColormapController:
                 self.config.lut_img_v = result[3]
         elif log_scale == "log":
             if discrete_log:
+                # Compute major ticks (powers of 10) for discrete band boundaries
+                vmin, vmax = self.config.color_range
+                log_major_ticks = get_nice_ticks(
+                    vmin, vmax, n_ticks, scale="log", linthresh=linthresh
+                )
+                # Keep only powers of 10 as boundaries
+                major_only = [
+                    v
+                    for v in log_major_ticks
+                    if v > 0 and np.isclose(np.log10(v) % 1, 0, atol=1e-9)
+                ]
                 result = apply_discrete_log(
-                    self._ctf, linthresh, linear_rgb_points, n_sub
+                    self._ctf,
+                    linthresh,
+                    linear_rgb_points,
+                    n_sub,
+                    tick_vals=major_only,
                 )
                 if result[0] is not None:
                     linear_rgb_points = result[0]
                     self.config.lut_img_h = result[2]
                     self.config.lut_img_v = result[3]
             else:
-                apply_log(self._ctf, linthresh)
-                self.config.lut_img_h = lut_to_img_h(self._ctf)
-                self.config.lut_img_v = lut_to_img_v(self._ctf)
+                result = apply_log(self._ctf, linthresh, linear_rgb_points)
+                if result:
+                    self.config.lut_img_h = result[0]
+                    self.config.lut_img_v = result[1]
         elif log_scale == "symlog":
             if discrete_log:
                 result = apply_discrete_symlog(
@@ -277,13 +293,12 @@ class ColormapController:
         self._compute_ticks(
             linthresh=linthresh,
             linear_rgb_points=linear_rgb_points,
-            n_intervals=n_intervals,
             n_ticks=n_ticks,
         )
 
-        # For symlog (or any discrete mode), rebuild a separate CTF
+        # For log, symlog (or any discrete mode), rebuild a separate CTF
         # so the mapper gets the correct points.
-        if log_scale == "symlog" or (discrete_log and log_scale in ("log", "linear")):
+        if log_scale in ("symlog", "log") or (discrete_log and log_scale == "linear"):
             pts = get_rgb_points(self._ctf)
             render_ctf = vtkColorTransferFunction()
             for i in range(0, len(pts), 4):
@@ -346,37 +361,49 @@ class ColormapController:
         self.config.luts_normal = luts_normal
         self.config.luts_inverted = luts_inverted
 
-    def _compute_ticks(
-        self, linthresh=None, linear_rgb_points=None, n_intervals=4, n_ticks=5
-    ):
+    def _compute_ticks(self, linthresh=None, linear_rgb_points=None, n_ticks=5):
         """Compute tick positions, labels, and contrast colors for the colorbar.
 
         Args:
             linthresh: Linear threshold for log/symlog scale (None for linear).
             linear_rgb_points: RGB control points from the linear CTF, used to
                 sample contrast colors. Falls back to current CTF points.
-            n_intervals: Number of equal intervals for linear tick placement.
-            n_ticks: Desired number of tick marks for log/symlog scales.
+            n_ticks: Desired number of tick marks (all scale modes).
         """
         vmin, vmax = self.config.color_range
 
-        # Ticks are computed the same regardless of discrete mode.
-        if self.config.use_log_scale == "linear":
-            data_range = vmax - vmin
-            ticks = []
-            if data_range > 0:
-                for i in range(1, n_intervals):
-                    val = vmin + data_range * i / n_intervals
-                    pos = i / n_intervals * 100
+        data_range = vmax - vmin
+        ticks = []
+        if data_range > 0:
+            if self.config.use_log_scale == "linear":
+                tick_vals = get_nice_ticks(vmin, vmax, n_ticks, scale="linear")
+                for val in tick_vals:
+                    pos = (val - vmin) / data_range * 100
                     ticks.append({"position": round(pos, 2), "label": format_tick(val)})
-        else:
-            ticks = compute_color_ticks(
-                vmin,
-                vmax,
-                scale=self.config.use_log_scale,
-                n=n_ticks,
-                linthresh=linthresh,
-            )
+            elif self.config.use_log_scale in ("log", "symlog"):
+                lt = linthresh if linthresh is not None else 1.0
+
+                def _sl(v):
+                    return np.sign(v) * np.log10(1.0 + np.abs(v) / lt)
+
+                sl_min = float(_sl(vmin))
+                sl_max = float(_sl(vmax))
+                sl_range = sl_max - sl_min
+                tick_vals = get_nice_ticks(
+                    vmin,
+                    vmax,
+                    n_ticks,
+                    scale=self.config.use_log_scale,
+                    linthresh=linthresh,
+                )
+                for val in tick_vals:
+                    if sl_range > 0:
+                        pos = (float(_sl(val)) - sl_min) / sl_range * 100
+                    else:
+                        pos = (val - vmin) / data_range * 100
+                    ticks.append(
+                        {"position": round(pos, 2), "label": format_log_tick(val)}
+                    )
 
         # Sample colors from the *linear* CTF so tick contrast matches the
         # displayed colorbar image, not the log/symlog-remapped rendering CTF.

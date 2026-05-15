@@ -138,9 +138,8 @@ All parameters have sensible defaults and are backward-compatible keyword argume
 | Field | Default | Description |
 |-------|---------|-------------|
 | `active_presets` | `default_presets.json` | List of preset names available in the picker |
-| `n_intervals` | `4` | Number of equal intervals for discrete linear mode |
-| `n_ticks` | `5` | Desired number of tick marks on the colorbar |
-| `n_discrete_colors` | `4` | Number of sub-bands per interval (1–20) |
+| `n_ticks` | `5` | Number of tick marks on the colorbar |
+| `n_discrete_colors` | `4` | Color bands between ticks (linear) or per decade (log/symlog) |
 | `n_colors` | `255` | Number of LUT samples |
 
 These are synced to the Trame client and trigger reactive updates via the controller.
@@ -156,16 +155,15 @@ These are synced to the Trame client and trigger reactive updates via the contro
 
 | Parameter | Default | Function | Description |
 |-----------|---------|----------|-------------|
-| `n` | `5` | `compute_color_ticks()` | Desired number of tick marks |
-| `min_gap` | `7` | `compute_color_ticks()` | Minimum gap between ticks (percentage points) |
-| `edge_margin` | `3` | `compute_color_ticks()` | Minimum distance from edges (percentage points) |
-| `linthresh` | `1.0` (symlog), `1e-15` (log) | `get_nice_ticks()`, `compute_color_ticks()` | Linear threshold for log/symlog scales |
+| `n` | `5` | `get_nice_ticks()` | Desired number of ticks |
+| `scale` | `"linear"` | `get_nice_ticks()` | Scale mode: `"linear"`, `"log"`, or `"symlog"` |
+| `linthresh` | `1.0` | `get_nice_ticks()` | Linear threshold for log/symlog scales |
 
 ### Tick mark behavior
 
 Tick marks are computed identically for discrete and continuous modes:
 
-- **Linear**: evenly spaced interval boundaries (e.g. 25%, 50%, 75% for `n_intervals=4`)
+- **Linear**: evenly spaced (e.g. 20%, 40%, 60%, 80% for `n_ticks=4`)
 - **Log**: only powers of 10 (decade marks) that fall within the data range
 - **Symlog**: powers of 10 filtered by visual position spacing — ticks far from zero (where the symlog transform expands the scale) are shown at every decade, while ticks near zero (where the transform compresses values) are adaptively thinned to prevent overlap. Zero is always shown when it falls within the data range and away from edges.
 
@@ -175,8 +173,8 @@ The adaptive spacing uses the symlog-transformed position of each candidate tick
 
 | Parameter | Default | Function | Description |
 |-----------|---------|----------|-------------|
-| `n_intervals` | `4` | `apply_discrete_linear()` | Number of equal intervals to divide the data range |
-| `n_sub` | `1` | All `apply_discrete_*()` functions | Number of sub-bands per interval/decade |
+| `n_ticks` | `4` | `apply_discrete_linear()` | Number of tick marks (creates `n_ticks + 1` equal gaps) |
+| `n_sub` | `1` | All `apply_discrete_*()` functions | Number of color bands per gap (linear) or per decade (log/symlog) |
 | `n_samples` | `256` | `apply_discrete_log()`, `apply_symlog()`, `apply_discrete_symlog()` | Resampling resolution for building continuous CTFs |
 
 ## Dependencies
@@ -266,9 +264,8 @@ provides the canonical definition with defaults.
 | `color_blind` | `bool` | `False` | Filter preset list to color-blind safe |
 | `use_log_scale` | `str` | `"linear"` | Scale mode: `"linear"`, `"log"`, `"symlog"` |
 | `discrete_log` | `bool` | `False` | Enable discrete banding |
-| `n_discrete_colors` | `int` | `4` | Number of discrete sub-bands (1–20) |
-| `n_intervals` | `int` | `4` | Equal intervals for discrete linear mode |
-| `n_ticks` | `int` | `5` | Desired tick marks on the colorbar |
+| `n_discrete_colors` | `int` | `4` | Color bands between ticks (linear) or per decade (log/symlog) |
+| `n_ticks` | `int` | `5` | Number of tick marks on the colorbar |
 | `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
 | `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
 | `override_range` | `bool` | `False` | Use manual range instead of data range |
