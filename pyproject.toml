@@ -9,6 +9,23 @@ description = "Self-contained colormap module for VTK color transfer functions i
 readme = "README.md"
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.10"
+authors = [
+    {name = "Kitware, Inc.", email = "trame@kitware.com"},
+]
+keywords = ["trame", "vtk", "colormap", "scientific-visualization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
 dependencies = [
     "numpy",
     "trame>=3",
@@ -17,11 +34,18 @@ dependencies = [
     "vtk>=9.6.1",
 ]
 
+[project.urls]
+Homepage = "https://github.com/Kitware/trame-colormaps"
+Repository = "https://github.com/Kitware/trame-colormaps"
+Issues = "https://github.com/Kitware/trame-colormaps/issues"
+
 [project.optional-dependencies]
 dev = [
+    "build",
+    "pre-commit",
     "pytest",
     "ruff",
-    "pre-commit",
+    "twine",
 ]
 
 [tool.pytest.ini_options]
