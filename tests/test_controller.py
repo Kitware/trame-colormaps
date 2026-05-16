@@ -2,11 +2,10 @@
 
 import pytest
 from trame.app import get_server
-from vtkmodules.vtkCommonCore import vtkDoubleArray
-from vtkmodules.vtkRenderingCore import vtkDataSetMapper
-
 from trame_colormaps.controller import ColormapController
 from trame_colormaps.state import ColormapConfig
+from vtkmodules.vtkCommonCore import vtkDoubleArray
+from vtkmodules.vtkRenderingCore import vtkDataSetMapper
 
 # --- Fixtures ---
 
