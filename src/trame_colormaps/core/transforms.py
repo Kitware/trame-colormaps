@@ -8,7 +8,7 @@ Provides functions that operate on vtkColorTransferFunction objects to apply:
 - Symlog (symmetric log) mapping
 - Discrete symlog banding
 
-These functions are designed to be called by the ColormapController but
+These functions are designed to be called by ColormapConfig but
 have no framework dependencies beyond VTK and numpy.
 """
 
@@ -429,7 +429,8 @@ def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256):
         n_samples: Number of uniform samples in symlog space for building the CTF.
 
     Returns:
-        Base64 PNG colorbar image string, or None if the range is zero.
+        Tuple of (lut_img_h, lut_img_v) base64 PNG strings, or None if
+        the range is zero.
     """
     x_min, x_max = ctf.GetRange()
     data_range = x_max - x_min
@@ -516,13 +517,13 @@ def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=
         n_samples: Number of uniform samples in symlog space for building the CTF.
 
     Returns:
-        Tuple of (display_rgb_points, discrete_tick_data, lut_img) or
-        (None, None, None) if the range is zero.
+        Tuple of (display_rgb_points, discrete_tick_data, lut_img_h,
+        lut_img_v) or (None, None, None, None) if the range is zero.
     """
     x_min, x_max = ctf.GetRange()
     data_range = x_max - x_min
     if data_range == 0:
-        return None, None, None
+        return None, None, None, None
 
     def symlog(v):
         """Symmetric log: sign(v) * log10(1 + |v|/linthresh)."""
@@ -565,14 +566,14 @@ def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=
     boundaries = sorted(b for b in boundaries if x_min <= b <= x_max)
 
     if len(boundaries) < 2:
-        return None, None, None
+        return None, None, None, None
 
     # Symlog range for normalization
     s_min = float(symlog(x_min))
     s_max = float(symlog(x_max))
     s_range = s_max - s_min
     if s_range == 0:
-        return None, None, None
+        return None, None, None, None
 
     # Store boundary values and their display positions (%) for tick alignment.
     all_tick_data = []
