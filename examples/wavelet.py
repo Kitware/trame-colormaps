@@ -4,10 +4,12 @@ A fully synthetic VTK pipeline that demonstrates trame-colormaps:
 - vtkRTAnalyticSource generates a 3D structured grid with the "RTData" scalar.
 - Contour iso-surfaces are clipped by a plane so you can see inside.
 - A slice plane through the center shows continuous vs discrete coloring.
-- ColormapController manages the color transfer function and wires it to
+- Both pipelines are merged via vtkAppendPolyData into a single mapper.
+- ColormapConfig manages the color transfer function and wires it to
   the mapper.
-- The colorbar widget provides an interactive preset picker, scale modes
-  (linear / log / symlog), discrete banding, and manual range override.
+- Four colorbar widgets (top, bottom, left, right) each provide an
+  interactive preset picker, scale modes (linear / log / symlog),
+  discrete banding, and manual range override.
 
 Run:
     cd <repo_root>
@@ -20,7 +22,12 @@ import vtkmodules.vtkRenderingOpenGL2  # noqa: F401
 from trame.app import TrameApp
 from trame.ui.vuetify3 import SinglePageLayout
 from vtkmodules.vtkCommonDataModel import vtkPlane
-from vtkmodules.vtkFiltersCore import vtkClipPolyData, vtkContourFilter, vtkCutter
+from vtkmodules.vtkFiltersCore import (
+    vtkAppendPolyData,
+    vtkClipPolyData,
+    vtkContourFilter,
+    vtkCutter,
+)
 from vtkmodules.vtkImagingCore import vtkRTAnalyticSource
 from vtkmodules.vtkRenderingCore import (
     vtkActor,
@@ -44,27 +51,27 @@ class WaveletColorMapDemo(TrameApp):
 
         self.top = colormaps.ColormapConfig(
             self.server,
-            mapper=self.contour_mapper,
+            mapper=self.mapper,
             data_array_fn=self.get_data_array,
-        ).set_data_array("RTData", self.get_data_array, "points")
+        ).set_data_array("RTData", self.get_data_array, "point")
 
         self.right = colormaps.ColormapConfig(
             self.server,
-            mapper=self.contour_mapper,
+            mapper=self.mapper,
             data_array_fn=self.get_data_array,
-        ).set_data_array("RTData", self.get_data_array, "points")
+        ).set_data_array("RTData", self.get_data_array, "point")
 
         self.left = colormaps.ColormapConfig(
             self.server,
-            mapper=self.slice_mapper,
+            mapper=self.mapper,
             data_array_fn=self.get_data_array,
-        ).set_data_array("RTData", self.get_data_array, "points")
+        ).set_data_array("RTData", self.get_data_array, "point")
 
         self.bottom = colormaps.ColormapConfig(
             self.server,
-            mapper=self.slice_mapper,
+            mapper=self.mapper,
             data_array_fn=self.get_data_array,
-        ).set_data_array("RTData", self.get_data_array, "points")
+        ).set_data_array("RTData", self.get_data_array, "point")
 
         # Auto render when mapper update
         for colormap in [self.top, self.right, self.bottom, self.left]:
@@ -94,12 +101,6 @@ class WaveletColorMapDemo(TrameApp):
         clip_contour.SetClipFunction(clip_plane)
         clip_contour.Update()
 
-        contour_mapper = vtkPolyDataMapper()
-        contour_mapper.SetInputConnection(clip_contour.GetOutputPort())
-
-        contour_actor = vtkActor()
-        contour_actor.SetMapper(contour_mapper)
-
         # --- Slice plane (perpendicular to clip — shows scalar gradient) ---
         slice_plane = vtkPlane()
         slice_plane.SetOrigin(0, 0, 0)
@@ -110,16 +111,21 @@ class WaveletColorMapDemo(TrameApp):
         slicer.SetCutFunction(slice_plane)
         slicer.Update()
 
-        slice_mapper = vtkPolyDataMapper()
-        slice_mapper.SetInputConnection(slicer.GetOutputPort())
+        # --- Merge contour + slice into one mapper ---
+        append = vtkAppendPolyData()
+        append.AddInputConnection(clip_contour.GetOutputPort())
+        append.AddInputConnection(slicer.GetOutputPort())
+        append.Update()
 
-        slice_actor = vtkActor()
-        slice_actor.SetMapper(slice_mapper)
+        mapper = vtkPolyDataMapper()
+        mapper.SetInputConnection(append.GetOutputPort())
+
+        actor = vtkActor()
+        actor.SetMapper(mapper)
 
         # --- Renderer ---
         renderer = vtkRenderer()
-        renderer.AddActor(contour_actor)
-        renderer.AddActor(slice_actor)
+        renderer.AddActor(actor)
         renderer.SetBackground(0.15, 0.15, 0.15)
         renderer.ResetCamera()
 
@@ -134,8 +140,7 @@ class WaveletColorMapDemo(TrameApp):
         # Capture variables on class
         self.wavelet = wavelet
         self.render_window = render_window
-        self.contour_mapper = contour_mapper
-        self.slice_mapper = slice_mapper
+        self.mapper = mapper
 
     def get_data_array(self):
         """Return the active scalar array from the wavelet output."""
