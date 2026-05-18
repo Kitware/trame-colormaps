@@ -71,12 +71,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate artifact attestation for sdist and wheel
-        if: steps.release.outputs.released == 'true'
-        uses: actions/attest-build-provenance@v4.1.0
-        with:
-          subject-path: "dist/*"
-
       # https://docs.pypi.org/trusted-publishers/using-a-publisher/
       - uses: pypa/gh-action-pypi-publish@release/v1
         if: steps.release.outputs.released == 'true'
