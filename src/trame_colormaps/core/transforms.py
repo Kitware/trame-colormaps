@@ -222,9 +222,7 @@ def apply_log(ctf, linthresh, linear_rgb_points=None, n_samples=256):
         new_rgb_points.extend([float(x_min), clamp_r, clamp_g, clamp_b])
         display_rgb_points.extend([float(x_min), clamp_r, clamp_g, clamp_b])
         d_lt = x_min + lt_disp_frac * data_range
-        new_rgb_points.extend(
-            [float(linthresh) - data_range * 1e-9, clamp_r, clamp_g, clamp_b]
-        )
+        new_rgb_points.extend([float(linthresh) - data_range * 1e-9, clamp_r, clamp_g, clamp_b])
         display_rgb_points.extend([d_lt - data_range * 1e-9, clamp_r, clamp_g, clamp_b])
 
     # --- Region 2: [linthresh, x_max] — log-mapped ---
@@ -594,9 +592,7 @@ def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=
         neg_outward = list(reversed(neg))
         thinned_neg = [neg_outward[i] for i in range(0, len(neg_outward), 2)]
         thinned_pos = [pos[i] for i in range(0, len(pos), 2)]
-        discrete_tick_data = sorted(
-            thinned_neg + zero + thinned_pos, key=lambda t: t["val"]
-        )
+        discrete_tick_data = sorted(thinned_neg + zero + thinned_pos, key=lambda t: t["val"])
     else:
         discrete_tick_data = all_tick_data
 

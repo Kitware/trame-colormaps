@@ -1,3 +1,14 @@
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "trame>=3.13.2",
+#     "trame-colormaps>=1",
+#     "trame-vtk",
+#     "trame-vuetify",
+# ]
+# ///
 """Example: Wavelet with clipped contour + slice plane.
 
 A fully synthetic VTK pipeline that demonstrates trame-colormaps:
@@ -184,9 +195,7 @@ class WaveletColorMapDemo(TrameApp):
                         ),
                         self.left.provide_as("left"),
                     ):
-                        with html.Div(
-                            style="position:absolute;top:0;bottom:0;left:0;right:0;"
-                        ):
+                        with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                             VerticalScalarBar("left", popup_location="right")
 
                     # Middle
@@ -207,9 +216,7 @@ class WaveletColorMapDemo(TrameApp):
                         ),
                         self.right.provide_as("right"),
                     ):
-                        with html.Div(
-                            style="position:absolute;top:0;bottom:0;left:0;right:0;"
-                        ):
+                        with html.Div(style="position:absolute;top:0;bottom:0;left:0;right:0;"):
                             VerticalScalarBar("right", popup_location="left")
 
                     # Bottom

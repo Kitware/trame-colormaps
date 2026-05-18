@@ -34,8 +34,7 @@ import urllib.request
 from pathlib import Path
 
 SOURCE_URL = (
-    "https://gitlab.kitware.com/paraview/paraview/"
-    "-/raw/master/Remoting/Views/ColorMaps.json"
+    "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json"
 )
 SOURCE_LICENSE = "BSD-3-Clause"
 

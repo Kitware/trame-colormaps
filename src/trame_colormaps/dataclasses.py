@@ -481,15 +481,11 @@ class ColormapConfig(StateDataModel):
                         pos = (float(_sl(val)) - sl_min) / sl_range * 100
                     else:
                         pos = (val - vmin) / data_range * 100
-                    ticks.append(
-                        {"position": round(pos, 2), "label": format_log_tick(val)}
-                    )
+                    ticks.append({"position": round(pos, 2), "label": format_log_tick(val)})
 
         # Sample colors from the *linear* CTF so tick contrast matches the
         # displayed colorbar image, not the log/symlog-remapped rendering CTF.
-        rgb_points = (
-            linear_rgb_points if linear_rgb_points else get_rgb_points(self._ctf)
-        )
+        rgb_points = linear_rgb_points if linear_rgb_points else get_rgb_points(self._ctf)
         if len(rgb_points) < 4:
             self.color_ticks = []
             return
@@ -715,9 +711,7 @@ class ColormapConfig(StateDataModel):
                     self.lut_img_v = result[1]
         elif log_scale == "symlog":
             if discrete_log:
-                result = apply_discrete_symlog(
-                    self._ctf, linthresh, linear_rgb_points, n_sub
-                )
+                result = apply_discrete_symlog(self._ctf, linthresh, linear_rgb_points, n_sub)
                 if result[0] is not None:
                     linear_rgb_points = result[0]
                     self.lut_img_h = result[2]

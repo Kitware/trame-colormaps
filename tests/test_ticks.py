@@ -103,9 +103,7 @@ class TestGetNiceTicks:
     def test_log_majors_first(self):
         """Majors (powers of 10) should appear before any minors."""
         ticks = get_nice_ticks(0, 276, 5, scale="log", linthresh=37.35)
-        powers = [
-            t for t in ticks if t > 0 and np.isclose(np.log10(t) % 1, 0, atol=1e-9)
-        ]
+        powers = [t for t in ticks if t > 0 and np.isclose(np.log10(t) % 1, 0, atol=1e-9)]
         assert len(powers) >= 1
 
     def test_log_nice_minors(self):
@@ -116,9 +114,7 @@ class TestGetNiceTicks:
                 continue
             mantissa = t / 10.0 ** int(np.floor(np.log10(t)))
             nice = {1, 2, 2.5, 3, 4, 5, 6, 7, 7.5, 8, 9, 10}
-            assert any(np.isclose(mantissa, n, atol=0.01) for n in nice), (
-                f"{t} not nice"
-            )
+            assert any(np.isclose(mantissa, n, atol=0.01) for n in nice), f"{t} not nice"
 
     def test_symlog_has_negative_and_positive(self):
         ticks = get_nice_ticks(-1000, 1000, 10, scale="symlog", linthresh=1.0)
@@ -132,9 +128,5 @@ class TestGetNiceTicks:
     def test_symlog_majors_before_minors(self):
         """At least one power of 10 should be present."""
         ticks = get_nice_ticks(-276, 276, 9, scale="symlog", linthresh=37.35)
-        powers = [
-            t
-            for t in ticks
-            if t != 0 and np.isclose(np.log10(abs(t)) % 1, 0, atol=1e-9)
-        ]
+        powers = [t for t in ticks if t != 0 and np.isclose(np.log10(abs(t)) % 1, 0, atol=1e-9)]
         assert len(powers) >= 1

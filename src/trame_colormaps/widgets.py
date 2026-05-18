@@ -14,21 +14,14 @@ __all__ = [
 def buttons(name):
     return [
         {
-            "icon": (
-                f"{name}.color_blind ? 'mdi-shield-check-outline' : 'mdi-palette'"
-            ),
+            "icon": (f"{name}.color_blind ? 'mdi-shield-check-outline' : 'mdi-palette'"),
             "click": f"{name}.color_blind = !{name}.color_blind",
-            "tip": (
-                f"'Toggle to ' + ({name}.color_blind ? "
-                "'All Colors' : 'Colorblind Safe')"
-            ),
+            "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
         },
         {
             "icon": f"{name}.invert ? 'mdi-invert-colors' : 'mdi-invert-colors-off'",
             "click": f"{name}.invert = !{name}.invert",
-            "tip": (
-                f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"
-            ),
+            "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
         },
         {
             "icon": (
@@ -53,17 +46,11 @@ def buttons(name):
         {
             "icon": f"{name}.diverging ? 'mdi-triangle' : 'mdi-triangle-outline'",
             "click": f"{name}.diverging = !{name}.diverging",
-            "tip": (
-                f"'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"
-            ),
+            "tip": (f"'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"),
         },
         {
-            "icon": (
-                f"{name}.override_range ? 'mdi-arrow-expand-horizontal' : 'mdi-pencil'"
-            ),
-            "click": (
-                f"!{name}.diverging && ({name}.override_range = !{name}.override_range)"
-            ),
+            "icon": (f"{name}.override_range ? 'mdi-arrow-expand-horizontal' : 'mdi-pencil'"),
+            "click": (f"!{name}.diverging && ({name}.override_range = !{name}.override_range)"),
             "tip": (
                 f"{name}.diverging ? 'Range locked in Δ mode'"
                 f" : 'Toggle to ' + ({name}.override_range ? "
@@ -72,8 +59,7 @@ def buttons(name):
         },
         {
             "icon": (
-                f"{name}.discrete_log ? 'mdi-view-sequential' :"
-                " 'mdi-gradient-horizontal'"
+                f"{name}.discrete_log ? 'mdi-view-sequential' : 'mdi-gradient-horizontal'"
             ),
             "click": f"{name}.discrete_log = !{name}.discrete_log",
             "tip": f"'Toggle to ' + ({name}.discrete_log ? 'Continuous' : 'Discrete')",
@@ -224,9 +210,7 @@ class ColorMapEditor(v3.VCard):
                 f"{name}.n_colors"
                 "]"
             )
-            _v_for = (
-                f"entry in ({name}.invert ? {name}.luts_inverted : {name}.luts_normal)"
-            )
+            _v_for = f"entry in ({name}.invert ? {name}.luts_inverted : {name}.luts_normal)"
             _v_show = (
                 f"({name}.search && {name}.search.length"
                 f" ? entry.name.toLowerCase().includes({name}.search.toLowerCase())"
@@ -308,9 +292,7 @@ class HorizontalScalarBar(html.Div):
 class VerticalScalarBar(html.Div):
     def __init__(self, name, popup_location="top", **kwargs):
         super().__init__(
-            classes=(
-                "tcmap-vertical bg-blue-grey-darken-2 d-flex flex-column align-center"
-            ),
+            classes=("tcmap-vertical bg-blue-grey-darken-2 d-flex flex-column align-center"),
         )
         self.server.enable_module(module)
 

@@ -45,21 +45,15 @@ def _init_registry():
     color_blind = {n for n, p in registry.items() if p.get("ColorBlindSafe", False)}
     defaults_path = _PRESET_DIR / "default_presets.json"
     defaults = (
-        json.loads(defaults_path.read_text())
-        if defaults_path.exists()
-        else sorted(all_names)
+        json.loads(defaults_path.read_text()) if defaults_path.exists() else sorted(all_names)
     )
 
     # Category-based preset sets
-    diverging = {
-        n for n, p in registry.items() if p.get("Category", "").lower() == "diverging"
-    }
+    diverging = {n for n, p in registry.items() if p.get("Category", "").lower() == "diverging"}
     sequential = {
         n for n, p in registry.items() if p.get("Category", "").lower() == "sequential"
     }
-    cyclic = {
-        n for n, p in registry.items() if p.get("Category", "").lower() == "cyclic"
-    }
+    cyclic = {n for n, p in registry.items() if p.get("Category", "").lower() == "cyclic"}
     categorical = {
         n
         for n, p in registry.items()

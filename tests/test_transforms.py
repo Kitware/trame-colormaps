@@ -204,9 +204,7 @@ class TestApplyDiscreteSymlog:
         apply_linear(ctf, PRESET_NAME)
         rescale_ctf(ctf, -1000.0, 1000.0)
         pts = get_rgb_points(ctf)
-        result = apply_discrete_symlog(
-            ctf, linthresh=1.0, linear_rgb_points=pts, n_sub=4
-        )
+        result = apply_discrete_symlog(ctf, linthresh=1.0, linear_rgb_points=pts, n_sub=4)
         assert isinstance(result, tuple)
         assert len(result) == 4
 

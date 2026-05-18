@@ -51,13 +51,10 @@ def get_nice_ticks(vmin, vmax, n, scale="linear", linthresh=None):
         # Filter out ticks too close to edges
         if len(raw_ticks) > 0:
             raw_ticks = raw_ticks[
-                (raw_ticks > vmin + data_range * 0.01)
-                & (raw_ticks < vmax - data_range * 0.01)
+                (raw_ticks > vmin + data_range * 0.01) & (raw_ticks < vmax - data_range * 0.01)
             ]
         # Priority: always include 0 if range spans negative to positive
-        if vmin < 0 < vmax and not np.any(
-            np.isclose(raw_ticks, 0.0, atol=nice_step * 1e-9)
-        ):
+        if vmin < 0 < vmax and not np.any(np.isclose(raw_ticks, 0.0, atol=nice_step * 1e-9)):
             raw_ticks = np.sort(np.append(raw_ticks, 0.0))
         return raw_ticks
     elif scale == "log":
