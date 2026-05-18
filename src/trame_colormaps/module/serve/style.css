@@ -1,0 +1,102 @@
+:root {
+  --tcmap-editor-size: 360px;
+}
+
+.tcmap-editor {
+  max-width: var(--tcmap-editor-size);
+  min-width: var(--tcmap-editor-size);
+}
+
+.tcmap-editor-icon {
+  min-width: 0;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0;
+}
+
+.tcmap-editor-search {
+  max-width: 120px;
+}
+
+.tcmap-img-preset {
+  width: 100%;
+  min-width: 20rem;
+  height: 1rem;
+}
+
+.tcmap-horizontal {
+  width: 100%;
+  height: 1rem;
+  user-select: none;
+  cursor: context-menu;
+}
+
+.tcmap-vertical {
+  width: 1rem;
+  height: 100%;
+  user-select: none;
+  cursor: context-menu;
+}
+
+.tcmap-vertical-labels {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  padding: 2px 0;
+}
+
+.tcmap-h-img-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.tcmap-v-img-container {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  min-height: 0;
+}
+
+.tcmap-h-img-container > img {
+  height: 2rem;
+  width: 100%;
+}
+
+.tcmap-v-img-container > img {
+  height: 100%;
+  width: 2rem;
+}
+
+.tcmap-ticks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.tcmap-tick-container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.tcmap-tick-line-h {
+  width: 1.5px;
+  height: 25%;
+}
+
+.tcmap-tick-line-v {
+  height: 1.5px;
+  width: 25%;
+}
+
+.tcmap-tick-label {
+  font-size: 0.5rem;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 2px;
+}
