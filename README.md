@@ -18,29 +18,37 @@ uv add trame-colormaps
 ## Development
 
 ```bash
+# Get code
 git clone https://github.com/Kitware/trame-colormaps.git
 cd trame-colormaps
-uv pip install -e ".[dev]"
+
+# Create venv and install all dependencies
+uv sync --all-extras --dev
+
+# Activate environment
+source .venv/bin/activate
+
+# Install commit analysis
 pre-commit install
+pre-commit install --hook-type commit-msg
 ```
 
 Run tests:
 
 ```bash
-uv run pytest
+pytest
 ```
 
 Run the example app:
 
 ```bash
-uv run python examples/wavelet.py
+python ./examples/wavelet.py
 ```
 
 Lint and format:
 
 ```bash
-uv run ruff check .
-uv run ruff format .
+pre-commit run --all-files
 ```
 
 ### Releasing

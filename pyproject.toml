@@ -1,23 +1,23 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools-scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "trame-colormaps"
 version = "1.0.0"
 description = "Self-contained colormap module for VTK color transfer functions in Trame apps"
 readme = "README.md"
-license = {text = "BSD-3-Clause"}
+license = {text = "Apache Software License"}
 requires-python = ">=3.10"
 authors = [
     {name = "Kitware, Inc.", email = "trame@kitware.com"},
 ]
 keywords = ["trame", "vtk", "colormap", "scientific-visualization"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -41,24 +41,30 @@ Issues = "https://github.com/Kitware/trame-colormaps/issues"
 
 [project.optional-dependencies]
 dev = [
-    "build",
     "pre-commit",
     "pytest",
     "ruff",
-    "twine",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
 
-[tool.setuptools.package-data]
-trame_colormaps = ["presets/*.json"]
+[tool.hatch.build]
+include = [
+  "/src/**/*.py",
+  "/src/trame_colormaps/**/*.css",
+  "/src/trame_colormaps/**/*.json",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/trame",
+    "src/trame_colormaps",
+]
 
 [tool.ruff]
-line-length = 88
+line-length = 96
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
@@ -70,3 +76,20 @@ select = ["E", "F", "I", "W"]
 
 [tool.codespell]
 ignore-words-list = "buda,te,nd"
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:project.version",
+]
+version_variables = [
+    "src/trame_colormaps/__init__.py:__version__",
+]
+
+build_command = """
+    python -m pip install uv
+    uv build
+"""
+
+[tool.semantic_release.publish]
+dist_glob_patterns = ["dist/*"]
+upload_to_vcs_release = true

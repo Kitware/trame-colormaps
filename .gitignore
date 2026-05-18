@@ -7,3 +7,4 @@ build/
 *.egg
 .ruff_cache/
 uv.lock
+.DS_Store
