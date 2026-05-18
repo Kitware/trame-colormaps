@@ -32,7 +32,7 @@ def buttons(name):
         {
             "icon": (
                 f"{name}.use_log_scale === 'log' ? 'mdi-math-log' : "
-                "{name}.use_log_scale === 'symlog' ? 'mdi-sine-wave' : 'mdi-stairs'"
+                f"{name}.use_log_scale === 'symlog' ? 'mdi-sine-wave' : 'mdi-stairs'"
             ),
             "click": (
                 f"{name}.use_log_scale = {name}.use_log_scale === 'linear' ? 'log' : "
@@ -330,13 +330,13 @@ class VerticalScalarBar(html.Div):
                             "width:100%;"
                             "transform:translateY(-50%);"
                             "display:flex;"
-                            "flex-direction:column;"
+                            "flex-direction:row;"
                             "align-items:center;`",
                         ),
                     ):
                         html.Div(
                             style=(
-                                "`height:1.5px;width:30%;background:${tick.color};`",
+                                "`width:100%;height:1.5px;background:${tick.color};`",
                             ),
                         )
                         html.Span(
@@ -347,11 +347,9 @@ class VerticalScalarBar(html.Div):
                                 "white-space: nowrap;"
                                 "color: ${tick.color};"
                                 "writing-mode:vertical-lr;"
-                                "transform: rotate(180deg);`",
+                                "transform: rotate(180deg);"
+                                "padding-left:2px;`",
                             ),
-                        )
-                        html.Div(
-                            style=("`height:1.5px;flex:1;background:${tick.color};`",),
                         )
             # Min label at bottom
             html.Div(

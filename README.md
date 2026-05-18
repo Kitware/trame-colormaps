@@ -67,22 +67,24 @@ and discrete settings. Only one panel can be open at a time.
 
 A production app using `trame-colormaps` for climate data visualization.
 Each data variable gets its own horizontal colorbar at the bottom of the view,
-with symlog tick marks that adapt to the data range. This is the simplest
-integration pattern — a single `Colorbar` with `orientation="horizontal"`
-placed in a footer.
+with symlog tick marks that adapt to the data range.
 
 ## Public API
 
-All public symbols are exported from `trame_colormaps/__init__.py`:
+Import via the trame namespace:
 
-| Symbol | Source | Purpose |
-|--------|--------|--------|
-| `Colorbar` | `colorbar.py` | **Recommended.** Self-contained colorbar: owns config, controller, and UI. |
-| `create_colorbar` | `colorbar.py` | Colorbar for composed configs (when colormap fields live in a larger StateDataModel) |
-| `ColormapController` | `controller.py` | Per-view CTF manager: creates CTF, wires mapper, manages presets/range/ticks |
-| `ColormapConfig` | `state.py` | Reactive state model with all colormap fields (standalone use) |
-| `ControlPanel` | `control_panel.py` | Class-based control panel (used internally by `Colorbar`) |
-| `create_control_panel` | `control_panel.py` | Standalone control panel (preset picker, scale, range, discrete) |
+```python
+from trame.dataclasses.colormaps import ColormapConfig
+from trame.widgets.colormaps import HorizontalScalarBar, VerticalScalarBar, ColorMapEditor
+```
+
+| Symbol | Module | Purpose |
+|--------|--------|---------|
+| `ColormapConfig` | `trame_colormaps.dataclasses` | Reactive state model — owns CTF, mapper, presets, range, ticks |
+| `HorizontalScalarBar` | `trame_colormaps.widgets` | Horizontal colorbar widget with built-in control panel |
+| `VerticalScalarBar` | `trame_colormaps.widgets` | Vertical colorbar widget with built-in control panel |
+| `ColorMapEditor` | `trame_colormaps.widgets` | Preset picker / control panel popup (used internally by scalar bars) |
+| `buttons` | `trame_colormaps.widgets` | Returns button config dicts for the control panel toolbar |
 
 ## Preset Data Sources
 
@@ -129,20 +131,141 @@ set_active_presets(["Cool to Warm", "batlow", "vik", "Viridis (matplotlib)"])
 set_active_presets("/path/to/my_presets.json")
 ```
 
+## Usage
+
+### Basic: single colorbar
+
+```python
+from trame.app import TrameApp
+from trame.dataclasses.colormaps import ColormapConfig
+from trame.widgets.colormaps import HorizontalScalarBar
+
+class MyApp(TrameApp):
+    def __init__(self, server=None):
+        super().__init__(server)
+        # ... set up VTK pipeline, mapper, etc. ...
+
+        self.colormap = ColormapConfig(
+            self.server,
+            mapper=self.mapper,
+            data_array_fn=self.get_data_array,
+        ).set_data_array("Temperature", self.get_data_array, "point")
+
+        # Re-render when the colormap updates the mapper
+        self.colormap.watch(["mapper_change"], self.render)
+
+        self._build_ui()
+
+    def get_data_array(self):
+        ds = self.source.GetOutput()
+        return ds.GetPointData().GetScalars() if ds else None
+
+    def render(self, *_):
+        self.ctx.view.update()
+
+    def _build_ui(self):
+        with SinglePageLayout(self.server) as self.ui:
+            with self.ui.content:
+                # ... 3D view ...
+                with self.colormap.provide_as("bar"):
+                    HorizontalScalarBar("bar", popup_location="top")
+```
+
+### Multiple colorbars
+
+Each `ColormapConfig` instance is independent. When one control panel opens,
+all others close automatically:
+
+```python
+self.top = ColormapConfig(server, mapper=mapper, data_array_fn=get_data)
+self.top.set_data_array("RTData", get_data, "point")
+
+self.left = ColormapConfig(server, mapper=mapper, data_array_fn=get_data)
+self.left.set_data_array("RTData", get_data, "point")
+
+# In UI:
+with self.top.provide_as("top"):
+    HorizontalScalarBar("top", popup_location="bottom")
+
+with self.left.provide_as("left"):
+    VerticalScalarBar("left", popup_location="right")
+```
+
+### Updating color range after data changes
+
+When the underlying data changes (e.g. new data loaded, pipeline update),
+call `update_color_range()` to recompute the range, re-apply transforms,
+and regenerate ticks:
+
+```python
+self.colormap.update_color_range()
+```
+
+### Switching data array at runtime
+
+To color by a different variable without creating a new `ColormapConfig`:
+
+```python
+self.colormap.set_data_array(
+    "Pressure",
+    data_array_fn=lambda: get_pressure_array(),
+    scalar_mode="point",  # "cell" (default), "point", or "default"
+)
+```
+
+## ColormapConfig Fields
+
+`ColormapConfig` in `dataclasses.py` is a `trame.app.dataclass.StateDataModel`
+subclass. Fields fall into three groups:
+
+| Field | Type | Default | Role |
+|-------|------|---------|------|
+| **User-settable (bound to UI, triggers reactive updates)** ||||
+| `active_presets` | `list[str]` | `default_presets.json` | Preset names available in the picker |
+| `preset` | `str` | `"BuGnYl"` | Active color preset name |
+| `invert` | `bool` | `False` | Invert the transfer function |
+| `color_blind` | `bool` | `False` | Filter preset list to color-blind safe |
+| `use_log_scale` | `str` | `"linear"` | Scale mode: `"linear"`, `"log"`, `"symlog"` |
+| `discrete_log` | `bool` | `False` | Enable discrete banding |
+| `n_discrete_colors` | `int` | `4` | Color bands between ticks (linear) or per decade (log/symlog) |
+| `n_ticks` | `int` | `5` | Number of tick marks on the colorbar |
+| `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
+| `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
+| `override_range` | `bool` | `False` | Use manual range instead of data range |
+| **Derived (computed internally, read by UI)** ||||
+| `color_range` | `tuple[float, float]` | `(0, 1)` | Active min/max color range |
+| `color_value_min_valid` | `bool` | `True` | Whether `color_value_min` parses as a valid float |
+| `color_value_max_valid` | `bool` | `True` | Whether `color_value_max` parses as a valid float |
+| `n_colors` | `int` | `255` | Number of LUT samples |
+| `lut_img_h` | `str` | `""` | Base64 PNG data URI of the horizontal colorbar image |
+| `lut_img_v` | `str` | `""` | Base64 PNG data URI of the vertical colorbar image |
+| `color_ticks` | `list` | `[]` | Tick marks: `[{position, label, color}, ...]` |
+| `effective_color_range` | `tuple[float, float]` | `(0, 1)` | Actual CTF range after transforms |
+| `luts_normal` | `list` | `[]` | Sorted preset picker entries (normal) |
+| `luts_inverted` | `list` | `[]` | Sorted preset picker entries (inverted) |
+| **UI widget state** ||||
+| `menu` | `bool` | `False` | Whether the control panel popup is open |
+| `search` | `str \| None` | `None` | Preset search filter text |
+| `orientation` | `str` | `"horizontal"` | Colorbar orientation |
+| `mapper_change` | `int` | `0` | Server-only counter incremented on each mapper update |
+
+### ColormapConfig Methods
+
+| Method | Purpose |
+|--------|---------|
+| `set_data_array(name, fn, scalar_mode)` | Configure the mapper's scalar mode and color array, recompute range, re-apply preset |
+| `update_color_range()` | Recompute range from data (or validate manual range), re-apply transforms, regenerate ticks |
+| `update_color_preset(name, invert, log_scale, ...)` | Apply a preset with scale/discrete settings — also called automatically by reactive watchers |
+
+### `ColormapConfig.__init__` parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `server` | *required* | Trame server instance (first positional arg) |
+| `mapper` | `None` | VTK mapper — the CTF is set as its lookup table |
+| `data_array_fn` | `None` | Callable returning the VTK data array for range computation |
+
 ## Configurable Parameters
-
-All parameters have sensible defaults and are backward-compatible keyword arguments.
-
-### `state.py` — `ColormapConfig` (reactive, user-facing)
-
-| Field | Default | Description |
-|-------|---------|-------------|
-| `active_presets` | `default_presets.json` | List of preset names available in the picker |
-| `n_ticks` | `5` | Number of tick marks on the colorbar |
-| `n_discrete_colors` | `4` | Color bands between ticks (linear) or per decade (log/symlog) |
-| `n_colors` | `255` | Number of LUT samples |
-
-These are synced to the Trame client and trigger reactive updates via the controller.
 
 ### `core/presets.py` — function parameters
 
@@ -173,36 +296,42 @@ The adaptive spacing uses the symlog-transformed position of each candidate tick
 
 | Parameter | Default | Function | Description |
 |-----------|---------|----------|-------------|
-| `n_ticks` | `4` | `apply_discrete_linear()` | Number of tick marks (creates `n_ticks + 1` equal gaps) |
 | `n_sub` | `1` | All `apply_discrete_*()` functions | Number of color bands per gap (linear) or per decade (log/symlog) |
-| `n_samples` | `256` | `apply_discrete_log()`, `apply_symlog()`, `apply_discrete_symlog()` | Resampling resolution for building continuous CTFs |
+| `n_samples` | `256` | `apply_log()`, `apply_symlog()`, `apply_discrete_symlog()` | Resampling resolution for building continuous CTFs |
 
 ## Dependencies
 
 | Package | Used in | Purpose |
-|---------|---------|--------|
-| **vtk** (`vtkmodules`) | `core/presets.py`, `core/transforms.py`, `controller.py` | `vtkColorTransferFunction` for color sampling, `vtkPNGWriter`/`vtkImageData` for colorbar image generation |
-| **numpy** | `core/ticks.py`, `core/transforms.py` | Tick computation, LUT transforms |
-| **trame** | `state.py`, `colorbar.py`, `control_panel.py` | `StateDataModel` for reactive config, Vuetify 3 widgets for UI |
-| **trame-dataclass** | `state.py` | `StateDataModel` base class; `provide_as` scoped slot |
+|---------|---------|---------|
+| **vtk** (`vtkmodules`) | `core/presets.py`, `core/transforms.py`, `dataclasses.py` | `vtkColorTransferFunction` for color sampling, `vtkPNGWriter`/`vtkImageData` for colorbar image generation, mapper wiring |
+| **numpy** | `core/ticks.py`, `core/transforms.py`, `dataclasses.py` | Tick computation, LUT transforms, linthresh calculation |
+| **trame** | `dataclasses.py`, `widgets.py` | `StateDataModel` for reactive config, Vuetify 3 widgets for UI |
+| **trame-dataclass** | `dataclasses.py` | `StateDataModel` base class, `Sync`/`ServerOnly` field types, `provide_as` scoped slot |
 
 ## Module Structure
 
 ```
 src/trame_colormaps/
-├── __init__.py          # Re-exports: Colorbar, ColormapController, ColormapConfig
-├── colorbar.py          # Colorbar — self-contained colorbar (config + controller + UI)
-├── control_panel.py     # Preset picker, scale mode, range, discrete settings
-├── state.py             # ColormapConfig(StateDataModel) — reactive color state
-├── controller.py        # ColormapController — owns LUT, wires mapper, manages presets/range/ticks
+├── __init__.py          # Package version
+├── dataclasses.py       # ColormapConfig(StateDataModel) — reactive state, CTF, mapper wiring
+├── widgets.py           # ColorMapEditor, HorizontalScalarBar, VerticalScalarBar
+├── module.py            # No-op trame module stub for enable_module
 ├── core/
+│   ├── __init__.py      # "Pure VTK/numpy, no trame dependency"
 │   ├── presets.py       # Preset discovery, COLORBAR_CACHE, lut_to_img()
 │   ├── ticks.py         # Tick computation (linear, log, symlog)
 │   └── transforms.py   # LUT transforms (linear, log, symlog, discrete variants)
 └── presets/
+    ├── __init__.py      # Bundled preset JSON shipping
     ├── paraview_colormaps.json   # 199 ParaView built-in presets
     ├── crameri_colormaps.json    # 60 Crameri scientific colour maps
     └── default_presets.json      # Active preset list with color-blind-safe flags
+
+src/trame/
+├── dataclasses/
+│   └── colormaps.py     # Re-exports ColormapConfig
+└── widgets/
+    └── colormaps.py     # Re-exports widgets, initialize(server)
 ```
 
 ## Layer Separation
@@ -210,21 +339,20 @@ src/trame_colormaps/
 | Layer | Modules | Dependencies |
 |-------|---------|-------------|
 | **Core** (pure VTK/numpy) | `core/presets.py`, `core/ticks.py`, `core/transforms.py` | VTK, numpy |
-| **State** (Trame reactive model) | `state.py` | trame |
-| **Controller** (orchestration) | `controller.py` | Core + State + VTK |
-| **Widgets** (UI) | `colorbar.py`, `control_panel.py` | trame (Vuetify 3) |
+| **State + Logic** (Trame reactive model) | `dataclasses.py` | Core + trame |
+| **Widgets** (UI) | `widgets.py` | trame (Vuetify 3, HTML) |
 
 The core layer has zero Trame dependency and can be used independently
 for headless colormap operations.
 
 ## Widget Structure
 
-`Colorbar.render()` produces the following DOM tree:
+`HorizontalScalarBar` / `VerticalScalarBar` produce the following DOM tree:
 
 ```
 html.Div  (top-level — flexbox row/column, bg-blue-grey-darken-2)
 ├── VMenu  (activator="parent" — click anywhere on the bar to open)
-│   └── ControlPanel → VCard (360px popup)
+│   └── ColorMapEditor → VCard (360px popup)
 │       ├── VCardItem: toggle buttons (color-blind, invert, scale, range, discrete)
 │       ├── VCardItem: discrete color count input (v-show when discrete)
 │       ├── VCardItem: min/max text fields (v-show when override_range)
@@ -232,218 +360,21 @@ html.Div  (top-level — flexbox row/column, bg-blue-grey-darken-2)
 │       └── VList: searchable preset list with thumbnail images
 ├── html.Div  (min range label)
 ├── html.Div  (colorbar image container, position:relative)
-│   ├── html.Img  (LUT image — horizontal or vertical depending on orientation)
+│   ├── html.Img  (LUT image — horizontal or vertical)
 │   └── html.Div  (tick overlay, position:absolute, pointer-events:none)
-│       └── html.Div v-for="tick in config.color_ticks"
+│       └── html.Div v-for="tick in <name>.color_ticks"
 │           ├── html.Div  (tick line)
 │           └── html.Span (tick label)
 └── html.Div  (max range label)
 ```
 
-Template bindings use `config.*` via `config.provide_as("config")`.
+Template bindings use `<name>.*` via `config.provide_as("<name>")`.
 When one control panel opens, all others close automatically.
 The popup panel position is controlled by `popup_location`:
-`"top"` → above bar, `"bottom"` → below, `"start"` → left, `"end"` → right.
-
-The control panel reads `config.luts_normal` / `config.luts_inverted`,
-populated reactively by the controller when `active_presets` changes.
-
-## Config Fields
-
-The `config` object passed to `ColormapController` and `Colorbar`
-must be a `trame.app.dataclass.StateDataModel` (or subclass) with the
-following fields. All fields are required. `ColormapConfig` in `state.py`
-provides the canonical definition with defaults.
-
-| Field | Type | Default | Role |
-|-------|------|---------|------|
-| **User-settable (read by controller, bound to UI)** ||||
-| `active_presets` | `list[str]` | `default_presets.json` | Preset names available in the picker |
-| `preset` | `str` | `"BuGnYl"` | Active color preset name |
-| `invert` | `bool` | `False` | Invert the transfer function |
-| `color_blind` | `bool` | `False` | Filter preset list to color-blind safe |
-| `use_log_scale` | `str` | `"linear"` | Scale mode: `"linear"`, `"log"`, `"symlog"` |
-| `discrete_log` | `bool` | `False` | Enable discrete banding |
-| `n_discrete_colors` | `int` | `4` | Color bands between ticks (linear) or per decade (log/symlog) |
-| `n_ticks` | `int` | `5` | Number of tick marks on the colorbar |
-| `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
-| `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
-| `override_range` | `bool` | `False` | Use manual range instead of data range |
-| **Derived (written by controller, read by UI)** ||||
-| `color_range` | `tuple[float, float]` | `(0, 1)` | Active min/max color range |
-| `color_value_min_valid` | `bool` | `True` | Whether `color_value_min` parses as a valid float |
-| `color_value_max_valid` | `bool` | `True` | Whether `color_value_max` parses as a valid float |
-| `n_colors` | `int` | `255` | Number of LUT samples |
-| `lut_img_h` | `str` | `""` | Base64 PNG data URI of the horizontal colorbar image |
-| `lut_img_v` | `str` | `""` | Base64 PNG data URI of the vertical colorbar image |
-| `color_ticks` | `list` | `[]` | Tick marks: `[{position, label, color}, ...]` |
-| `effective_color_range` | `tuple[float, float]` | `(0, 1)` | Actual CTF range after transforms |
-| `luts_normal` | `list` | `[]` | Sorted preset picker entries (normal) |
-| `luts_inverted` | `list` | `[]` | Sorted preset picker entries (inverted) |
-| **UI widget state (used by control panel / colorbar)** ||||
-| `menu` | `bool` | `False` | Whether the control panel popup is open |
-| `search` | `str \| None` | `None` | Preset search filter text |
-| `orientation` | `str` | `"horizontal"` | Colorbar orientation: `"horizontal"` or `"vertical"` |
-
-When composing into a larger application config, include all fields above
-alongside your app-specific fields. The controller reads and writes them
-by name — no inheritance required.
-
-## Usage
-
-### Recommended: `Colorbar` (self-contained)
-
-The `Colorbar` class bundles config, controller, and UI into a single object.
-
-```python
-from trame_colormaps import Colorbar
-
-
-def get_data_array():
-    """Return the VTK data array the colorbar should map.
-
-    Called by the controller whenever it needs to recompute the color
-    range (e.g. on preset change, data update, or manual range reset).
-    """
-    ds = my_source.GetOutput()
-    if ds is None:
-        return None
-    return ds.GetPointData().GetScalars()
-
-
-def do_render():
-    """Trigger a view update after the controller changes the LUT.
-
-    Called automatically after every color change (preset swap, range
-    edit, scale toggle, etc.) so the 3D view stays in sync.
-    """
-    ctrl.view_update()
-
-
-# Create a colorbar (each instance gets its own config and controller)
-colorbar = Colorbar(
-    server=server,
-    variable_name="RTData",
-    mapper=my_mapper,
-    data_array_fn=get_data_array,
-    render_fn=do_render,
-    orientation="horizontal",   # or "vertical"
-    scalar_mode="default",      # "default", "point", or "cell"
-    popup_location="top",       # "top", "bottom", "start", "end"
-)
-
-# Inside your layout, call render() to emit the DOM:
-colorbar.render()
-```
-
-**Multiple colorbars** are fully supported. When one control panel is opened,
-all others close automatically:
-
-```python
-cb_top = Colorbar(server=server, variable_name="RTData", mapper=mapper,
-                  data_array_fn=get_data, render_fn=render,
-                  orientation="horizontal", popup_location="bottom")
-
-cb_left = Colorbar(server=server, variable_name="RTData", mapper=mapper,
-                   data_array_fn=get_data, render_fn=render,
-                   orientation="vertical", popup_location="end")
-
-# In layout:
-with layout:
-    cb_top.render()   # horizontal bar at top
-    cb_left.render()  # vertical bar on left
-```
-
-#### `Colorbar` constructor parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `server` | *required* | Trame server instance |
-| `variable_name` | *required* | Scalar array name to color by |
-| `mapper` | *required* | VTK mapper to wire the color transfer function to |
-| `data_array_fn` | *required* | Callable returning the VTK data array |
-| `render_fn` | *required* | Callable to trigger a view update after changes |
-| `orientation` | `"horizontal"` | `"horizontal"` or `"vertical"` |
-| `scalar_mode` | `"default"` | `"default"`, `"point"`, or `"cell"` |
-| `config` | `None` | Optional `ColormapConfig` to reuse; a new one is created if `None` |
-| `popup_location` | auto | Where the control panel pops up: `"top"`, `"bottom"`, `"start"`, `"end"`. Defaults to `"top"` for horizontal, `"end"` for vertical |
-
-#### `Colorbar` attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `config` | The `ColormapConfig` instance |
-| `controller` | The `ColormapController` instance |
-| `panel` | The `ControlPanel` instance |
-
-### Composed config: `ColormapController` + `create_colorbar`
-
-Use `create_colorbar` when colormap fields are composed into a larger
-application config rather than using a standalone `ColormapConfig`.
-The caller creates the controller and wires the mapper:
-
-```python
-from trame.app import dataclass
-from trame_colormaps import ColormapController, ColormapConfig, create_colorbar
-
-class ViewConfiguration(dataclass.StateDataModel):
-    # Application-specific fields
-    variable: str = dataclass.Sync(str)
-    order: int = dataclass.Sync(int, 0)
-    size: int = dataclass.Sync(int, 6)
-
-    # Colormap fields (same as ColormapConfig)
-    preset: str = dataclass.Sync(str, "Cool to Warm")
-    invert: bool = dataclass.Sync(bool, False)
-    # ... all other ColormapConfig fields ...
-
-config = ViewConfiguration(server, variable="Temperature")
-controller = ColormapController(
-    server=server,
-    variable_name="Temperature",
-    mapper=my_mapper,
-    data_array_fn=lambda: get_data_array(),
-    render_fn=render,
-    config=config,
-    scalar_mode="cell",
-)
-
-# In UI building:
-create_colorbar(config, controller.update_color_preset)
-```
-
-### Controller Methods
-
-| Method | Purpose |
-|--------|--------|
-| `update_color_range()` | Recompute range from data (or validate manual range), re-apply transforms, regenerate ticks |
-| `update_color_preset(name, invert, log_scale, ...)` | Apply a preset with scale/discrete settings — also called automatically by reactive watchers |
-| `set_data_array(variable_name, data_array_fn, scalar_mode)` | Switch to a different data array at runtime — reconfigures mapper, recomputes range, re-applies preset |
-
-### Updating color range after data changes
-
-When the underlying data changes (e.g. new data loaded, pipeline update),
-call `update_color_range()` on the controller to recompute the range,
-re-apply transforms, and regenerate ticks:
-
-```python
-colorbar.controller.update_color_range()
-```
-
-### Switching data array at runtime
-
-To color by a different variable without creating a new controller:
-
-```python
-colorbar.controller.set_data_array(
-    "Pressure",
-    data_array_fn=lambda: get_pressure_array(),
-    scalar_mode="point",  # "cell" (default), "point", or "default"
-)
-```
+`"top"` → above bar, `"bottom"` → below, `"left"`/`"right"` for vertical bars.
 
 ## Examples
 
 | File | Description |
 |------|-------------|
-| `examples/wavelet.py` | 4-region layout with horizontal + vertical colorbars |
+| `examples/wavelet.py` | 4-region layout with horizontal + vertical colorbars around a 3D wavelet visualization |

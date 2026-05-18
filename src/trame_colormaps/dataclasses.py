@@ -4,9 +4,6 @@ Self-contained state for a single colormap instance, including preset name,
 scale mode, range, discrete settings, and derived display data (lut_img_h/v, ticks).
 
 Can be used standalone or composed into a larger application config.
-When used standalone, instantiate ColormapConfig directly.  When composed
-into an existing config, pass that config object to ColormapController
-instead.
 """
 
 import math
@@ -49,14 +46,9 @@ __all__ = ["ColormapConfig"]
 class ColormapConfig(StateDataModel):
     """Reactive state model for a single colormap instance.
 
-    All fields are synced to the Trame client via ``Sync``.
-    Use this standalone when the colormaps module owns its own state,
-    or compose these same fields into a larger application config and
-    pass that object to ``ColormapController`` instead.
-
     Fields fall into three groups:
 
-    **User-settable** — bound to UI controls, read by the controller:
+    **User-settable** — bound to UI controls, trigger reactive updates:
 
     - ``active_presets``: List of preset names available in the picker.
     - ``preset``: Active color preset name.
@@ -72,7 +64,7 @@ class ColormapConfig(StateDataModel):
     - ``override_range``: When True, use the manual strings instead of
       the data-derived range.
 
-    **Derived** — written by the controller, consumed by UI:
+    **Derived** — computed internally, consumed by UI:
 
     - ``color_range``: Active (min, max) as floats, either from data or
       parsed from the manual strings.
@@ -93,9 +85,11 @@ class ColormapConfig(StateDataModel):
 
     - ``menu``: Whether the preset control panel is open.
     - ``search``: Preset search/filter text.
+    - ``orientation``: Colorbar orientation (``"horizontal"`` or ``"vertical"``).
+    - ``mapper_change``: Server-only counter incremented on each mapper update.
     """
 
-    # --- User-settable (bound to UI, read by controller) ---
+    # --- User-settable (bound to UI, triggers reactive updates) ---
     active_presets: list[str] = Sync(list, DEFAULT_PRESETS)
     preset: str = Sync(str, "BuGnYl")
     invert: bool = Sync(bool, False)
@@ -108,7 +102,7 @@ class ColormapConfig(StateDataModel):
     color_value_max: str = Sync(str, "1")
     override_range: bool = Sync(bool, False)
 
-    # --- Derived (written by controller, read by UI) ---
+    # --- Derived (computed internally, read by UI) ---
     color_value_min_valid: bool = Sync(bool, True)
     color_value_max_valid: bool = Sync(bool, True)
     color_range: list[float] = Sync(tuple[float, float], (0, 1))
@@ -183,7 +177,7 @@ class ColormapConfig(StateDataModel):
         """Rebuild the sorted preset picker lists from active_presets.
 
         Filters COLORBAR_CACHE by the given preset names and populates
-        ``config.luts_normal`` and ``config.luts_inverted``.
+        ``self.luts_normal`` and ``self.luts_inverted``.
 
         Args:
             active_presets: List of preset names to include.
@@ -383,7 +377,7 @@ class ColormapConfig(StateDataModel):
         """Apply a color preset with the specified scale and discrete settings.
 
         Args:
-            name: Preset name (must exist in PRESET_REGISTRY).
+            name: Preset name (must exist in COLORBAR_CACHE).
             invert: Whether to invert the transfer function.
             log_scale: Scale mode — ``"linear"``, ``"log"``, or ``"symlog"``.
             discrete_log: Enable discrete (stepped) color banding.
