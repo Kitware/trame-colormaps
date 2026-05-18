@@ -27,7 +27,8 @@ def _init_registry():
     """Load all presets and build the module-level registry constants.
 
     Returns:
-        Tuple of (registry, all_names, color_blind_safe, default_presets).
+        Tuple of (registry, all_names, color_blind_safe, default_presets,
+                  diverging, sequential, cyclic, categorical).
     """
 
     def load(filename):
@@ -48,10 +49,45 @@ def _init_registry():
         if defaults_path.exists()
         else sorted(all_names)
     )
-    return registry, all_names, color_blind, defaults
+
+    # Category-based preset sets
+    diverging = {
+        n for n, p in registry.items() if p.get("Category", "").lower() == "diverging"
+    }
+    sequential = {
+        n for n, p in registry.items() if p.get("Category", "").lower() == "sequential"
+    }
+    cyclic = {
+        n for n, p in registry.items() if p.get("Category", "").lower() == "cyclic"
+    }
+    categorical = {
+        n
+        for n, p in registry.items()
+        if p.get("Category", "").lower() in ("categorical", "multi-sequential")
+    }
+
+    return (
+        registry,
+        all_names,
+        color_blind,
+        defaults,
+        diverging,
+        sequential,
+        cyclic,
+        categorical,
+    )
 
 
-PRESET_REGISTRY, ALL_PRESETS, COLOR_BLIND_SAFE, DEFAULT_PRESETS = _init_registry()
+(
+    PRESET_REGISTRY,
+    ALL_PRESETS,
+    COLOR_BLIND_SAFE,
+    DEFAULT_PRESETS,
+    DIVERGING_PRESETS,
+    SEQUENTIAL_PRESETS,
+    CYCLIC_PRESETS,
+    CATEGORICAL_PRESETS,
+) = _init_registry()
 
 #: Module-level active preset list. Modified via set_active_presets().
 _active_presets = [n for n in DEFAULT_PRESETS if n in PRESET_REGISTRY]

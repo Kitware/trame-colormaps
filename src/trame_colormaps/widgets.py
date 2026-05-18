@@ -35,22 +35,37 @@ def buttons(name):
                 f"{name}.use_log_scale === 'symlog' ? 'mdi-sine-wave' : 'mdi-stairs'"
             ),
             "click": (
-                f"{name}.use_log_scale = {name}.use_log_scale === 'linear' ? 'log' : "
-                f"{name}.use_log_scale === 'log' ? 'symlog' : 'linear'"
+                f"{name}.use_log_scale = {name}.diverging"
+                f" ? ({name}.use_log_scale === 'linear' ? 'symlog' : 'linear')"
+                f" : ({name}.use_log_scale === 'linear' ? 'log' : "
+                f"{name}.use_log_scale === 'log' ? 'symlog' : 'linear')"
             ),
             "tip": (
-                f"'Toggle to ' + ({name}.use_log_scale === 'linear' ?"
+                f"'Toggle to ' + ({name}.diverging"
+                f" ? ({name}.use_log_scale === 'linear'"
+                f" ? 'SymLog Scale' : 'Linear Scale')"
+                f" : ({name}.use_log_scale === 'linear' ?"
                 f" 'Log Scale' : {name}"
-                ".use_log_scale === 'log' ? 'SymLog Scale' : 'Linear Scale')"
+                ".use_log_scale === 'log' ? 'SymLog Scale' : 'Linear Scale'))"
+            ),
+        },
+        {
+            "icon": f"{name}.diverging ? 'mdi-triangle' : 'mdi-triangle-outline'",
+            "click": f"{name}.diverging = !{name}.diverging",
+            "tip": (
+                f"'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"
             ),
         },
         {
             "icon": (
                 f"{name}.override_range ? 'mdi-arrow-expand-horizontal' : 'mdi-pencil'"
             ),
-            "click": f"{name}.override_range = !{name}.override_range",
+            "click": (
+                f"!{name}.diverging && ({name}.override_range = !{name}.override_range)"
+            ),
             "tip": (
-                f"'Toggle to ' + ({name}.override_range ? "
+                f"{name}.diverging ? 'Range locked in Δ mode'"
+                f" : 'Toggle to ' + ({name}.override_range ? "
                 "'Data Range' : 'Custom Range')"
             ),
         },
@@ -149,8 +164,34 @@ class ColorMapEditor(v3.VCard):
                     max=[20],
                 )
 
-            # --- Custom range inputs ---
-            with v3.VCardItem(v_show=f"{name}.override_range", classes="py-0 mb-2"):
+            # --- Diverging mode inputs (abs_max + epsilon) ---
+            with v3.VCardItem(v_show=f"{name}.diverging", classes="py-0 mb-2"):
+                v3.VTextField(
+                    v_model=f"{name}.abs_max",
+                    label="|max|",
+                    error=(f"!{name}.abs_max_valid",),
+                    density="compact",
+                    variant="outlined",
+                    flat=True,
+                    hide_details=True,
+                    classes="mt-2",
+                )
+                v3.VTextField(
+                    v_model=f"{name}.epsilon",
+                    label="ε tolerance",
+                    error=(f"!{name}.epsilon_valid",),
+                    density="compact",
+                    variant="outlined",
+                    flat=True,
+                    hide_details=True,
+                    classes="mt-2",
+                )
+
+            # --- Custom range inputs (hidden when diverging) ---
+            with v3.VCardItem(
+                v_show=f"{name}.override_range && !{name}.diverging",
+                classes="py-0 mb-2",
+            ):
                 v3.VTextField(
                     v_model=f"{name}.color_value_min",
                     label="Min",
@@ -233,7 +274,7 @@ class HorizontalScalarBar(html.Div):
 
             html.Div(
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null "
-                f"? {_fmt_expr(name, 0)} : '' }}}}",
+                f"? '' + {_fmt_expr(name, 0)} : '' }}}}",
                 classes="text-caption px-2 text-no-wrap",
             )
             with html.Div(

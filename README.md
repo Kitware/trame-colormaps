@@ -106,6 +106,123 @@ All colormap presets are stored as JSON files under `src/trame_colormaps/presets
 - All are perceptually uniform and color-blind safe
 - Downloaded from the [cmcrameri GitHub repository](https://github.com/callumrollo/cmcrameri)
 
+### Colormap Usage Guide
+
+| Category | Use When | Data Character |
+|----------|----------|----------------|
+| **Sequential** | Magnitude — more/less of something | Temperature, pressure, density |
+| **Diverging** | Deviation — Δ from a reference value | Anomaly, residual, balance |
+| **Cyclic** | Periodic — values that wrap around | Phase, angle, time-of-day |
+| **Categorical** | Discrete labels — no inherent order | Material ID, region, class |
+
+> **Note:** Categorical presets are excluded from `default_presets.json` because
+> trame-colormaps generates its own discrete/categorical colormaps from any preset
+> via the discrete banding feature.
+
+#### Using Sequential Colormaps
+
+Sequential colormaps encode **"more vs less"** — data that is ordered and one-sided
+with no special reference value.
+
+**Use when:**
+
+- Data interpretation is monotonic: low → high
+- There is no meaningful midpoint or zero crossing
+
+**Examples:** temperature (no reference), density, probability, intensity, error magnitude (`|Δ|`).
+
+**Properties:**
+
+- Monotonic lightness — darker always means more (or less)
+- No implied midpoint
+- Easy to interpret quantitatively
+
+**Good defaults:** Viridis, Plasma, batlow — perceptually uniform ramps.
+
+#### Using Diverging Colormaps
+
+Diverging colormaps encode **"above vs below reference"** — data with a meaningful
+center value where you care about the direction of deviation.
+
+**Use when:**
+
+- There is a meaningful center (usually 0, but not always)
+- You care about direction: below reference ← neutral → above reference
+
+**Examples:** Δ = A − B, anomalies (value − mean), residuals, signed errors.
+
+**Properties:**
+
+- Two symmetric color branches around a neutral center (white/light gray)
+- Encodes both sign and magnitude
+- Must be centered correctly to avoid misinterpretation
+- Should be perceptually balanced on both sides
+
+**Common derived difference fields:**
+
+1. **Absolute difference** — `Δ = A − B`
+   Your primary case (simulation vs observation). Symmetric, interpretable.
+
+2. **Relative / percent difference** — `Δ = (A − B) / B` or `Δ% = 100 × (A − B) / B`
+   Useful when scale matters. Still centered at 0 → diverging applies.
+
+3. **Deviation from a baseline** — `Δ = value − reference_value`
+   Examples: temperature − freezing point, measurement − target threshold, field − spatial mean.
+
+4. **Standardized anomaly** — `Δ = (value − mean) / std`
+   Now Δ is in "number of standard deviations." Very common in climate and statistics.
+
+5. **Log-ratio (for multiplicative differences)** — `Δ = log(A / B)`
+   Symmetric around 0. Handles ratios cleanly and plays nicely with wide dynamic ranges.
+
+**Diverging workflow:**
+
+1. **Derive Δ field** — compute the difference quantity
+2. **Choose scale** — linear or symlog (symlog for wide dynamic ranges near zero)
+3. **Apply diverging colormap centered at 0** — toggle diverging mode
+4. **Optional tolerance band (epsilon)** — suppress a dead zone around zero
+
+#### Using Cyclic Colormaps
+
+Cyclic colormaps encode **"wrap-around / periodic"** — data where start and end
+represent the same value (0° ≡ 360°).
+
+**Use when:**
+
+- Data is periodic with no true endpoints
+- There must be no visual discontinuity at the boundary
+
+**Examples:** angle, phase, orientation, wind direction, time of day (circular).
+
+**Properties:**
+
+- Ends match seamlessly — color at min == color at max
+- No discontinuity at boundaries
+- Not suitable for ordered or magnitude data
+
+#### Using Categorical Colormaps
+
+Categorical colormaps encode **"different kinds, not ordered"** — discrete labels
+with no inherent ranking.
+
+**Use when:**
+
+- Data represents discrete labels with no meaningful ordering
+- You need maximum visual distinction between classes
+
+**Examples:** material IDs, cluster labels, classes, region tags.
+
+**Properties:**
+
+- Distinct, maximally separated colors
+- No gradient or implied ordering between colors
+- Not suitable for continuous or magnitude data
+
+> **Note:** In trame-colormaps, any preset can be turned into a categorical
+> colormap via the discrete banding feature. This also serves as a way to apply
+> color-based contours to continuous data — discrete bands act as visual
+> iso-surfaces that segment the color range into distinct regions.
+
 ### `default_presets.json` — Active Preset List
 
 A JSON array of colormap names that controls which presets are active by default.

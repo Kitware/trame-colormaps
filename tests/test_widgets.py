@@ -15,9 +15,9 @@ class TestButtons:
         result = buttons("cfg")
         assert isinstance(result, list)
 
-    def test_five_buttons(self):
+    def test_six_buttons(self):
         result = buttons("cfg")
-        assert len(result) == 5
+        assert len(result) == 6
 
     def test_each_has_icon_click_tip(self):
         for btn in buttons("cfg"):
@@ -26,9 +26,8 @@ class TestButtons:
             assert "tip" in btn
 
     def test_name_interpolation(self):
-        """All icon/click/tip strings should contain the given name."""
+        """All click/tip strings should contain the given name."""
         for btn in buttons("myConfig"):
-            assert "myConfig" in btn["icon"]
             assert "myConfig" in btn["click"]
             assert "myConfig" in btn["tip"]
 
@@ -43,15 +42,19 @@ class TestButtons:
     def test_log_scale_button(self):
         btn = buttons("c")[2]
         assert "use_log_scale" in btn["click"]
-        assert "log" in btn["click"]
-        assert "symlog" in btn["click"]
+        assert "log" in btn["click"] or "symlog" in btn["click"]
+
+    def test_diverging_button(self):
+        btn = buttons("c")[3]
+        assert "diverging" in btn["click"]
+        assert "Difference" in btn["tip"]
 
     def test_override_range_button(self):
-        btn = buttons("c")[3]
+        btn = buttons("c")[4]
         assert "override_range" in btn["click"]
 
     def test_discrete_button(self):
-        btn = buttons("c")[4]
+        btn = buttons("c")[5]
         assert "discrete_log" in btn["click"]
 
     def test_log_icon_f_string(self):

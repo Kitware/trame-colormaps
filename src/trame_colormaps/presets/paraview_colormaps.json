@@ -10,7 +10,8 @@
     ],
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -40,7 +41,8 @@
     ],
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "RGB",
@@ -53,7 +55,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -63,7 +66,8 @@
     "RGBPoints": [0, 1, 1, 1, 1, 0, 0, 0],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -221,7 +225,8 @@
       0.976511, 0.989753, 0.61676, 0.996078, 0.982257, 0.994109, 0.631017, 1.0,
       0.988362, 0.998364, 0.644924
     ],
-    "ColorBlindSafe": false
+    "ColorBlindSafe": false,
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -234,7 +239,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -280,7 +286,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -438,7 +445,8 @@
       0.974417, 0.90359, 0.130215, 0.996078, 0.983868, 0.904867, 0.136897, 1.0,
       0.993248, 0.906157, 0.143936
     ],
-    "ColorBlindSafe": false
+    "ColorBlindSafe": false,
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -457,7 +465,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -480,7 +489,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -493,7 +503,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "CIELAB",
@@ -529,7 +540,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -544,7 +556,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -625,7 +638,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -674,7 +688,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -813,7 +828,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -825,7 +841,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "Name": "KAAMS",
@@ -847,7 +864,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Diverging",
@@ -859,7 +877,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -894,7 +913,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "RGB",
@@ -903,7 +923,8 @@
     "RGBPoints": [0, 0, 0, 0, 1, 1, 1, 1],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -915,7 +936,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -937,7 +959,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -959,7 +982,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "HSV",
@@ -968,7 +992,8 @@
     "RGBPoints": [0, 0, 0, 1, 1, 1, 0, 0],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -980,7 +1005,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -992,7 +1018,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -1004,7 +1031,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "RGB",
@@ -1016,7 +1044,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "HSV",
@@ -1028,7 +1057,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "ColorSpace": "Lab",
@@ -1040,7 +1070,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -1058,7 +1089,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -1075,7 +1107,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -1094,7 +1127,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1113,7 +1147,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1131,7 +1166,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1146,7 +1182,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1163,7 +1200,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1182,7 +1220,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1200,7 +1239,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1219,7 +1259,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1238,7 +1279,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1257,7 +1299,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1276,7 +1319,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1295,7 +1339,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1314,7 +1359,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1330,7 +1376,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1348,7 +1395,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1364,7 +1412,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1382,7 +1431,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1400,7 +1450,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1416,7 +1467,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1435,7 +1487,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1454,7 +1507,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1470,7 +1524,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1488,7 +1543,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1507,7 +1563,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1523,7 +1580,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1541,7 +1599,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1558,7 +1617,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1576,7 +1636,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1594,7 +1655,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1612,7 +1674,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1630,7 +1693,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1648,7 +1712,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1667,7 +1732,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1686,7 +1752,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1705,7 +1772,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1724,7 +1792,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1743,7 +1812,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1762,7 +1832,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1781,7 +1852,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1800,7 +1872,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1819,7 +1892,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1838,7 +1912,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1857,7 +1932,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1876,7 +1952,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1895,7 +1972,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1913,7 +1991,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1931,7 +2010,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1949,7 +2029,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1957,7 +2038,8 @@
     "RGBPoints": [-1, 0, 0, 1, 0, 0.5, 0.5, 0.5, 1, 1, 1, 0],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1976,7 +2058,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -1995,7 +2078,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2014,7 +2098,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2033,7 +2118,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2052,7 +2138,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2071,7 +2158,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2090,7 +2178,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2109,7 +2198,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2128,7 +2218,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2147,7 +2238,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2166,7 +2258,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2185,7 +2278,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2204,7 +2298,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2223,7 +2318,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2242,7 +2338,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2261,7 +2358,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2280,7 +2378,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2299,7 +2398,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2318,7 +2418,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2337,7 +2438,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2356,7 +2458,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2375,7 +2478,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -2386,7 +2490,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2405,7 +2510,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2424,7 +2530,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2442,7 +2549,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -2460,7 +2568,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "RGB",
@@ -2471,7 +2580,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -2490,7 +2600,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -2509,7 +2620,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2533,7 +2645,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "IndexedColors": [
@@ -2555,7 +2668,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -2581,7 +2695,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -2607,7 +2722,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -2633,7 +2749,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -2655,7 +2772,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -2689,7 +2807,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2721,7 +2840,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2751,7 +2871,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2779,7 +2900,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2805,7 +2927,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2829,7 +2952,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2851,7 +2975,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2871,7 +2996,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2889,7 +3015,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2921,7 +3048,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2953,7 +3081,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -2981,7 +3110,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3009,7 +3139,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3033,7 +3164,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3057,7 +3189,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3079,7 +3212,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3099,7 +3233,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3115,7 +3250,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3149,7 +3285,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3181,7 +3318,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3211,7 +3349,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3239,7 +3378,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3265,7 +3405,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3289,7 +3430,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3311,7 +3453,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3331,7 +3474,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3349,7 +3493,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -3377,7 +3522,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3403,7 +3549,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3427,7 +3574,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3449,7 +3597,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3471,7 +3620,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3491,7 +3641,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3509,7 +3660,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3536,7 +3688,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3562,7 +3715,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3587,7 +3741,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3609,7 +3764,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3629,7 +3785,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3647,7 +3804,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3665,7 +3823,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3695,7 +3854,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3723,7 +3883,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3749,7 +3910,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3773,7 +3935,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3795,7 +3958,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3815,7 +3979,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3833,7 +3998,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": true,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -3858,7 +4024,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -3884,7 +4051,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -3912,7 +4080,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -3938,7 +4107,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -3966,7 +4136,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -3992,7 +4163,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -4022,7 +4194,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [
@@ -4056,7 +4229,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "IndexedColors": [1, 0, 0, 1, 0.862745, 0, 0, 0.695201, 0],
@@ -4066,7 +4240,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "IndexedColors": [
@@ -4081,7 +4256,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "IndexedColors": [
@@ -4099,7 +4275,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -4123,7 +4300,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "ColorSpace": "Lab",
@@ -4145,7 +4323,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "cyclic"
   },
   {
     "ColorSpace": "Lab",
@@ -4166,7 +4345,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -4188,7 +4368,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -4345,7 +4526,8 @@
       0.987691, 0.977154, 0.734536, 0.996078, 0.987387, 0.984288, 0.742002, 1.0,
       0.987053, 0.991438, 0.749504
     ],
-    "ColorBlindSafe": false
+    "ColorBlindSafe": false,
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -4502,7 +4684,8 @@
       0.944152, 0.961916, 0.146861, 0.996078, 0.941896, 0.96859, 0.140956, 1.0,
       0.940015, 0.975158, 0.131326
     ],
-    "ColorBlindSafe": false
+    "ColorBlindSafe": false,
+    "Category": "sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -4611,7 +4794,8 @@
       0.9018, 0.26, 252, 1.0, 0.9057, 0.2593, 253, 1.0, 0.9094, 0.2634, 254,
       1.0, 0.9131, 0.268, 255, 1.0, 0.9169, 0.2731
     ],
-    "ColorBlindSafe": false
+    "ColorBlindSafe": false,
+    "Category": "sequential"
   },
   {
     "ShowIndexedColorActiveValues": 1,
@@ -4936,7 +5120,8 @@
     "ColorSpace": "RGB",
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "KAAMS Step",
@@ -4949,7 +5134,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Spectrum Step",
@@ -4965,7 +5151,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "Name": "Warm Step",
@@ -4981,7 +5168,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Cool Step",
@@ -4999,7 +5187,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "Name": "Blues Step",
@@ -5017,7 +5206,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Wild Flower Step",
@@ -5035,7 +5225,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Citrus Step",
@@ -5051,7 +5242,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Traffic Lights Step",
@@ -5063,7 +5255,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "Name": "Traffic Lights For Deuteranopes Step",
@@ -5075,7 +5268,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "Name": "Traffic Lights For Deuteranopes 2 Step",
@@ -5089,7 +5283,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "categorical"
   },
   {
     "Name": "Fast",
@@ -5111,7 +5306,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   },
   {
     "Name": "Fast (Reds)",
@@ -5128,7 +5324,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "Fast (Blues)",
@@ -5144,7 +5341,8 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "sequential"
   },
   {
     "Name": "ParaView 6.0.0 Default",
@@ -5165,6 +5363,7 @@
     ],
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
-    "License": "BSD-3-Clause"
+    "License": "BSD-3-Clause",
+    "Category": "diverging"
   }
 ]
