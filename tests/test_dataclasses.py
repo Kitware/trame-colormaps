@@ -5,7 +5,7 @@ from trame.app import get_server
 from vtkmodules.vtkCommonCore import vtkDoubleArray
 from vtkmodules.vtkRenderingCore import vtkPolyDataMapper
 
-from trame_colormaps.core.presets import DEFAULT_PRESETS
+from trame_colormaps.core.presets import DEFAULT_PRESETS, DIVERGING_PRESETS
 from trame_colormaps.dataclasses import ColormapConfig
 
 # --- Helpers ---
@@ -295,3 +295,176 @@ class TestLutListBuilding:
     def test_empty_list_shows_all(self, config):
         config._build_lut_lists([])
         assert len(config.luts_normal) > 0
+
+
+# =====================================================================
+# Diverging mode
+# =====================================================================
+
+
+class TestDivergingDefaults:
+    def test_diverging_default(self, config):
+        assert config.diverging is False
+
+    def test_epsilon_default(self, config):
+        assert config.epsilon == "0"
+
+    def test_epsilon_valid_default(self, config):
+        assert config.epsilon_valid is True
+
+
+class TestDivergingPresets:
+    def test_diverging_presets_not_empty(self):
+        assert len(DIVERGING_PRESETS) > 0
+
+    def test_cool_to_warm_is_diverging(self):
+        assert "Cool to Warm" in DIVERGING_PRESETS
+
+    def test_bam_is_diverging(self):
+        assert "bam" in DIVERGING_PRESETS
+
+    def test_brewer_diverging_included(self):
+        brewer = [n for n in DIVERGING_PRESETS if "Brewer Diverging" in n]
+        assert len(brewer) > 0
+
+    def test_blue_orange_divergent_included(self):
+        assert "Blue Orange (divergent)" in DIVERGING_PRESETS
+
+
+class TestDivergingMode:
+    """Test _on_diverging_change logic by calling the watcher directly.
+
+    Watchers fire asynchronously via trame's event loop at runtime;
+    tests exercise the method logic directly.
+    """
+
+    @pytest.fixture
+    def div_cfg(self):
+        """ColormapConfig with asymmetric data for diverging tests."""
+        server = get_server(f"test_div_{id(object())}")
+        mapper = vtkPolyDataMapper()
+        data_arr = _make_data_array([-30.0, 10.0, 50.0])
+        cfg = ColormapConfig(
+            server,
+            mapper=mapper,
+            data_array_fn=lambda: data_arr,
+        )
+        cfg.set_data_array("TestData", lambda: data_arr, "point")
+        return cfg
+
+    def test_entering_diverging_filters_presets(self, div_cfg):
+        div_cfg._on_diverging_change(True)
+        for name in div_cfg.active_presets:
+            assert name in DIVERGING_PRESETS, f"{name} is not a diverging preset"
+
+    def test_entering_diverging_enables_override_range(self, div_cfg):
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.override_range is True
+
+    def test_entering_diverging_makes_range_symmetric(self, div_cfg):
+        div_cfg._on_diverging_change(True)
+        vmin, vmax = div_cfg.color_range
+        assert vmin == -vmax
+        assert vmax > 0
+
+    def test_symmetric_range_uses_max_abs(self, div_cfg):
+        # data is [-30, 10, 50], so abs_max = 50
+        div_cfg._on_diverging_change(True)
+        _, vmax = div_cfg.color_range
+        assert vmax == 50.0
+
+    def test_diverging_forces_log_to_linear(self, div_cfg):
+        div_cfg.use_log_scale = "log"
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.use_log_scale == "linear"
+
+    def test_diverging_keeps_symlog(self, div_cfg):
+        div_cfg.use_log_scale = "symlog"
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.use_log_scale == "symlog"
+
+    def test_diverging_keeps_linear(self, div_cfg):
+        div_cfg.use_log_scale = "linear"
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.use_log_scale == "linear"
+
+    def test_diverging_switches_to_diverging_preset(self, div_cfg):
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.preset in DIVERGING_PRESETS
+
+    def test_leaving_diverging_restores_presets(self, div_cfg):
+        original_presets = list(div_cfg.active_presets)
+        div_cfg._on_diverging_change(True)
+        div_cfg._on_diverging_change(False)
+        assert div_cfg.active_presets == original_presets
+
+    def test_leaving_diverging_restores_log_scale(self, div_cfg):
+        div_cfg.use_log_scale = "log"
+        div_cfg._on_diverging_change(True)
+        assert div_cfg.use_log_scale == "linear"
+        div_cfg._on_diverging_change(False)
+        assert div_cfg.use_log_scale == "log"
+
+
+class TestEpsilon:
+    """Test _on_epsilon_change and _apply_symmetric_range by calling directly."""
+
+    @pytest.fixture
+    def eps_cfg(self):
+        server = get_server(f"test_eps_{id(object())}")
+        mapper = vtkPolyDataMapper()
+        data_arr = _make_data_array([-20.0, 0.0, 30.0])
+        cfg = ColormapConfig(
+            server,
+            mapper=mapper,
+            data_array_fn=lambda: data_arr,
+        )
+        cfg.set_data_array("TestData", lambda: data_arr, "point")
+        return cfg
+
+    def test_epsilon_does_not_change_range(self, eps_cfg):
+        eps_cfg.diverging = True
+        eps_cfg._on_diverging_change(True)
+        # abs_max populated from data: max(|-20|,|30|) = 30
+        assert eps_cfg.abs_max == "30.0"
+        assert eps_cfg.color_range == (-30.0, 30.0)
+        eps_cfg.epsilon = "5"
+        eps_cfg._on_epsilon_change("5")
+        # Range stays the same — epsilon modifies CTF, not range
+        assert eps_cfg.color_range == (-30.0, 30.0)
+
+    def test_epsilon_injects_band_in_ctf(self, eps_cfg):
+        eps_cfg.diverging = True
+        eps_cfg._on_diverging_change(True)
+        eps_cfg.epsilon = "5"
+        eps_cfg._on_epsilon_change("5")
+        # Check that the CTF has control points at -5, 0, +5
+        from trame_colormaps.core.presets import get_rgb_points
+
+        pts = get_rgb_points(eps_cfg._ctf)
+        xs = [pts[i] for i in range(0, len(pts), 4)]
+        assert -5.0 in xs
+        assert 0.0 in xs
+        assert 5.0 in xs
+
+    def test_epsilon_invalid_keeps_old_ctf(self, eps_cfg):
+        eps_cfg.diverging = True
+        eps_cfg._on_diverging_change(True)
+        eps_cfg.epsilon = "abc"
+        eps_cfg._on_epsilon_change("abc")
+        assert eps_cfg.epsilon_valid is False
+
+    def test_epsilon_negative_invalid(self, eps_cfg):
+        eps_cfg.diverging = True
+        eps_cfg._on_diverging_change(True)
+        eps_cfg.epsilon = "-1"
+        eps_cfg._on_epsilon_change("-1")
+        assert eps_cfg.epsilon_valid is False
+
+    def test_abs_max_clamps_range(self, eps_cfg):
+        eps_cfg.diverging = True
+        eps_cfg._on_diverging_change(True)
+        # User clamps to 10 (ignoring actual data range of 30)
+        eps_cfg.abs_max = "10"
+        eps_cfg._on_abs_max_change("10")
+        assert eps_cfg.color_range == (-10.0, 10.0)

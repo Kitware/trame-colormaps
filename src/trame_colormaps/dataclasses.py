@@ -17,10 +17,12 @@ from trame_colormaps.core.presets import (
     COLOR_BLIND_SAFE,
     COLORBAR_CACHE,
     DEFAULT_PRESETS,
+    DIVERGING_PRESETS,
     get_rgb_points,
     lut_to_img_h,
     lut_to_img_v,
     rescale_ctf,
+    set_rgb_points,
 )
 from trame_colormaps.core.ticks import (
     format_log_tick,
@@ -101,10 +103,15 @@ class ColormapConfig(StateDataModel):
     color_value_min: str = Sync(str, "0")
     color_value_max: str = Sync(str, "1")
     override_range: bool = Sync(bool, False)
+    diverging: bool = Sync(bool, False)
+    epsilon: str = Sync(str, "0")
+    abs_max: str = Sync(str, "")
 
     # --- Derived (computed internally, read by UI) ---
     color_value_min_valid: bool = Sync(bool, True)
     color_value_max_valid: bool = Sync(bool, True)
+    epsilon_valid: bool = Sync(bool, True)
+    abs_max_valid: bool = Sync(bool, True)
     color_range: list[float] = Sync(tuple[float, float], (0, 1))
     n_colors: int = Sync(int, 255)
     lut_img_h: str = Sync(str)
@@ -129,6 +136,11 @@ class ColormapConfig(StateDataModel):
         if self._mapper:
             self._mapper.SetLookupTable(self._ctf)
             self._mapper.SetUseLookupTableScalarRange(True)
+
+        # Saved state for restoring when leaving diverging mode
+        self._saved_active_presets = None
+        self._saved_log_scale = None
+        self._saved_override_range = None
 
         super().__init__(*args, **kwargs)
         ALL_COLORMAP_CONFIGS.append(self._id)
@@ -166,6 +178,200 @@ class ColormapConfig(StateDataModel):
 
         if self.color_value_min_valid and self.color_value_max_valid:
             self.color_range = (min_value, max_value)
+
+    @watch("diverging")
+    def _on_diverging_change(self, diverging):
+        """Enter or leave diverging mode.
+
+        On enter: save current active_presets and use_log_scale, filter presets
+        to diverging-only, force log scale away from 'log', enable override_range,
+        and recompute the symmetric range centered at zero.
+
+        On leave: restore saved presets and log scale.
+        """
+        if diverging:
+            self._saved_active_presets = list(self.active_presets)
+            self._saved_log_scale = self.use_log_scale
+            self._saved_override_range = self.override_range
+            # Filter active presets to diverging-only
+            div_presets = [n for n in self.active_presets if n in DIVERGING_PRESETS]
+            if not div_presets:
+                # Fall back to all diverging presets from the full registry
+                div_presets = sorted(DIVERGING_PRESETS)
+            self.active_presets = div_presets
+            # Force log scale to linear if it was 'log' (only linear/symlog allowed)
+            if self.use_log_scale == "log":
+                self.use_log_scale = "linear"
+            # Switch to first diverging preset if current is not diverging
+            if self.preset not in DIVERGING_PRESETS:
+                self.preset = div_presets[0] if div_presets else self.preset
+            # Enable override range, compute abs_max from data, apply symmetric range
+            self.override_range = True
+            self._compute_abs_max_from_data()
+            self._apply_symmetric_range()
+        else:
+            # Restore saved state
+            if self._saved_active_presets is not None:
+                self.active_presets = self._saved_active_presets
+                self._saved_active_presets = None
+            if self._saved_log_scale is not None:
+                self.use_log_scale = self._saved_log_scale
+                self._saved_log_scale = None
+            if self._saved_override_range is not None:
+                self.override_range = self._saved_override_range
+                self._saved_override_range = None
+
+    @watch("epsilon")
+    def _on_epsilon_change(self, epsilon):
+        """Validate epsilon string and re-apply preset if in diverging mode.
+
+        Epsilon modifies the CTF (not the range) by injecting a dead zone
+        of center color around zero.
+        """
+        try:
+            val = float(epsilon)
+            self.epsilon_valid = val >= 0 and not math.isnan(val)
+        except (ValueError, TypeError):
+            self.epsilon_valid = False
+
+        if self.diverging and self.epsilon_valid:
+            self.update_color_preset(
+                self.preset,
+                self.invert,
+                self.use_log_scale,
+                self.discrete_log,
+                self.n_discrete_colors,
+                self.n_ticks,
+            )
+
+    @watch("abs_max")
+    def _on_abs_max_change(self, abs_max):
+        """Validate abs_max and recompute symmetric range if diverging."""
+        try:
+            val = float(abs_max)
+            self.abs_max_valid = val > 0 and not math.isnan(val)
+        except (ValueError, TypeError):
+            self.abs_max_valid = False
+
+        if self.diverging and self.abs_max_valid:
+            self._apply_symmetric_range()
+
+    def _compute_abs_max_from_data(self):
+        """Populate abs_max field from data array range."""
+        if not self._get_data_array:
+            return
+        data_array = self._get_data_array()
+        if not data_array:
+            return
+        data_range = data_array.GetRange()
+        abs_max_val = max(abs(data_range[0]), abs(data_range[1]))
+        self.abs_max = str(abs_max_val)
+
+    def _apply_symmetric_range(self):
+        """Apply the symmetric range centered at zero.
+
+        Range is [-abs_max, +abs_max]. Epsilon does NOT expand the range;
+        instead it creates a dead zone in the CTF around zero where the
+        center color is held constant.
+        """
+        try:
+            abs_max_val = float(self.abs_max)
+        except (ValueError, TypeError):
+            return
+
+        if abs_max_val <= 0:
+            return
+
+        self.color_value_min = str(-abs_max_val)
+        self.color_value_max = str(abs_max_val)
+        self.color_value_min_valid = True
+        self.color_value_max_valid = True
+        self.color_range = (-abs_max_val, abs_max_val)
+
+    def _inject_epsilon_band(self):
+        """Insert an epsilon dead zone into the CTF around zero.
+
+        Redistributes control points so that:
+        - Points in [-abs_max, 0) are linearly remapped into [-abs_max, -eps]
+        - Points in (0, +abs_max] are linearly remapped into [+eps, +abs_max]
+        - The band [-eps, +eps] is flat center color (sampled at x=0)
+
+        This compresses the colormap into the outer regions and holds the
+        center color constant across the tolerance band.
+        """
+        try:
+            eps = float(self.epsilon) if self.epsilon_valid else 0.0
+        except (ValueError, TypeError):
+            eps = 0.0
+        eps = max(0.0, eps)
+
+        if eps <= 0:
+            return
+
+        vmin, vmax = self.color_range
+        if vmax <= 0 or vmin >= 0:
+            return
+
+        # Sample center color at x=0 before redistribution
+        rgb = [0.0, 0.0, 0.0]
+        self._ctf.GetColor(0.0, rgb)
+        cr, cg, cb = rgb[0], rgb[1], rgb[2]
+
+        # Get current control points
+        pts = get_rgb_points(self._ctf)
+        n = len(pts) // 4
+
+        # Separate into left (x < 0), center (x == 0), and right (x > 0)
+        left_pts = []  # will be remapped into [vmin, -eps]
+        right_pts = []  # will be remapped into [+eps, vmax]
+        for i in range(n):
+            x = pts[i * 4]
+            r, g, b = pts[i * 4 + 1], pts[i * 4 + 2], pts[i * 4 + 3]
+            if x < 0:
+                left_pts.append((x, r, g, b))
+            elif x > 0:
+                right_pts.append((x, r, g, b))
+            # x == 0 control point is replaced by the band
+
+        # Remap left points: [vmin, 0) → [vmin, -eps]
+        new_pts = []
+        if left_pts:
+            old_min = vmin
+            old_max = 0.0
+            new_min = vmin
+            new_max = -eps
+            old_range = old_max - old_min
+            new_range = new_max - new_min
+            for x, r, g, b in left_pts:
+                if old_range != 0:
+                    t = (x - old_min) / old_range
+                    nx = new_min + t * new_range
+                else:
+                    nx = new_min
+                new_pts.extend([nx, r, g, b])
+
+        # Insert dead zone band
+        new_pts.extend([-eps, cr, cg, cb])
+        new_pts.extend([0.0, cr, cg, cb])
+        new_pts.extend([eps, cr, cg, cb])
+
+        # Remap right points: (0, vmax] → [+eps, vmax]
+        if right_pts:
+            old_min = 0.0
+            old_max = vmax
+            new_min = eps
+            new_max = vmax
+            old_range = old_max - old_min
+            new_range = new_max - new_min
+            for x, r, g, b in right_pts:
+                if old_range != 0:
+                    t = (x - old_min) / old_range
+                    nx = new_min + t * new_range
+                else:
+                    nx = new_max
+                new_pts.extend([nx, r, g, b])
+
+        set_rgb_points(self._ctf, new_pts)
 
     @watch("override_range", "color_range", eager=True)
     def _on_range_change(self, *_):
@@ -213,7 +419,23 @@ class ColormapConfig(StateDataModel):
         ticks = []
         if data_range > 0:
             if self.use_log_scale == "linear":
-                tick_vals = get_nice_ticks(vmin, vmax, n_ticks, scale="linear")
+                if self.diverging and vmin < 0 < vmax:
+                    # Symmetric ticks: compute for positive half, mirror
+                    half_n = max(2, n_ticks // 2 + 1)
+                    pos_ticks = get_nice_ticks(0, vmax, half_n, scale="linear")
+                    sym = set()
+                    for v in pos_ticks:
+                        sym.add(float(v))
+                        sym.add(float(-v))
+                    sym.add(0.0)
+                    tick_vals = np.array(sorted(sym))
+                    # Filter to range
+                    tick_vals = tick_vals[
+                        (tick_vals > vmin + data_range * 0.01)
+                        & (tick_vals < vmax - data_range * 0.01)
+                    ]
+                else:
+                    tick_vals = get_nice_ticks(vmin, vmax, n_ticks, scale="linear")
                 for val in tick_vals:
                     pos = (val - vmin) / data_range * 100
                     ticks.append({"position": round(pos, 2), "label": format_tick(val)})
@@ -226,13 +448,34 @@ class ColormapConfig(StateDataModel):
                 sl_min = float(_sl(vmin))
                 sl_max = float(_sl(vmax))
                 sl_range = sl_max - sl_min
-                tick_vals = get_nice_ticks(
-                    vmin,
-                    vmax,
-                    n_ticks,
-                    scale=self.use_log_scale,
-                    linthresh=linthresh,
-                )
+                if self.diverging and vmin < 0 < vmax:
+                    # Symmetric ticks: compute for positive half, mirror
+                    half_n = max(2, n_ticks // 2 + 1)
+                    pos_ticks = get_nice_ticks(
+                        0,
+                        vmax,
+                        half_n,
+                        scale=self.use_log_scale,
+                        linthresh=linthresh,
+                    )
+                    sym = set()
+                    for v in pos_ticks:
+                        sym.add(float(v))
+                        sym.add(float(-v))
+                    sym.add(0.0)
+                    tick_vals = np.array(sorted(sym))
+                    tick_vals = tick_vals[
+                        (tick_vals > vmin + data_range * 0.01)
+                        & (tick_vals < vmax - data_range * 0.01)
+                    ]
+                else:
+                    tick_vals = get_nice_ticks(
+                        vmin,
+                        vmax,
+                        n_ticks,
+                        scale=self.use_log_scale,
+                        linthresh=linthresh,
+                    )
                 for val in tick_vals:
                     if sl_range > 0:
                         pos = (float(_sl(val)) - sl_min) / sl_range * 100
@@ -396,6 +639,10 @@ class ColormapConfig(StateDataModel):
         apply_linear(self._ctf, name, invert)
         rescale_ctf(self._ctf, *self.color_range)
 
+        # In diverging mode, inject an epsilon dead zone around zero
+        if self.diverging:
+            self._inject_epsilon_band()
+
         # Capture the linear colorbar image (always the same regardless of scale)
         self.effective_color_range = self._ctf.GetRange()
         self.lut_img_h = lut_to_img_h(self._ctf)
@@ -419,6 +666,17 @@ class ColormapConfig(StateDataModel):
         if log_scale == "linear" and discrete_log:
             vmin, vmax = self.color_range
             tick_vals = get_nice_ticks(vmin, vmax, n_ticks, scale="linear")
+            # In diverging mode, inject epsilon boundaries so the dead
+            # zone is always preserved as its own discrete region.
+            if self.diverging and self.epsilon_valid:
+                try:
+                    eps = float(self.epsilon)
+                except (ValueError, TypeError):
+                    eps = 0.0
+                if eps > 0:
+                    eps_bounds = [-eps, eps]
+                    merged = sorted(set(list(tick_vals) + eps_bounds))
+                    tick_vals = np.array(merged)
             result = apply_discrete_linear(
                 self._ctf, linear_rgb_points, n_sub, tick_vals=tick_vals
             )
