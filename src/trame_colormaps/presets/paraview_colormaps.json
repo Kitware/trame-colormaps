@@ -541,7 +541,7 @@
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
     "License": "BSD-3-Clause",
-    "Category": "sequential"
+    "Category": "multi-sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -639,7 +639,7 @@
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
     "License": "BSD-3-Clause",
-    "Category": "sequential"
+    "Category": "multi-sequential"
   },
   {
     "ColorSpace": "RGB",
@@ -2531,7 +2531,7 @@
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
     "License": "BSD-3-Clause",
-    "Category": "sequential"
+    "Category": "multi-sequential"
   },
   {
     "ColorSpace": "Lab",
@@ -2750,7 +2750,7 @@
     "ColorBlindSafe": false,
     "Source": "https://gitlab.kitware.com/paraview/paraview/-/raw/master/Remoting/Views/ColorMaps.json",
     "License": "BSD-3-Clause",
-    "Category": "sequential"
+    "Category": "multi-sequential"
   },
   {
     "IndexedColors": [
