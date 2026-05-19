@@ -53,11 +53,12 @@ def _init_registry():
     sequential = {
         n for n, p in registry.items() if p.get("Category", "").lower() == "sequential"
     }
+    multi_sequential = {
+        n for n, p in registry.items() if p.get("Category", "").lower() == "multi-sequential"
+    }
     cyclic = {n for n, p in registry.items() if p.get("Category", "").lower() == "cyclic"}
     categorical = {
-        n
-        for n, p in registry.items()
-        if p.get("Category", "").lower() in ("categorical", "multi-sequential")
+        n for n, p in registry.items() if p.get("Category", "").lower() == "categorical"
     }
 
     return (
@@ -67,6 +68,7 @@ def _init_registry():
         defaults,
         diverging,
         sequential,
+        multi_sequential,
         cyclic,
         categorical,
     )
@@ -79,6 +81,7 @@ def _init_registry():
     DEFAULT_PRESETS,
     DIVERGING_PRESETS,
     SEQUENTIAL_PRESETS,
+    MULTI_SEQUENTIAL_PRESETS,
     CYCLIC_PRESETS,
     CATEGORICAL_PRESETS,
 ) = _init_registry()

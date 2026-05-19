@@ -14,7 +14,17 @@ __all__ = [
 def buttons(name):
     return [
         {
-            "icon": (f"{name}.color_blind ? 'mdi-shield-check-outline' : 'mdi-palette'"),
+            "icon": (f"{name}.show_categories ? 'mdi-palette' : 'mdi-palette-outline'"),
+            "click": f"{name}.show_categories = !{name}.show_categories",
+            "tip": (
+                f"'Toggle to '"
+                f" + ({name}.show_categories"
+                " ? 'Hide' : 'Show')"
+                " + ' Category Filter'"
+            ),
+        },
+        {
+            "icon": (f"{name}.color_blind ? 'mdi-blinds-open' : 'mdi-blinds'"),
             "click": f"{name}.color_blind = !{name}.color_blind",
             "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
         },
@@ -128,6 +138,40 @@ class ColorMapEditor(v3.VCard):
                         classes="tcmap-editor-icon",
                         click=f"{name}.menu=false",
                     )
+
+            # --- Category filter checkboxes ---
+            with v3.VCardItem(
+                v_show=(f"{name}.show_categories && !{name}.diverging"),
+                classes="py-0 mb-2",
+            ):
+                v3.VCheckboxBtn(
+                    v_model=f"{name}.selected_categories",
+                    label="Sequential",
+                    value="sequential",
+                    density="compact",
+                    hide_details=True,
+                )
+                v3.VCheckboxBtn(
+                    v_model=f"{name}.selected_categories",
+                    label="Multi-Sequential",
+                    value="multi-sequential",
+                    density="compact",
+                    hide_details=True,
+                )
+                v3.VCheckboxBtn(
+                    v_model=f"{name}.selected_categories",
+                    label="Diverging",
+                    value="diverging",
+                    density="compact",
+                    hide_details=True,
+                )
+                v3.VCheckboxBtn(
+                    v_model=f"{name}.selected_categories",
+                    label="Cyclic",
+                    value="cyclic",
+                    density="compact",
+                    hide_details=True,
+                )
 
             # --- Discrete colors slider/input ---
             _discrete_label = (

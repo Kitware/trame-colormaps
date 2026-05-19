@@ -77,6 +77,118 @@ A production app using `trame-colormaps` for climate data visualization.
 Each data variable gets its own horizontal colorbar at the bottom of the view,
 with symlog tick marks that adapt to the data range.
 
+## UI How-To
+
+### Opening the Control Panel
+
+Hover over any colorbar and the cursor changes to a **context-menu** icon:
+
+<img src="docs/images/context-menu.png" alt="context-menu cursor" width="32">
+
+Click the colorbar to open its control panel. Only one panel can be open at
+a time — opening one automatically closes any other.
+
+### The Control Panel
+
+<img src="docs/images/normal.png" alt="Control Panel" style="border: 1px solid black;">
+
+The control panel has three sections, top to bottom:
+
+- **Toolbar** — A row of icon buttons across the top that toggle modes and
+  settings (category filter, colorblind safe, invert, scale, diverging,
+  custom range, and discrete banding). The current preset name doubles as a
+  search field on the right, with a close button to dismiss the panel.
+
+- **Settings panels** — Context-sensitive inputs that appear below the toolbar
+  depending on which modes are active. These include category filter
+  checkboxes, discrete color count, diverging mode controls (|max| and
+  ε tolerance), and custom range inputs (Min / Max).
+
+- **Preset list** — A scrollable list of colormap swatches filtered by the
+  active categories, colorblind setting, and search text. Click any swatch
+  to apply it immediately.
+
+### Toolbar
+
+<img src="docs/images/panelbar.png" alt="Toolbar" style="border: 1px solid black;">
+
+The toolbar has three areas, left to right:
+
+- **Icon buttons** — Seven toggle buttons that control filtering and display
+  modes. Each button lights up or changes icon when its mode is active.
+  Details on each button are covered below.
+
+- **Search / preset name** — Shows the name of the currently active preset.
+  Click into it to type and filter the preset list by name. Use the clear
+  button to reset the search.
+
+- **Close button** (✕) — Dismisses the control panel.
+
+#### Icon Buttons (left to right)
+
+| # | Off | On | Toggle | Description |
+|---|-----|-----|--------|-------------|
+| 1 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette-outline.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette.svg" width="24"> | Category Filter | Shows/hides category checkboxes (Sequential, Multi-Sequential, Diverging, Cyclic) in the *Settings panel* to control which presets appear in the list. |
+| 2 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds-open.svg" width="24"> | Colorblind Safe | Limits the *Preset list* to colorblind-safe presets only. Filters within the selected categories. |
+| 3 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors-off.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24"> | Invert | Reverses the colormap direction (shown in the *Colorbar* and *Preset list*). |
+| 4a | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="24"> | | Scale: Linear | Click to switch to Log scale. In diverging mode, switches to SymLog. |
+| 4b | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="24"> | | Scale: Log | Click to switch to SymLog scale. **Note**: Not available in diverging mode. |
+| 4c | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="24"> | | Scale: SymLog | Click to return to Linear scale. |
+| 5 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle-outline.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle.svg" width="24"> | Δ Difference | Enters diverging mode: forces diverging-only presets in *Preset list*, symmetric range around zero, and exposes \|max\| and ε controls in *Settings panel*. |
+| 6 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/arrow-expand-horizontal.svg" width="24"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs exposed in the *Settings panel*. Locked (not shown in *Settings panel*)in diverging mode. |
+| 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/view-sequential.svg" width="24"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes "Colors per tick interval" (Linear) or "Colors per magnitude" (Log/SymLog) control in *Settings panel*. |
+
+#### Scale Modes
+
+<table>
+<tr>
+<td width="33%" align="center"><img src="docs/images/clicked-linear.png" width="100%" style="border: 1px solid black;"><br><em>Linear</em></td>
+<td width="33%" align="center"><img src="docs/images/clicked-log.png" width="100%" style="border: 1px solid black;"><br><em>Log</em></td>
+<td width="33%" align="center"><img src="docs/images/clicked-symlog.png" width="100%" style="border: 1px solid black;"><br><em>SymLog</em></td>
+</tr>
+</table>
+
+In all three screenshots, every mode except Δ Difference is active:
+
+- **Category Filter** — Only *Cyclic* is checked in the *Settings panel*;
+  the *Preset list* shows only cyclic presets (vikO, brocO, corkO, …).
+- **Colorblind Safe** — Further limits the *Preset list* to colorblind-safe
+  cyclic presets.
+- **Invert** — Preset swatches and the colorbar render reversed.
+- **Custom Range** — *Settings panel* shows editable **Min** and **Max** fields.
+- **Discrete** — *Settings panel* shows the band count control. Its label
+  adapts to the active scale: "Colors per tick interval" (Linear) or
+  "Colors per order of magnitude" (Log / SymLog).
+- **Search** — The text field contains "V", filtering the *Preset list* to
+  matching names. A clear button (✕) appears to reset the search.
+
+The only difference between the three images is the **Scale** button, which
+cycles through Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">), Log (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="16">), and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">).
+The colorbar tick labels at the bottom switch between decimal notation
+(Linear) and scientific notation (Log / SymLog).
+
+#### Δ Difference Mode
+
+<table>
+<tr>
+<td width="50%" align="center"><img src="docs/images/clicked-delta-linear.png" width="100%" style="border: 1px solid black;"><br><em>Δ Linear</em></td>
+<td width="50%" align="center"><img src="docs/images/clicked-delta-symlog.png" width="100%" style="border: 1px solid black;"><br><em>Δ SymLog</em></td>
+</tr>
+</table>
+
+When Δ Difference is active (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle.svg" width="16"> filled):
+
+- **Preset list** is forced to diverging-only presets regardless of category
+  selection (vik shown here).
+- **Scale** only toggles between Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">) and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">) — Log is
+  not available.
+- **Settings panel** replaces Min/Max with **|max|** (symmetric range
+  centered at zero) and **ε tolerance** (dead zone width around zero
+  where the center color is held constant).
+- **Custom Range** button is locked — range is always driven by |max|.
+- **Category Filter** checkboxes are hidden since presets are forced to
+  diverging.
+
 ## Public API
 
 Import via the trame namespace:
@@ -119,6 +231,7 @@ All colormap presets are stored as JSON files under `src/trame_colormaps/presets
 | Category | Use When | Data Character |
 |----------|----------|----------------|
 | **Sequential** | Magnitude — more/less of something | Temperature, pressure, density |
+| **Multi-Sequential** | Structured subranges — regimes that differ | Terrain, threshold bands |
 | **Diverging** | Deviation — Δ from a reference value | Anomaly, residual, balance |
 | **Cyclic** | Periodic — values that wrap around | Phase, angle, time-of-day |
 | **Categorical** | Discrete labels — no inherent order | Material ID, region, class |
@@ -146,6 +259,29 @@ with no special reference value.
 - Easy to interpret quantitatively
 
 **Good defaults:** Viridis, Plasma, batlow — perceptually uniform ramps.
+
+#### Using Multi-Sequential Colormaps
+
+Multi-sequential colormaps encode **structured data** — data with meaningful
+subranges where different regimes should look visually distinct.
+
+**Use when:**
+
+- Data has meaningful subranges
+- Different regimes should look different
+
+**Examples:**
+
+1. **Terrain / elevation** — deep ocean → shallow → land → mountains → snow;
+   each region has different semantics.
+2. **Threshold-based interpretation** — low → acceptable → warning → critical.
+3. **Nonlinear emphasis** (without changing scale) — more color variation in
+   important ranges, less in unimportant ones.
+
+**Properties:**
+
+- Does not imply "above vs below" — just adds internal structure
+- Requires care to avoid false edges and visual discontinuities
 
 #### Using Diverging Colormaps
 

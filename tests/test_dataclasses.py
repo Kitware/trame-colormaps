@@ -5,10 +5,31 @@ from trame.app import get_server
 from vtkmodules.vtkCommonCore import vtkDoubleArray
 from vtkmodules.vtkRenderingCore import vtkPolyDataMapper
 
-from trame_colormaps.core.presets import DEFAULT_PRESETS, DIVERGING_PRESETS
+from trame_colormaps.core.presets import (
+    CYCLIC_PRESETS,
+    DEFAULT_PRESETS,
+    DIVERGING_PRESETS,
+    MULTI_SEQUENTIAL_PRESETS,
+    SEQUENTIAL_PRESETS,
+)
 from trame_colormaps.dataclasses import ColormapConfig
 
 # --- Helpers ---
+# In production, trame's reactive event loop fires @watch handlers
+# automatically when a field changes.  Tests run without that loop,
+# so we must set the field *and* call the handler ourselves.
+
+
+def _enter_diverging(cfg):
+    """Simulate toggling diverging on: set the field and call the handler."""
+    cfg.diverging = True
+    cfg._on_diverging_change(True)
+
+
+def _leave_diverging(cfg):
+    """Simulate toggling diverging off: set the field and call the handler."""
+    cfg.diverging = False
+    cfg._on_diverging_change(False)
 
 
 def _make_data_array(values, name="TestData"):
@@ -332,10 +353,10 @@ class TestDivergingPresets:
 
 
 class TestDivergingMode:
-    """Test _on_diverging_change logic by calling the watcher directly.
+    """Test diverging mode enter/leave behavior.
 
-    Watchers fire asynchronously via trame's event loop at runtime;
-    tests exercise the method logic directly.
+    Uses _enter_diverging / _leave_diverging helpers that set the field
+    and call the handler together, matching real runtime behavior.
     """
 
     @pytest.fixture
@@ -353,56 +374,59 @@ class TestDivergingMode:
         return cfg
 
     def test_entering_diverging_filters_presets(self, div_cfg):
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         for name in div_cfg.active_presets:
             assert name in DIVERGING_PRESETS, f"{name} is not a diverging preset"
 
     def test_entering_diverging_enables_override_range(self, div_cfg):
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.override_range is True
 
     def test_entering_diverging_makes_range_symmetric(self, div_cfg):
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         vmin, vmax = div_cfg.color_range
         assert vmin == -vmax
         assert vmax > 0
 
     def test_symmetric_range_uses_max_abs(self, div_cfg):
         # data is [-30, 10, 50], so abs_max = 50
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         _, vmax = div_cfg.color_range
         assert vmax == 50.0
 
     def test_diverging_forces_log_to_linear(self, div_cfg):
         div_cfg.use_log_scale = "log"
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.use_log_scale == "linear"
 
     def test_diverging_keeps_symlog(self, div_cfg):
         div_cfg.use_log_scale = "symlog"
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.use_log_scale == "symlog"
 
     def test_diverging_keeps_linear(self, div_cfg):
         div_cfg.use_log_scale = "linear"
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.use_log_scale == "linear"
 
     def test_diverging_switches_to_diverging_preset(self, div_cfg):
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.preset in DIVERGING_PRESETS
 
-    def test_leaving_diverging_restores_presets(self, div_cfg):
-        original_presets = list(div_cfg.active_presets)
-        div_cfg._on_diverging_change(True)
-        div_cfg._on_diverging_change(False)
-        assert div_cfg.active_presets == original_presets
+    def test_leaving_diverging_restores_category_presets(self, div_cfg):
+        _enter_diverging(div_cfg)
+        # While diverging, only diverging presets are active
+        for p in div_cfg.active_presets:
+            assert p in DIVERGING_PRESETS
+        _leave_diverging(div_cfg)
+        # After leaving, presets rebuilt from selected_categories
+        assert len(div_cfg.active_presets) > len(DIVERGING_PRESETS)
 
     def test_leaving_diverging_restores_log_scale(self, div_cfg):
         div_cfg.use_log_scale = "log"
-        div_cfg._on_diverging_change(True)
+        _enter_diverging(div_cfg)
         assert div_cfg.use_log_scale == "linear"
-        div_cfg._on_diverging_change(False)
+        _leave_diverging(div_cfg)
         assert div_cfg.use_log_scale == "log"
 
 
@@ -423,8 +447,7 @@ class TestEpsilon:
         return cfg
 
     def test_epsilon_does_not_change_range(self, eps_cfg):
-        eps_cfg.diverging = True
-        eps_cfg._on_diverging_change(True)
+        _enter_diverging(eps_cfg)
         # abs_max populated from data: max(|-20|,|30|) = 30
         assert eps_cfg.abs_max == "30.0"
         assert eps_cfg.color_range == (-30.0, 30.0)
@@ -434,8 +457,7 @@ class TestEpsilon:
         assert eps_cfg.color_range == (-30.0, 30.0)
 
     def test_epsilon_injects_band_in_ctf(self, eps_cfg):
-        eps_cfg.diverging = True
-        eps_cfg._on_diverging_change(True)
+        _enter_diverging(eps_cfg)
         eps_cfg.epsilon = "5"
         eps_cfg._on_epsilon_change("5")
         # Check that the CTF has control points at -5, 0, +5
@@ -448,23 +470,113 @@ class TestEpsilon:
         assert 5.0 in xs
 
     def test_epsilon_invalid_keeps_old_ctf(self, eps_cfg):
-        eps_cfg.diverging = True
-        eps_cfg._on_diverging_change(True)
+        _enter_diverging(eps_cfg)
         eps_cfg.epsilon = "abc"
         eps_cfg._on_epsilon_change("abc")
         assert eps_cfg.epsilon_valid is False
 
     def test_epsilon_negative_invalid(self, eps_cfg):
-        eps_cfg.diverging = True
-        eps_cfg._on_diverging_change(True)
+        _enter_diverging(eps_cfg)
         eps_cfg.epsilon = "-1"
         eps_cfg._on_epsilon_change("-1")
         assert eps_cfg.epsilon_valid is False
 
     def test_abs_max_clamps_range(self, eps_cfg):
-        eps_cfg.diverging = True
-        eps_cfg._on_diverging_change(True)
+        _enter_diverging(eps_cfg)
         # User clamps to 10 (ignoring actual data range of 30)
         eps_cfg.abs_max = "10"
         eps_cfg._on_abs_max_change("10")
         assert eps_cfg.color_range == (-10.0, 10.0)
+
+
+class TestCategoryFiltering:
+    """Tests for category-based preset filtering."""
+
+    @pytest.fixture
+    def cat_cfg(self):
+        server = get_server(f"test_cat_{id(object())}")
+        mapper = vtkPolyDataMapper()
+        arr = _make_data_array([0, 50, 100])
+        cfg = ColormapConfig(server, mapper=mapper, data_array_fn=lambda: arr)
+        cfg.update_color_range()
+        return cfg
+
+    def test_default_categories_include_all_four(self, cat_cfg):
+        assert set(cat_cfg.selected_categories) == {
+            "sequential",
+            "multi-sequential",
+            "diverging",
+            "cyclic",
+        }
+
+    def test_selecting_only_diverging_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = ["diverging"]
+        cat_cfg._on_categories_change(["diverging"])
+        for p in cat_cfg.active_presets:
+            assert p in DIVERGING_PRESETS
+
+    def test_selecting_only_sequential_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = ["sequential"]
+        cat_cfg._on_categories_change(["sequential"])
+        for p in cat_cfg.active_presets:
+            assert p in SEQUENTIAL_PRESETS
+
+    def test_selecting_only_cyclic_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = ["cyclic"]
+        cat_cfg._on_categories_change(["cyclic"])
+        for p in cat_cfg.active_presets:
+            assert p in CYCLIC_PRESETS
+
+    def test_selecting_only_multi_sequential_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = ["multi-sequential"]
+        cat_cfg._on_categories_change(["multi-sequential"])
+        for p in cat_cfg.active_presets:
+            assert p in MULTI_SEQUENTIAL_PRESETS
+
+    def test_empty_selection_falls_back_to_defaults(self, cat_cfg):
+        cat_cfg.selected_categories = []
+        cat_cfg._on_categories_change([])
+        assert cat_cfg.active_presets == sorted(DEFAULT_PRESETS)
+
+    def test_multiple_categories_combine(self, cat_cfg):
+        cat_cfg.selected_categories = ["sequential", "diverging"]
+        cat_cfg._on_categories_change(["sequential", "diverging"])
+        active = set(cat_cfg.active_presets)
+        assert active <= (SEQUENTIAL_PRESETS | DIVERGING_PRESETS)
+        assert active & SEQUENTIAL_PRESETS
+        assert active & DIVERGING_PRESETS
+
+    def test_leaving_diverging_uses_current_categories(self, cat_cfg):
+        cat_cfg.selected_categories = ["cyclic"]
+        _enter_diverging(cat_cfg)
+        _leave_diverging(cat_cfg)
+        for p in cat_cfg.active_presets:
+            assert p in CYCLIC_PRESETS
+
+    def test_show_categories_default_false(self, cat_cfg):
+        assert cat_cfg.show_categories is False
+
+
+class TestPresetSets:
+    """Tests for the module-level preset category sets."""
+
+    def test_sequential_not_empty(self):
+        assert len(SEQUENTIAL_PRESETS) > 0
+
+    def test_multi_sequential_not_empty(self):
+        assert len(MULTI_SEQUENTIAL_PRESETS) > 0
+
+    def test_diverging_not_empty(self):
+        assert len(DIVERGING_PRESETS) > 0
+
+    def test_cyclic_not_empty(self):
+        assert len(CYCLIC_PRESETS) > 0
+
+    def test_no_overlap_sequential_diverging(self):
+        assert not (SEQUENTIAL_PRESETS & DIVERGING_PRESETS)
+
+    def test_no_overlap_sequential_multi_sequential(self):
+        assert not (SEQUENTIAL_PRESETS & MULTI_SEQUENTIAL_PRESETS)
+
+    def test_no_overlap_diverging_cyclic(self):
+        assert not (DIVERGING_PRESETS & CYCLIC_PRESETS)

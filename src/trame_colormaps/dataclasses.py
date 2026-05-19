@@ -16,8 +16,11 @@ from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 from trame_colormaps.core.presets import (
     COLOR_BLIND_SAFE,
     COLORBAR_CACHE,
+    CYCLIC_PRESETS,
     DEFAULT_PRESETS,
     DIVERGING_PRESETS,
+    MULTI_SEQUENTIAL_PRESETS,
+    SEQUENTIAL_PRESETS,
     get_rgb_points,
     lut_to_img_h,
     lut_to_img_v,
@@ -41,6 +44,13 @@ from trame_colormaps.core.transforms import (
 )
 
 ALL_COLORMAP_CONFIGS = []
+
+_CATEGORY_SETS = {
+    "sequential": SEQUENTIAL_PRESETS,
+    "multi-sequential": MULTI_SEQUENTIAL_PRESETS,
+    "diverging": DIVERGING_PRESETS,
+    "cyclic": CYCLIC_PRESETS,
+}
 
 __all__ = ["ColormapConfig"]
 
@@ -126,6 +136,10 @@ class ColormapConfig(StateDataModel):
     search: str | None = Sync(str)
     orientation: str = Sync(str, "horizontal")
     mapper_change: int = ServerOnly(int, 0)
+    show_categories: bool = Sync(bool, False)
+    selected_categories: list[str] = Sync(
+        list, ["sequential", "multi-sequential", "diverging", "cyclic"]
+    )
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
         # Create and own the CTF
@@ -210,16 +224,34 @@ class ColormapConfig(StateDataModel):
             self._compute_abs_max_from_data()
             self._apply_symmetric_range()
         else:
-            # Restore saved state
-            if self._saved_active_presets is not None:
-                self.active_presets = self._saved_active_presets
-                self._saved_active_presets = None
+            # Restore presets from category selection
+            combined = set()
+            for cat in self.selected_categories:
+                combined |= _CATEGORY_SETS.get(cat, set())
+            self.active_presets = sorted(combined) if combined else sorted(DEFAULT_PRESETS)
+            self._saved_active_presets = None
             if self._saved_log_scale is not None:
                 self.use_log_scale = self._saved_log_scale
                 self._saved_log_scale = None
             if self._saved_override_range is not None:
                 self.override_range = self._saved_override_range
                 self._saved_override_range = None
+            # Recompute range from data so we leave the symmetric range
+            self.update_color_range()
+
+    @watch("selected_categories")
+    def _on_categories_change(self, selected_categories):
+        """Rebuild active_presets from the selected category sets.
+
+        In diverging mode, active_presets is always diverging-only
+        regardless of category selection.
+        """
+        if self.diverging:
+            return
+        combined = set()
+        for cat in selected_categories:
+            combined |= _CATEGORY_SETS.get(cat, set())
+        self.active_presets = sorted(combined) if combined else sorted(DEFAULT_PRESETS)
 
     @watch("epsilon")
     def _on_epsilon_change(self, epsilon):
