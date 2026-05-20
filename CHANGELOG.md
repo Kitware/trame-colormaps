@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.1 (2026-05-20)
+
+### Bug Fixes
+
+- **vtk**: Remove version constraint
+  ([`ff29610`](https://github.com/Kitware/trame-colormaps/commit/ff29610238e655af14ff8e1e0e10cb932323353f))
+
+
 ## v1.1.0 (2026-05-19)
 
 ### Features
