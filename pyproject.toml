@@ -31,7 +31,7 @@ dependencies = [
     "trame>=3",
     "trame-dataclass>=2",
     "trame-vuetify>=3.2",
-    "vtk>=9.6.1",
+    "vtk",
 ]
 
 [project.urls]
