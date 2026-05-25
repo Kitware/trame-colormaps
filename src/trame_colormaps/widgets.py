@@ -22,16 +22,19 @@ def buttons(name):
                 " ? 'Hide' : 'Show')"
                 " + ' Category Filter'"
             ),
+            "active": f"{name}.show_categories",
         },
         {
             "icon": (f"{name}.color_blind ? 'mdi-blinds-open' : 'mdi-blinds'"),
             "click": f"{name}.color_blind = !{name}.color_blind",
             "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
+            "active": f"{name}.color_blind",
         },
         {
             "icon": f"{name}.invert ? 'mdi-invert-colors' : 'mdi-invert-colors-off'",
             "click": f"{name}.invert = !{name}.invert",
             "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
+            "active": f"{name}.invert",
         },
         {
             "icon": (
@@ -52,11 +55,13 @@ def buttons(name):
                 f" 'Log Scale' : {name}"
                 ".use_log_scale === 'log' ? 'SymLog Scale' : 'Linear Scale'))"
             ),
+            "active": "true",
         },
         {
             "icon": f"{name}.diverging ? 'mdi-triangle' : 'mdi-triangle-outline'",
             "click": f"{name}.diverging = !{name}.diverging",
             "tip": (f"'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"),
+            "active": f"{name}.diverging",
         },
         {
             "icon": (f"{name}.override_range ? 'mdi-arrow-expand-horizontal' : 'mdi-pencil'"),
@@ -66,6 +71,7 @@ def buttons(name):
                 f" : 'Toggle to ' + ({name}.override_range ? "
                 "'Data Range' : 'Custom Range')"
             ),
+            "active": f"{name}.override_range",
         },
         {
             "icon": (
@@ -73,6 +79,7 @@ def buttons(name):
             ),
             "click": f"{name}.discrete_log = !{name}.discrete_log",
             "tip": f"'Toggle to ' + ({name}.discrete_log ? 'Continuous' : 'Discrete')",
+            "active": f"{name}.discrete_log",
         },
     ]
 
@@ -108,7 +115,8 @@ class ColorMapEditor(v3.VCard):
                                 icon=(b["icon"],),
                                 click=b["click"],
                                 size="small",
-                                variant="text",
+                                variant=(f"{b['active']} ? 'outlined' : 'text'",),
+                                color=(f"{b['active']} ? 'primary' : undefined",),
                                 classes="tcmap-editor-icon",
                             )
                             v3.VTooltip(

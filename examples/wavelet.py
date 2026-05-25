@@ -235,25 +235,33 @@ class WaveletColorMapDemo(TrameApp):
                     icon="mdi-arrow-up-bold",
                     click="show_up = !show_up",
                     density="compact",
-                    variant=("show_up ? 'flat' : 'outlined'",),
+                    variant=("show_up ? 'outlined' : 'text'",),
+                    color=("show_up ? 'primary' : undefined",),
+                    classes="rounded tcmap-icon-black",
                 )
                 v3.VBtn(
                     icon="mdi-arrow-down-bold",
                     click="show_down = !show_down",
                     density="compact",
-                    variant=("show_down ? 'flat' : 'outlined'",),
+                    variant=("show_down ? 'outlined' : 'text'",),
+                    color=("show_down ? 'primary' : undefined",),
+                    classes="rounded tcmap-icon-black",
                 )
                 v3.VBtn(
                     icon="mdi-arrow-left-bold",
                     click="show_left = !show_left",
                     density="compact",
-                    variant=("show_left ? 'flat' : 'outlined'",),
+                    variant=("show_left ? 'outlined' : 'text'",),
+                    color=("show_left ? 'primary' : undefined",),
+                    classes="rounded tcmap-icon-black",
                 )
                 v3.VBtn(
                     icon="mdi-arrow-right-bold",
                     click="show_right = !show_right",
                     density="compact",
-                    variant=("show_right ? 'flat' : 'outlined'",),
+                    variant=("show_right ? 'outlined' : 'text'",),
+                    color=("show_right ? 'primary' : undefined",),
+                    classes="rounded tcmap-icon-black",
                 )
                 v3.VBtn(
                     icon="mdi-crop-free",
