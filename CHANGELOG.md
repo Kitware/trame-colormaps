@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-05-25)
+
+### Features
+
+- Primary-colored square outline on active toggle buttons
+  ([`dc6b309`](https://github.com/Kitware/trame-colormaps/commit/dc6b3092e9bcbd063cd0621b9fdf87b8bc2d7003))
+
+
 ## v1.1.1 (2026-05-20)
 
 ### Bug Fixes
