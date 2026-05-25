@@ -12,6 +12,12 @@
   width: 24px !important;
   height: 24px !important;
   padding: 0;
+  border-radius: 4px !important;
+}
+
+.tcmap-editor-icon.v-btn--variant-outlined .v-icon,
+.tcmap-icon-black.v-btn--variant-outlined .v-icon {
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 
 .tcmap-editor-search {
