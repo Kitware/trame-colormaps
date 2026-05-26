@@ -137,9 +137,7 @@ class ColormapConfig(StateDataModel):
     orientation: str = Sync(str, "horizontal")
     mapper_change: int = ServerOnly(int, 0)
     show_categories: bool = Sync(bool, False)
-    selected_categories: list[str] = Sync(
-        list, ["sequential", "multi-sequential", "diverging", "cyclic"]
-    )
+    selected_categories: str = Sync(str, "sequential")
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
         # Create and own the CTF
@@ -225,10 +223,9 @@ class ColormapConfig(StateDataModel):
             self._apply_symmetric_range()
         else:
             # Restore presets from category selection
-            combined = set()
-            for cat in self.selected_categories:
-                combined |= _CATEGORY_SETS.get(cat, set())
-            self.active_presets = sorted(combined) if combined else sorted(DEFAULT_PRESETS)
+            self.selected_categories = "sequential"
+            presets = _CATEGORY_SETS.get(self.selected_categories, set())
+            self.active_presets = sorted(presets) if presets else sorted(DEFAULT_PRESETS)
             self._saved_active_presets = None
             if self._saved_log_scale is not None:
                 self.use_log_scale = self._saved_log_scale
@@ -241,17 +238,15 @@ class ColormapConfig(StateDataModel):
 
     @watch("selected_categories")
     def _on_categories_change(self, selected_categories):
-        """Rebuild active_presets from the selected category sets.
+        """Rebuild active_presets from the selected category.
 
         In diverging mode, active_presets is always diverging-only
         regardless of category selection.
         """
         if self.diverging:
             return
-        combined = set()
-        for cat in selected_categories:
-            combined |= _CATEGORY_SETS.get(cat, set())
-        self.active_presets = sorted(combined) if combined else sorted(DEFAULT_PRESETS)
+        presets = _CATEGORY_SETS.get(selected_categories, set())
+        self.active_presets = sorted(presets) if presets else sorted(DEFAULT_PRESETS)
 
     @watch("epsilon")
     def _on_epsilon_change(self, epsilon):

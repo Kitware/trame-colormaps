@@ -14,29 +14,6 @@ __all__ = [
 def buttons(name):
     return [
         {
-            "icon": (f"{name}.show_categories ? 'mdi-palette' : 'mdi-palette-outline'"),
-            "click": f"{name}.show_categories = !{name}.show_categories",
-            "tip": (
-                f"'Toggle to '"
-                f" + ({name}.show_categories"
-                " ? 'Hide' : 'Show')"
-                " + ' Category Filter'"
-            ),
-            "active": f"{name}.show_categories",
-        },
-        {
-            "icon": (f"{name}.color_blind ? 'mdi-blinds-open' : 'mdi-blinds'"),
-            "click": f"{name}.color_blind = !{name}.color_blind",
-            "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
-            "active": f"{name}.color_blind",
-        },
-        {
-            "icon": f"{name}.invert ? 'mdi-invert-colors' : 'mdi-invert-colors-off'",
-            "click": f"{name}.invert = !{name}.invert",
-            "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
-            "active": f"{name}.invert",
-        },
-        {
             "icon": (
                 f"{name}.use_log_scale === 'log' ? 'mdi-math-log' : "
                 f"{name}.use_log_scale === 'symlog' ? 'mdi-sine-wave' : 'mdi-stairs'"
@@ -58,28 +35,67 @@ def buttons(name):
             "active": "true",
         },
         {
-            "icon": f"{name}.diverging ? 'mdi-triangle' : 'mdi-triangle-outline'",
-            "click": f"{name}.diverging = !{name}.diverging",
-            "tip": (f"'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"),
+            "icon": "'mdi-triangle-outline'",
+            "click": (
+                f"({name}.diverging || ({name}.use_log_scale !== 'log'"
+                f" && !{name}.override_range))"
+                f" && ({name}.diverging = !{name}.diverging)"
+            ),
+            "tip": (
+                f"!{name}.diverging && {name}.use_log_scale === 'log'"
+                f" ? 'Δ mode unavailable in Log scale'"
+                f" : !{name}.diverging && {name}.override_range"
+                f" ? 'Δ mode unavailable with custom range'"
+                f" : 'Toggle to ' + ({name}.diverging ? 'Normal Mode' : 'Difference Mode')"
+            ),
             "active": f"{name}.diverging",
+            "disabled": (
+                f"!{name}.diverging && "
+                f"({name}.use_log_scale === 'log' || {name}.override_range)"
+            ),
+        },
+        {"separator": True},
+        {
+            "icon": "'mdi-palette'",
+            "click": f"{name}.show_categories = !{name}.show_categories",
+            "tip": (
+                f"{name}.diverging"
+                f" ? 'Presets locked to Diverging in Δ mode'"
+                f" : 'Select preset category'"
+            ),
+            "active": "false",
+            "disabled": f"{name}.diverging",
+            "menu": True,
         },
         {
-            "icon": (f"{name}.override_range ? 'mdi-arrow-expand-horizontal' : 'mdi-pencil'"),
+            "icon": "'mdi-blinds'",
+            "click": f"{name}.color_blind = !{name}.color_blind",
+            "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
+            "active": f"{name}.color_blind",
+        },
+        {
+            "icon": "'mdi-invert-colors'",
+            "click": f"{name}.invert = !{name}.invert",
+            "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
+            "active": f"{name}.invert",
+        },
+        {"separator": True},
+        {
+            "icon": "'mdi-gradient-horizontal'",
+            "click": f"{name}.discrete_log = !{name}.discrete_log",
+            "tip": f"'Toggle to ' + ({name}.discrete_log ? 'Continuous' : 'Discrete')",
+            "active": f"{name}.discrete_log",
+        },
+        {
+            "icon": "'mdi-pencil'",
             "click": (f"!{name}.diverging && ({name}.override_range = !{name}.override_range)"),
             "tip": (
-                f"{name}.diverging ? 'Range locked in Δ mode'"
+                f"{name}.diverging ? 'Custom range unavailable in Δ mode'"
                 f" : 'Toggle to ' + ({name}.override_range ? "
                 "'Data Range' : 'Custom Range')"
             ),
             "active": f"{name}.override_range",
-        },
-        {
-            "icon": (
-                f"{name}.discrete_log ? 'mdi-view-sequential' : 'mdi-gradient-horizontal'"
-            ),
-            "click": f"{name}.discrete_log = !{name}.discrete_log",
-            "tip": f"'Toggle to ' + ({name}.discrete_log ? 'Continuous' : 'Discrete')",
-            "active": f"{name}.discrete_log",
+            "disabled": f"{name}.diverging",
         },
     ]
 
@@ -110,20 +126,64 @@ class ColorMapEditor(v3.VCard):
             with v3.VCardItem(classes="py-1 px-2"):
                 with html.Div(classes="d-flex align-center ga-1"):
                     for b in buttons(name):
-                        with html.Div():
-                            v3.VBtn(
-                                icon=(b["icon"],),
-                                click=b["click"],
-                                size="small",
-                                variant=(f"{b['active']} ? 'outlined' : 'text'",),
-                                color=(f"{b['active']} ? 'primary' : undefined",),
-                                classes="tcmap-editor-icon",
-                            )
-                            v3.VTooltip(
-                                text=(b["tip"],),
-                                activator="parent",
-                                location="bottom",
-                            )
+                        if b.get("separator"):
+                            v3.VDivider(vertical=True, classes="mx-1 my-auto", length="20")
+                            continue
+                        btn_kwargs = dict(
+                            icon=(b["icon"],),
+                            size="small",
+                            variant=(f"{b['active']} ? 'outlined' : 'text'",),
+                            color=(f"{b['active']} ? 'primary' : undefined",),
+                            classes="tcmap-editor-icon",
+                        )
+                        if "disabled" in b:
+                            btn_kwargs["disabled"] = (b["disabled"],)
+                        if b.get("menu"):
+                            with html.Div():
+                                with v3.VMenu(
+                                    v_model=f"{name}.show_categories",
+                                    close_on_content_click=False,
+                                    location="bottom",
+                                ):
+                                    with html.Template(v_slot_activator="{ props: menuProps }"):
+                                        btn_kwargs["v_bind"] = "menuProps"
+                                        v3.VBtn(**btn_kwargs)
+                                    with v3.VList(density="compact"):
+                                        for cat_value, cat_label in [
+                                            ("sequential", "Sequential"),
+                                            ("multi-sequential", "Multi-Sequential"),
+                                            ("diverging", "Diverging"),
+                                            ("cyclic", "Cyclic"),
+                                        ]:
+                                            v3.VListItem(
+                                                title=cat_label,
+                                                value=cat_value,
+                                                click=(
+                                                    f"{name}.selected_categories"
+                                                    f" = '{cat_value}';"
+                                                    f" {name}.search = null;"
+                                                    f" {name}.show_categories"
+                                                    " = false"
+                                                ),
+                                                active=(
+                                                    f"{name}.selected_categories"
+                                                    f" === '{cat_value}'",
+                                                ),
+                                            )
+                                v3.VTooltip(
+                                    text=(b["tip"],),
+                                    activator="parent",
+                                    location="bottom",
+                                )
+                        else:
+                            btn_kwargs["click"] = b["click"]
+                            with html.Div():
+                                v3.VBtn(**btn_kwargs)
+                                v3.VTooltip(
+                                    text=(b["tip"],),
+                                    activator="parent",
+                                    location="bottom",
+                                )
 
                     v3.VSpacer()
                     v3.VTextField(
@@ -146,40 +206,6 @@ class ColorMapEditor(v3.VCard):
                         classes="tcmap-editor-icon",
                         click=f"{name}.menu=false",
                     )
-
-            # --- Category filter checkboxes ---
-            with v3.VCardItem(
-                v_show=(f"{name}.show_categories && !{name}.diverging"),
-                classes="py-0 mb-2",
-            ):
-                v3.VCheckboxBtn(
-                    v_model=f"{name}.selected_categories",
-                    label="Sequential",
-                    value="sequential",
-                    density="compact",
-                    hide_details=True,
-                )
-                v3.VCheckboxBtn(
-                    v_model=f"{name}.selected_categories",
-                    label="Multi-Sequential",
-                    value="multi-sequential",
-                    density="compact",
-                    hide_details=True,
-                )
-                v3.VCheckboxBtn(
-                    v_model=f"{name}.selected_categories",
-                    label="Diverging",
-                    value="diverging",
-                    density="compact",
-                    hide_details=True,
-                )
-                v3.VCheckboxBtn(
-                    v_model=f"{name}.selected_categories",
-                    label="Cyclic",
-                    value="cyclic",
-                    density="compact",
-                    hide_details=True,
-                )
 
             # --- Discrete colors slider/input ---
             _discrete_label = (

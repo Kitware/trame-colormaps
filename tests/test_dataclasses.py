@@ -501,57 +501,45 @@ class TestCategoryFiltering:
         cfg.update_color_range()
         return cfg
 
-    def test_default_categories_include_all_four(self, cat_cfg):
-        assert set(cat_cfg.selected_categories) == {
-            "sequential",
-            "multi-sequential",
-            "diverging",
-            "cyclic",
-        }
+    def test_default_category_is_sequential(self, cat_cfg):
+        assert cat_cfg.selected_categories == "sequential"
 
-    def test_selecting_only_diverging_filters_presets(self, cat_cfg):
-        cat_cfg.selected_categories = ["diverging"]
-        cat_cfg._on_categories_change(["diverging"])
+    def test_selecting_diverging_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = "diverging"
+        cat_cfg._on_categories_change("diverging")
         for p in cat_cfg.active_presets:
             assert p in DIVERGING_PRESETS
 
-    def test_selecting_only_sequential_filters_presets(self, cat_cfg):
-        cat_cfg.selected_categories = ["sequential"]
-        cat_cfg._on_categories_change(["sequential"])
+    def test_selecting_sequential_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = "sequential"
+        cat_cfg._on_categories_change("sequential")
         for p in cat_cfg.active_presets:
             assert p in SEQUENTIAL_PRESETS
 
-    def test_selecting_only_cyclic_filters_presets(self, cat_cfg):
-        cat_cfg.selected_categories = ["cyclic"]
-        cat_cfg._on_categories_change(["cyclic"])
+    def test_selecting_cyclic_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = "cyclic"
+        cat_cfg._on_categories_change("cyclic")
         for p in cat_cfg.active_presets:
             assert p in CYCLIC_PRESETS
 
-    def test_selecting_only_multi_sequential_filters_presets(self, cat_cfg):
-        cat_cfg.selected_categories = ["multi-sequential"]
-        cat_cfg._on_categories_change(["multi-sequential"])
+    def test_selecting_multi_sequential_filters_presets(self, cat_cfg):
+        cat_cfg.selected_categories = "multi-sequential"
+        cat_cfg._on_categories_change("multi-sequential")
         for p in cat_cfg.active_presets:
             assert p in MULTI_SEQUENTIAL_PRESETS
 
-    def test_empty_selection_falls_back_to_defaults(self, cat_cfg):
-        cat_cfg.selected_categories = []
-        cat_cfg._on_categories_change([])
+    def test_invalid_category_falls_back_to_defaults(self, cat_cfg):
+        cat_cfg.selected_categories = "nonexistent"
+        cat_cfg._on_categories_change("nonexistent")
         assert cat_cfg.active_presets == sorted(DEFAULT_PRESETS)
 
-    def test_multiple_categories_combine(self, cat_cfg):
-        cat_cfg.selected_categories = ["sequential", "diverging"]
-        cat_cfg._on_categories_change(["sequential", "diverging"])
-        active = set(cat_cfg.active_presets)
-        assert active <= (SEQUENTIAL_PRESETS | DIVERGING_PRESETS)
-        assert active & SEQUENTIAL_PRESETS
-        assert active & DIVERGING_PRESETS
-
-    def test_leaving_diverging_uses_current_categories(self, cat_cfg):
-        cat_cfg.selected_categories = ["cyclic"]
+    def test_leaving_diverging_resets_to_sequential(self, cat_cfg):
+        cat_cfg.selected_categories = "cyclic"
         _enter_diverging(cat_cfg)
         _leave_diverging(cat_cfg)
+        assert cat_cfg.selected_categories == "sequential"
         for p in cat_cfg.active_presets:
-            assert p in CYCLIC_PRESETS
+            assert p in SEQUENTIAL_PRESETS
 
     def test_show_categories_default_false(self, cat_cfg):
         assert cat_cfg.show_categories is False
