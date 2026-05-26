@@ -64,14 +64,14 @@ class TestButtons:
     def test_palette_button(self):
         btn = buttons("c")[3]
         assert "show_categories" in btn["click"]
-        assert "palette" in btn["icon"]  # static icon, outline from variant
+        assert btn["icon"] == "mdi-palette"
 
     def test_log_icon_f_string(self):
         """Regression: symlog icon expression must interpolate the name."""
         btn = buttons("cfg")[0]
-        # The icon string should NOT contain literal '{name}'
-        assert "{name}" not in btn["icon"]
-        assert "cfg" in btn["icon"]
+        icon = btn["icon"][0] if isinstance(btn["icon"], tuple) else btn["icon"]
+        assert "{name}" not in icon
+        assert "cfg" in icon
 
     def test_separators_at_correct_positions(self):
         result = buttons("c")
@@ -119,12 +119,15 @@ class TestButtons:
         assert "diverging" in btn["disabled"]
 
     def test_non_scale_icons_are_static(self):
-        """All buttons except scale have static icon strings (no ternary)."""
+        """All buttons except scale have plain mdi- icon strings."""
         for i, btn in enumerate(buttons("c")):
             if btn.get("separator") or i == 0:
                 continue
-            # Static icons are quoted literals like "'mdi-xxx'"
-            assert btn["icon"].startswith("'"), f"Button {i} icon is not static"
+            assert btn["icon"].startswith("mdi-"), f"Button {i} icon is not static"
+
+    def test_scale_icon_is_reactive_tuple(self):
+        btn = buttons("c")[0]
+        assert isinstance(btn["icon"], tuple)
 
 
 # --- Widget classes exist ---
