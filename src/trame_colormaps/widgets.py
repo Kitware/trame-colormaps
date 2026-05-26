@@ -15,8 +15,9 @@ def buttons(name):
     return [
         {
             "icon": (
+                f"{name}.use_log_scale === 'linear' ? 'mdi-stairs' : "
                 f"{name}.use_log_scale === 'log' ? 'mdi-math-log' : "
-                f"{name}.use_log_scale === 'symlog' ? 'mdi-sine-wave' : 'mdi-stairs'"
+                "'mdi-sine-wave'",
             ),
             "click": (
                 f"{name}.use_log_scale = {name}.diverging"
@@ -35,7 +36,7 @@ def buttons(name):
             "active": "true",
         },
         {
-            "icon": "'mdi-triangle-outline'",
+            "icon": "mdi-triangle-outline",
             "click": (
                 f"({name}.diverging || ({name}.use_log_scale !== 'log'"
                 f" && !{name}.override_range))"
@@ -56,7 +57,7 @@ def buttons(name):
         },
         {"separator": True},
         {
-            "icon": "'mdi-palette'",
+            "icon": "mdi-palette",
             "click": f"{name}.show_categories = !{name}.show_categories",
             "tip": (
                 f"{name}.diverging"
@@ -68,33 +69,33 @@ def buttons(name):
             "menu": True,
         },
         {
-            "icon": "'mdi-blinds'",
+            "icon": "mdi-blinds",
             "click": f"{name}.color_blind = !{name}.color_blind",
             "tip": (f"'Toggle to ' + ({name}.color_blind ? 'All Colors' : 'Colorblind Safe')"),
             "active": f"{name}.color_blind",
         },
         {
-            "icon": "'mdi-invert-colors'",
+            "icon": "mdi-invert-colors",
             "click": f"{name}.invert = !{name}.invert",
             "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
             "active": f"{name}.invert",
         },
         {"separator": True},
         {
-            "icon": "'mdi-gradient-horizontal'",
+            "icon": "mdi-gradient-horizontal",
             "click": f"{name}.discrete_log = !{name}.discrete_log",
             "tip": f"'Toggle to ' + ({name}.discrete_log ? 'Continuous' : 'Discrete')",
             "active": f"{name}.discrete_log",
         },
         {
-            "icon": "'mdi-pencil'",
+            "icon": "mdi-pencil",
             "click": (f"!{name}.diverging && ({name}.override_range = !{name}.override_range)"),
             "tip": (
                 f"{name}.diverging ? 'Custom range unavailable in Δ mode'"
                 f" : 'Toggle to ' + ({name}.override_range ? "
                 "'Data Range' : 'Custom Range')"
             ),
-            "active": f"{name}.override_range",
+            "active": f"!{name}.diverging && {name}.override_range",
             "disabled": f"{name}.diverging",
         },
     ]
@@ -130,7 +131,7 @@ class ColorMapEditor(v3.VCard):
                             v3.VDivider(vertical=True, classes="mx-1 my-auto", length="20")
                             continue
                         btn_kwargs = dict(
-                            icon=(b["icon"],),
+                            icon=b["icon"],
                             size="small",
                             variant=(f"{b['active']} ? 'outlined' : 'text'",),
                             color=(f"{b['active']} ? 'primary' : undefined",),
