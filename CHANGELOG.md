@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.1 (2026-05-26)
+
+### Bug Fixes
+
+- **toolbar**: Reorder buttons, add separators, dropdown category, mutual exclusion
+  ([`6b38174`](https://github.com/Kitware/trame-colormaps/commit/6b38174bf81183d4ac0d2ed17ce4ce58e12be7a3))
+
+
 ## v1.2.0 (2026-05-25)
 
 ### Features
