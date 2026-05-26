@@ -94,18 +94,17 @@ a time — opening one automatically closes any other.
 
 The control panel has three sections, top to bottom:
 
-- **Toolbar** — A row of icon buttons across the top that toggle modes and
-  settings (category filter, colorblind safe, invert, scale, diverging,
-  custom range, and discrete banding). The current preset name doubles as a
-  search field on the right, with a close button to dismiss the panel.
+- **Toolbar** — A row of icon buttons across the top that control scale,
+  diverging mode, preset category, colorblind filtering, inversion, discrete
+  banding, and custom range. A search field and close button sit on the right.
 
 - **Settings panels** — Context-sensitive inputs that appear below the toolbar
-  depending on which modes are active. These include category filter
-  checkboxes, discrete color count, diverging mode controls (|max| and
-  ε tolerance), and custom range inputs (Min / Max).
+  depending on which modes are active. These include discrete color count,
+  diverging mode controls (|max| and ε tolerance), and custom range inputs
+  (Min / Max).
 
 - **Preset list** — A scrollable list of colormap swatches filtered by the
-  active categories, colorblind setting, and search text. Click any swatch
+  active category, colorblind setting, and search text. Click any swatch
   to apply it immediately.
 
 ### Toolbar
@@ -114,29 +113,42 @@ The control panel has three sections, top to bottom:
 
 The toolbar has three areas, left to right:
 
-- **Icon buttons** — Seven toggle buttons that control filtering and display
-  modes. Each button lights up or changes icon when its mode is active.
-  Details on each button are covered below.
+- **Icon buttons** — Seven buttons separated into three groups by vertical
+  dividers. Active toggles show a primary-colored square outline; the icon
+  itself stays black. Details on each button below.
 
 - **Search / preset name** — Shows the name of the currently active preset.
   Click into it to type and filter the preset list by name. Use the clear
-  button to reset the search.
+  button to reset the search. Switching categories clears the search.
 
 - **Close button** (✕) — Dismisses the control panel.
 
 #### Icon Buttons (left to right)
 
-| # | Off | On | Toggle | Description |
-|---|-----|-----|--------|-------------|
-| 1 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette-outline.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Category Filter | Shows/hides category checkboxes (Sequential, Multi-Sequential, Diverging, Cyclic) in the *Settings panel* to control which presets appear in the list. |
-| 2 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds-open.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Colorblind Safe | Limits the *Preset list* to colorblind-safe presets only. Filters within the selected categories. |
-| 3 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors-off.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Invert | Reverses the colormap direction (shown in the *Colorbar* and *Preset list*). |
-| 4a | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | | Scale: Linear | Click to switch to Log scale. In diverging mode, switches to SymLog. |
-| 4b | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | | Scale: Log | Click to switch to SymLog scale. **Note**: Not available in diverging mode. |
-| 4c | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | | Scale: SymLog | Click to return to Linear scale. |
-| 5 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle-outline.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Δ Difference | Enters diverging mode: forces diverging-only presets in *Preset list*, symmetric range around zero, and exposes \|max\| and ε controls in *Settings panel*. |
-| 6 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/arrow-expand-horizontal.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs exposed in the *Settings panel*. Locked (not shown in *Settings panel*)in diverging mode. |
-| 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/view-sequential.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes "Colors per tick interval" (Linear) or "Colors per magnitude" (Log/SymLog) control in *Settings panel*. |
+| # | Icon | Active | Name | Description |
+|---|------|--------|------|-------------|
+| 1a | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | always | Scale: Linear | Click to cycle to Log. In Δ mode, cycles to SymLog. |
+| 1b | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | always | Scale: Log | Click to cycle to SymLog. Not available in Δ mode. |
+| 1c | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | always | Scale: SymLog | Click to return to Linear. |
+| 2 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle-outline.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle-outline.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Δ Difference | Forces diverging-only presets, symmetric range, exposes \|max\| and ε. Disabled when Log scale or Custom Range is active. |
+| | | | | |
+| 3 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette.svg" width="24"> | — | Category | Opens a dropdown to select one preset category (Sequential, Multi-Sequential, Diverging, Cyclic). Default is Sequential. Disabled in Δ mode. |
+| 4 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Colorblind Safe | Limits the *Preset list* to colorblind-safe presets within the active category. |
+| 5 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Invert | Reverses the colormap direction (shown in the *Colorbar* and *Preset list*). |
+| | | | | |
+| 6 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes band count in *Settings panel*. |
+| 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs. Disabled in Δ mode. Cannot be active at the same time as Δ Difference. |
+
+Empty rows in the table indicate the vertical separator dividers between
+button groups.
+
+#### Mutual Exclusion Rules
+
+- **Δ Difference** is disabled when Scale is Log or when Custom Range is on.
+  You can always turn Δ Difference *off*.
+- **Custom Range** is disabled when Δ Difference is on.
+- **Category dropdown** is disabled when Δ Difference is on (presets forced
+  to Diverging). When Δ is turned off, category resets to Sequential.
 
 #### Scale Modes
 
@@ -148,24 +160,23 @@ The toolbar has three areas, left to right:
 </tr>
 </table>
 
-In all three screenshots, every mode except Δ Difference is active:
+In all three screenshots, Colorblind Safe, Invert, Custom Range, and
+Discrete are active (outlined). The category is set to Cyclic via the
+dropdown, and the search field contains "V":
 
-- **Category Filter** — Only *Cyclic* is checked in the *Settings panel*;
-  the *Preset list* shows only cyclic presets (vikO, brocO, corkO, …).
-- **Colorblind Safe** — Further limits the *Preset list* to colorblind-safe
-  cyclic presets.
-- **Invert** — Preset swatches and the colorbar render reversed.
+- **Category** — Cyclic selected from dropdown; *Preset list* shows only
+  cyclic presets (vikO, brocO, corkO, …).
+- **Colorblind Safe** — Further limits to colorblind-safe cyclic presets.
+- **Invert** — Preset swatches and colorbar render reversed.
 - **Custom Range** — *Settings panel* shows editable **Min** and **Max** fields.
-- **Discrete** — *Settings panel* shows the band count control. Its label
-  adapts to the active scale: "Colors per tick interval" (Linear) or
-  "Colors per order of magnitude" (Log / SymLog).
-- **Search** — The text field contains "V", filtering the *Preset list* to
-  matching names. A clear button (✕) appears to reset the search.
+- **Discrete** — *Settings panel* shows band count. Label adapts: "Colors
+  per tick interval" (Linear) or "Colors per order of magnitude" (Log/SymLog).
+- **Search** — Text field contains "V"; a clear button (✕) appears.
 
-The only difference between the three images is the **Scale** button, which
+The only difference between the three images is the **Scale** icon, which
 cycles through Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">), Log (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="16">), and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">).
-The colorbar tick labels at the bottom switch between decimal notation
-(Linear) and scientific notation (Log / SymLog).
+The colorbar tick labels switch between decimal (Linear) and scientific
+notation (Log/SymLog).
 
 #### Δ Difference Mode
 
@@ -176,18 +187,15 @@ The colorbar tick labels at the bottom switch between decimal notation
 </tr>
 </table>
 
-When Δ Difference is active (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/triangle.svg" width="16"> filled):
+When Δ Difference is active (outlined with primary):
 
-- **Preset list** is forced to diverging-only presets regardless of category
-  selection (vik shown here).
+- **Preset list** is forced to diverging-only presets (vik shown here).
 - **Scale** only toggles between Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">) and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">) — Log is
   not available.
 - **Settings panel** replaces Min/Max with **|max|** (symmetric range
-  centered at zero) and **ε tolerance** (dead zone width around zero
-  where the center color is held constant).
-- **Custom Range** button is locked — range is always driven by |max|.
-- **Category Filter** checkboxes are hidden since presets are forced to
-  diverging.
+  centered at zero) and **ε tolerance** (dead zone around zero).
+- **Custom Range** button is disabled — range is always driven by |max|.
+- **Category** dropdown is disabled — presets locked to Diverging.
 
 ## Public API
 
