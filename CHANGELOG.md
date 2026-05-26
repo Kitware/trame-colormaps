@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.2 (2026-05-26)
+
+### Bug Fixes
+
+- **toolbar**: Static icons, dynamic_icon flag, hide custom range outline in delta
+  ([`eebb37c`](https://github.com/Kitware/trame-colormaps/commit/eebb37c6615c08ea75d089e2c8a9cfcb96c66df2))
+
+
 ## v1.2.1 (2026-05-26)
 
 ### Bug Fixes
