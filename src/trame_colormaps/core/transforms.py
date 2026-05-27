@@ -412,7 +412,73 @@ def apply_discrete_log(ctf, linthresh, linear_rgb_points, n_sub=1, tick_vals=Non
     return display_rgb_points, discrete_tick_data, lut_img, lut_img_v
 
 
-def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256):
+def _remap_with_dead_zone(pts, vmin, vmax, center, neg_eps, pos_eps, cr, cg, cb):
+    """Compress control points outward from a dead zone.
+
+    Points in ``[vmin, center)`` are linearly remapped into ``[vmin, neg_eps]``.
+    Points in ``(center, vmax]`` are linearly remapped into ``[pos_eps, vmax]``.
+    The band ``[neg_eps, center, pos_eps]`` is filled with the center color
+    ``(cr, cg, cb)``.
+
+    All original colors are retained — they are squeezed outward from
+    the dead zone rather than discarded.
+
+    Args:
+        pts: Flat list ``[x, r, g, b, ...]`` of control points.
+        vmin: Minimum x value of the range.
+        vmax: Maximum x value of the range.
+        center: The x value around which the dead zone is centered.
+        neg_eps: Negative boundary of the dead zone.
+        pos_eps: Positive boundary of the dead zone.
+        cr, cg, cb: Center color (flat band fill).
+
+    Returns a new flat list ``[x, r, g, b, ...]``.
+    """
+    n = len(pts) // 4
+    left_pts = []
+    right_pts = []
+    for i in range(n):
+        x = pts[i * 4]
+        r, g, b = pts[i * 4 + 1], pts[i * 4 + 2], pts[i * 4 + 3]
+        if x < center:
+            left_pts.append((x, r, g, b))
+        elif x > center:
+            right_pts.append((x, r, g, b))
+
+    new_pts = []
+    # Remap left: [vmin, center) → [vmin, neg_eps]
+    if left_pts:
+        old_range = center - vmin
+        new_range = neg_eps - vmin
+        for x, r, g, b in left_pts:
+            if old_range != 0:
+                t = (x - vmin) / old_range
+                nx = vmin + t * new_range
+            else:
+                nx = vmin
+            new_pts.extend([nx, r, g, b])
+
+    # Dead zone band
+    new_pts.extend([neg_eps, cr, cg, cb])
+    new_pts.extend([center, cr, cg, cb])
+    new_pts.extend([pos_eps, cr, cg, cb])
+
+    # Remap right: (center, vmax] → [pos_eps, vmax]
+    if right_pts:
+        old_range = vmax - center
+        new_range = vmax - pos_eps
+        for x, r, g, b in right_pts:
+            if old_range != 0:
+                t = (x - center) / old_range
+                nx = pos_eps + t * new_range
+            else:
+                nx = vmax
+            new_pts.extend([nx, r, g, b])
+
+    return new_pts
+
+
+def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256, epsilon=0.0):
     """Build a symlog CTF with decade control points.
 
     Control points are placed at powers of 10 (and ±linthresh, 0 for
@@ -420,11 +486,18 @@ def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256):
     from the linear colorbar at the position where that value falls in
     symlog space: t = (symlog(v) - symlog(min)) / (symlog(max) - symlog(min)).
 
+    When *epsilon* > 0 (diverging mode), a dead zone is injected around
+    zero.  Control points in (0, vmax] are compressed into [+eps, vmax]
+    and points in [vmin, 0) into [vmin, -eps].  The band [-eps, +eps]
+    is held at the center color.  All original colors are retained —
+    they are squeezed outward from the dead zone rather than discarded.
+
     Args:
         ctf: vtkColorTransferFunction.
         linthresh: Linear threshold for symlog transformation.
         linear_rgb_points: RGB control points from the linear LUT.
         n_samples: Number of uniform samples in symlog space for building the CTF.
+        epsilon: Half-width of the dead zone around zero (data-space units).
 
     Returns:
         Tuple of (lut_img_h, lut_img_v) base64 PNG strings, or None if
@@ -485,6 +558,47 @@ def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256):
         # Display points: uniform linear positions with symlog colors
         display_rgb_points.extend([x_lookup, r, g, b])
 
+    # --- Inject epsilon dead zone in symlog space ---
+    eps = max(0.0, float(epsilon))
+    if eps > 0 and x_min < 0 < x_max:
+        # Sample center color from the unmodified points at x=0
+        center_t = (float(symlog(0.0)) - s_min) / s_range
+        center_lookup = x_min + center_t * data_range
+        linear_ctf.GetColor(center_lookup, rgb)
+        cr, cg, cb = float(rgb[0]), float(rgb[1]), float(rgb[2])
+
+        # Display-space positions of center and ±epsilon
+        s_eps_pos = float(symlog(eps))
+        s_eps_neg = float(symlog(-eps))
+        d_center = center_lookup
+        d_eps_pos = x_min + (s_eps_pos - s_min) / s_range * data_range
+        d_eps_neg = x_min + (s_eps_neg - s_min) / s_range * data_range
+
+        # Remap rendering points (data space, center=0)
+        new_rgb_points = _remap_with_dead_zone(
+            new_rgb_points,
+            x_min,
+            x_max,
+            0.0,
+            -eps,
+            eps,
+            cr,
+            cg,
+            cb,
+        )
+        # Remap display points (display space, asymmetric boundaries)
+        display_rgb_points = _remap_with_dead_zone(
+            display_rgb_points,
+            x_min,
+            x_max,
+            d_center,
+            d_eps_neg,
+            d_eps_pos,
+            cr,
+            cg,
+            cb,
+        )
+
     # Regenerate colorbar image from display points so it matches the 3D
     set_rgb_points(ctf, display_rgb_points)
     lut_img = lut_to_img_h(ctf)
@@ -498,7 +612,14 @@ def apply_symlog(ctf, linthresh, linear_rgb_points=None, n_samples=256):
     return lut_img, lut_img_v
 
 
-def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=256):
+def apply_discrete_symlog(
+    ctf,
+    linthresh,
+    linear_rgb_points,
+    n_sub=1,
+    n_samples=256,
+    epsilon=0.0,
+):
     """Build a discrete (stepped) symlog CTF.
 
     Each decade interval is split into *n_sub* equal sub-bands in symlog
@@ -507,12 +628,16 @@ def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=
     steps at the sub-band boundaries.  The display image is also replaced
     with a banded colorbar.
 
+    When *epsilon* > 0, the finished discrete bands are remapped to
+    inject a dead zone around zero (same approach as ``apply_symlog``).
+
     Args:
         ctf: vtkColorTransferFunction.
         linthresh: Linear threshold for symlog transformation.
         linear_rgb_points: RGB control points from the linear LUT.
         n_sub: Number of sub-bands per decade interval.
         n_samples: Number of uniform samples in symlog space for building the CTF.
+        epsilon: Half-width of the dead zone around zero (data-space units).
 
     Returns:
         Tuple of (display_rgb_points, discrete_tick_data, lut_img_h,
@@ -672,6 +797,48 @@ def apply_discrete_symlog(ctf, linthresh, linear_rgb_points, n_sub=1, n_samples=
                 render_rgb_points.extend([float(v_hi) - eps_data, r, g, b])
 
             band_idx += 1
+
+    # --- Inject epsilon dead zone ---
+    dead_eps = max(0.0, float(epsilon))
+    if dead_eps > 0 and x_min < 0 < x_max:
+        # Sample center color from the linear CTF at symlog(0)
+        center_t = (float(symlog(0.0)) - s_min) / s_range
+        center_lookup = x_min + center_t * data_range
+        rgb_center = [0.0, 0.0, 0.0]
+        linear_ctf.GetColor(center_lookup, rgb_center)
+        cr = float(rgb_center[0])
+        cg = float(rgb_center[1])
+        cb = float(rgb_center[2])
+
+        # Display-space positions of center and ±epsilon
+        s_eps_pos = float(symlog(dead_eps))
+        s_eps_neg = float(symlog(-dead_eps))
+        d_center = center_lookup
+        d_eps_pos = x_min + (s_eps_pos - s_min) / s_range * data_range
+        d_eps_neg = x_min + (s_eps_neg - s_min) / s_range * data_range
+
+        render_rgb_points = _remap_with_dead_zone(
+            render_rgb_points,
+            x_min,
+            x_max,
+            0.0,
+            -dead_eps,
+            dead_eps,
+            cr,
+            cg,
+            cb,
+        )
+        display_rgb_points = _remap_with_dead_zone(
+            display_rgb_points,
+            x_min,
+            x_max,
+            d_center,
+            d_eps_neg,
+            d_eps_pos,
+            cr,
+            cg,
+            cb,
+        )
 
     # Generate the discrete banded colorbar image
     set_rgb_points(ctf, display_rgb_points)

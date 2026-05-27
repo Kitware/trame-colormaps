@@ -662,8 +662,10 @@ class ColormapConfig(StateDataModel):
         apply_linear(self._ctf, name, invert)
         rescale_ctf(self._ctf, *self.color_range)
 
-        # In diverging mode, inject an epsilon dead zone around zero
-        if self.diverging:
+        # In diverging mode, inject an epsilon dead zone around zero.
+        # For symlog, the dead zone is handled inside apply_symlog /
+        # apply_discrete_symlog so that it aligns with the symlog transform.
+        if self.diverging and log_scale != "symlog":
             self._inject_epsilon_band()
 
         # Capture the linear colorbar image (always the same regardless of scale)
@@ -737,14 +739,32 @@ class ColormapConfig(StateDataModel):
                     self.lut_img_h = result[0]
                     self.lut_img_v = result[1]
         elif log_scale == "symlog":
+            # Compute epsilon for diverging symlog dead zone
+            symlog_eps = 0.0
+            if self.diverging and self.epsilon_valid:
+                try:
+                    symlog_eps = max(0.0, float(self.epsilon))
+                except (ValueError, TypeError):
+                    symlog_eps = 0.0
             if discrete_log:
-                result = apply_discrete_symlog(self._ctf, linthresh, linear_rgb_points, n_sub)
+                result = apply_discrete_symlog(
+                    self._ctf,
+                    linthresh,
+                    linear_rgb_points,
+                    n_sub,
+                    epsilon=symlog_eps,
+                )
                 if result[0] is not None:
                     linear_rgb_points = result[0]
                     self.lut_img_h = result[2]
                     self.lut_img_v = result[3]
             else:
-                result = apply_symlog(self._ctf, linthresh, linear_rgb_points)
+                result = apply_symlog(
+                    self._ctf,
+                    linthresh,
+                    linear_rgb_points,
+                    epsilon=symlog_eps,
+                )
                 if result:
                     self.lut_img_h = result[0]
                     self.lut_img_v = result[1]
