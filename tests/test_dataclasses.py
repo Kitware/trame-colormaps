@@ -128,6 +128,16 @@ class TestDefaults:
     def test_active_presets_default_matches(self, config):
         assert config.active_presets == DEFAULT_PRESETS
 
+    def test_nan_color_default(self, config):
+        assert config.nan_color == [0.0, 0.0, 0.0, 0.0]
+
+    def test_show_nan_menu_default(self, config):
+        assert config.show_nan_menu is False
+
+    def test_nan_color_applied_to_ctf_at_init(self, config):
+        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
+        assert config._ctf.GetNanOpacity() == 0.0
+
 
 # =====================================================================
 # Mutation
@@ -568,3 +578,43 @@ class TestPresetSets:
 
     def test_no_overlap_diverging_cyclic(self):
         assert not (DIVERGING_PRESETS & CYCLIC_PRESETS)
+
+
+# =====================================================================
+# NaN Color
+# =====================================================================
+
+
+class TestNanColor:
+    def test_apply_nan_color_sets_ctf(self, config):
+        config.nan_color = [1.0, 0.0, 1.0, 1.0]
+        config._apply_nan_color()
+        assert config._ctf.GetNanColor() == pytest.approx((1.0, 0.0, 1.0))
+        assert config._ctf.GetNanOpacity() == 1.0
+
+    def test_apply_nan_color_transparent(self, config):
+        config.nan_color = [0.0, 0.0, 0.0, 0.0]
+        config._apply_nan_color()
+        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
+        assert config._ctf.GetNanOpacity() == 0.0
+
+    def test_apply_nan_color_propagates_to_symlog_ctf(self, config):
+        from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
+
+        config._symlog_ctf = vtkColorTransferFunction()
+        config.nan_color = [0.89, 0.10, 0.11, 1.0]
+        config._apply_nan_color()
+        assert config._symlog_ctf.GetNanColor() == pytest.approx((0.89, 0.10, 0.11))
+        assert config._symlog_ctf.GetNanOpacity() == 1.0
+
+    def test_apply_nan_color_handles_short_list(self, config):
+        config.nan_color = [1.0, 0.0]
+        config._apply_nan_color()
+        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
+        assert config._ctf.GetNanOpacity() == 0.0
+
+    def test_apply_nan_color_handles_none(self, config):
+        config.nan_color = None
+        config._apply_nan_color()
+        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
+        assert config._ctf.GetNanOpacity() == 0.0

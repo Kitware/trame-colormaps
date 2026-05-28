@@ -113,9 +113,10 @@ The control panel has three sections, top to bottom:
 
 The toolbar has three areas, left to right:
 
-- **Icon buttons** — Seven buttons separated into three groups by vertical
+- **Icon buttons** — Eight buttons separated into three groups by vertical
   dividers. Active toggles show a primary-colored square outline; the icon
-  itself stays black. Details on each button below.
+  itself stays black. The NaN color button opens a dropdown instead of
+  toggling. Details on each button below.
 
 - **Search / preset name** — Shows the name of the currently active preset.
   Click into it to type and filter the preset list by name. Use the clear
@@ -135,9 +136,10 @@ The toolbar has three areas, left to right:
 | 3 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/palette.svg" width="24"> | — | Category | Opens a dropdown to select one preset category (Sequential, Multi-Sequential, Diverging, Cyclic). Default is Sequential. Disabled in Δ mode. |
 | 4 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/blinds.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Colorblind Safe | Limits the *Preset list* to colorblind-safe presets within the active category. |
 | 5 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/invert-colors.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Invert | Reverses the colormap direction (shown in the *Colorbar* and *Preset list*). |
+| 6 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/crosshairs-question.svg" width="24"> | — | NaN Color | Opens a dropdown to select the color used for NaN/missing data. Default is transparent. Shows a color swatch and situation label for each option. |
 | | | | | |
-| 6 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes band count in *Settings panel*. |
-| 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs. Disabled in Δ mode. Cannot be active at the same time as Δ Difference. |
+| 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes band count in *Settings panel*. |
+| 8 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs. Disabled in Δ mode. Cannot be active at the same time as Δ Difference. |
 
 Empty rows in the table indicate the vertical separator dividers between
 button groups.
@@ -149,6 +151,23 @@ button groups.
 - **Custom Range** is disabled when Δ Difference is on.
 - **Category dropdown** is disabled when Δ Difference is on (presets forced
   to Diverging). When Δ is turned off, category resets to Sequential.
+
+#### NaN Color Dropdown
+
+The NaN Color button (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/crosshairs-question.svg" width="16">)
+opens a scrollable dropdown with 19 preset options. Each row shows a color
+swatch circle and a situation label. Options are grouped:
+
+| Group | Options |
+|-------|---------|
+| **Default** | transparent, general |
+| **Colormap types** | sequential maps, diverging maps, categorical maps, grayscale maps, bright maps, dark maps, hot maps, terrain final |
+| **Data quality** | error, warning, suspect data, masked data, debugging |
+| **Background/context** | light background, dark background, publication light, publication dark |
+
+The default is **transparent** (`rgba(0,0,0,0)`), meaning NaN cells are
+invisible. The selected color is applied via `vtkColorTransferFunction.SetNanColorRGBA()`
+on both the main CTF and any render CTF (e.g. symlog).
 
 #### Scale Modes
 
@@ -213,6 +232,7 @@ from trame.widgets.colormaps import HorizontalScalarBar, VerticalScalarBar, Colo
 | `VerticalScalarBar` | `trame_colormaps.widgets` | Vertical colorbar widget with built-in control panel |
 | `ColorMapEditor` | `trame_colormaps.widgets` | Preset picker / control panel popup (used internally by scalar bars) |
 | `buttons` | `trame_colormaps.widgets` | Returns button config dicts for the control panel toolbar |
+| `NAN_COLOR_OPTIONS` | `trame_colormaps.widgets` | List of 19 NaN color presets with RGBA values and situation labels |
 
 ## Preset Data Sources
 
@@ -501,6 +521,7 @@ subclass. Fields fall into three groups:
 | `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
 | `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
 | `override_range` | `bool` | `False` | Use manual range instead of data range |
+| `nan_color` | `list[float]` | `[0,0,0,0]` | RGBA color for NaN/missing values (transparent by default) |
 | **Derived (computed internally, read by UI)** ||||
 | `color_range` | `tuple[float, float]` | `(0, 1)` | Active min/max color range |
 | `color_value_min_valid` | `bool` | `True` | Whether `color_value_min` parses as a valid float |
@@ -516,6 +537,7 @@ subclass. Fields fall into three groups:
 | `menu` | `bool` | `False` | Whether the control panel popup is open |
 | `search` | `str \| None` | `None` | Preset search filter text |
 | `orientation` | `str` | `"horizontal"` | Colorbar orientation |
+| `show_nan_menu` | `bool` | `False` | Whether the NaN color dropdown is open |
 | `mapper_change` | `int` | `0` | Server-only counter incremented on each mapper update |
 
 ### ColormapConfig Methods
