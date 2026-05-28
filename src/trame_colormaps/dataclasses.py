@@ -131,6 +131,9 @@ class ColormapConfig(StateDataModel):
     luts_normal: list = Sync(list, list)
     luts_inverted: list = Sync(list, list)
 
+    # --- NaN color ---
+    nan_color: list[float] = Sync(list, [0.0, 0.0, 0.0, 0.0])
+
     # --- UI widget state (control panel popup) ---
     menu: bool = Sync(bool, False)
     search: str | None = Sync(str)
@@ -138,10 +141,12 @@ class ColormapConfig(StateDataModel):
     mapper_change: int = ServerOnly(int, 0)
     show_categories: bool = Sync(bool, False)
     selected_categories: str = Sync(str, "sequential")
+    show_nan_menu: bool = Sync(bool, False)
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
         # Create and own the CTF
         self._ctf = vtkColorTransferFunction()
+        self._ctf.SetNanColorRGBA(0.0, 0.0, 0.0, 0.0)
         self._mapper = mapper
         self._get_data_array = data_array_fn
 
@@ -788,5 +793,22 @@ class ColormapConfig(StateDataModel):
             self._mapper.SetLookupTable(self._ctf)
 
         self._mapper.SetScalarRange(self.color_range)
+        self._apply_nan_color()
 
         self.mapper_change += 1
+
+    @watch("nan_color", eager=True)
+    def _on_nan_color_change(self, nan_color):
+        """Apply NaN color to the active CTF(s) whenever it changes."""
+        self._apply_nan_color()
+        self.mapper_change += 1
+
+    def _apply_nan_color(self):
+        """Set NaN color (RGBA) on all active CTFs."""
+        c = self.nan_color
+        if not c or len(c) < 4:
+            c = [0.0, 0.0, 0.0, 0.0]
+        r, g, b, a = float(c[0]), float(c[1]), float(c[2]), float(c[3])
+        self._ctf.SetNanColorRGBA(r, g, b, a)
+        if hasattr(self, "_symlog_ctf") and self._symlog_ctf:
+            self._symlog_ctf.SetNanColorRGBA(r, g, b, a)

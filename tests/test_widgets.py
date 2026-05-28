@@ -1,6 +1,7 @@
 """Tests for trame_colormaps.widgets — buttons helper and widget exports."""
 
 from trame_colormaps.widgets import (
+    NAN_COLOR_OPTIONS,
     ColorMapEditor,
     HorizontalScalarBar,
     VerticalScalarBar,
@@ -15,22 +16,24 @@ class TestButtons:
         result = buttons("cfg")
         assert isinstance(result, list)
 
-    def test_nine_entries(self):
+    def test_ten_entries(self):
         result = buttons("cfg")
-        assert len(result) == 9
+        assert len(result) == 10
 
     def test_each_has_icon_click_tip(self):
         for btn in buttons("cfg"):
             if btn.get("separator"):
                 continue
             assert "icon" in btn
-            assert "click" in btn
+            # nan_menu and category menu don't have click
+            if not btn.get("nan_menu") and not btn.get("menu"):
+                assert "click" in btn
             assert "tip" in btn
 
     def test_name_interpolation(self):
         """All click/tip strings should contain the given name."""
         for btn in buttons("myConfig"):
-            if btn.get("separator"):
+            if btn.get("separator") or btn.get("nan_menu"):
                 continue
             assert "myConfig" in btn["click"]
             assert "myConfig" in btn["tip"]
@@ -54,11 +57,11 @@ class TestButtons:
         assert "Difference" in btn["tip"]
 
     def test_override_range_button(self):
-        btn = buttons("c")[8]
+        btn = buttons("c")[9]
         assert "override_range" in btn["click"]
 
     def test_discrete_button(self):
-        btn = buttons("c")[7]
+        btn = buttons("c")[8]
         assert "discrete_log" in btn["click"]
 
     def test_palette_button(self):
@@ -76,7 +79,7 @@ class TestButtons:
     def test_separators_at_correct_positions(self):
         result = buttons("c")
         assert result[2].get("separator") is True
-        assert result[6].get("separator") is True
+        assert result[7].get("separator") is True
 
     def test_all_buttons_have_active_field(self):
         for btn in buttons("c"):
@@ -101,9 +104,15 @@ class TestButtons:
         assert "c.diverging ||" in btn["click"] or "(c.diverging ||" in btn["click"]
 
     def test_override_range_disabled_when_diverging(self):
-        btn = buttons("c")[8]
+        btn = buttons("c")[9]
         assert "disabled" in btn
         assert "diverging" in btn["disabled"]
+
+    def test_nan_menu_button(self):
+        btn = buttons("c")[6]
+        assert btn.get("nan_menu") is True
+        assert btn["icon"] == "mdi-crosshairs-question"
+        assert btn["active"] == "false"
 
     def test_palette_button_is_menu(self):
         btn = buttons("c")[3]
@@ -142,3 +151,38 @@ class TestWidgetExports:
 
     def test_vertical_scalar_bar_is_class(self):
         assert isinstance(VerticalScalarBar, type)
+
+
+# --- NAN_COLOR_OPTIONS ---
+
+
+class TestNanColorOptions:
+    def test_is_list(self):
+        assert isinstance(NAN_COLOR_OPTIONS, list)
+
+    def test_has_19_entries(self):
+        assert len(NAN_COLOR_OPTIONS) == 19
+
+    def test_first_is_transparent(self):
+        first = NAN_COLOR_OPTIONS[0]
+        assert first["situation_preset_type"] == "transparent"
+        assert first["color"] == [0.0, 0.0, 0.0, 0.0]
+
+    def test_each_has_color_and_label(self):
+        for opt in NAN_COLOR_OPTIONS:
+            assert "color" in opt
+            assert "situation_preset_type" in opt
+            assert len(opt["color"]) == 4
+
+    def test_no_duplicate_colors(self):
+        colors = [tuple(o["color"]) for o in NAN_COLOR_OPTIONS]
+        assert len(colors) == len(set(colors))
+
+    def test_no_duplicate_labels(self):
+        labels = [o["situation_preset_type"] for o in NAN_COLOR_OPTIONS]
+        assert len(labels) == len(set(labels))
+
+    def test_all_rgba_values_in_range(self):
+        for opt in NAN_COLOR_OPTIONS:
+            for v in opt["color"]:
+                assert 0.0 <= v <= 1.0

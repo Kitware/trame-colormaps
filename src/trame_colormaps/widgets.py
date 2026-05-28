@@ -10,6 +10,32 @@ __all__ = [
     "VerticalScalarBar",
 ]
 
+NAN_COLOR_OPTIONS = [
+    # Default
+    {"color": [0.0, 0.0, 0.0, 0.0], "situation_preset_type": "transparent"},
+    {"color": [0.75, 0.75, 0.75, 1.0], "situation_preset_type": "general"},
+    # Colormap types
+    {"color": [0.85, 0.85, 0.85, 1.0], "situation_preset_type": "sequential maps"},
+    {"color": [0.60, 0.60, 0.60, 1.0], "situation_preset_type": "diverging maps"},
+    {"color": [0.80, 0.80, 0.80, 1.0], "situation_preset_type": "categorical maps"},
+    {"color": [0.22, 0.49, 0.72, 1.0], "situation_preset_type": "grayscale maps"},
+    {"color": [0.0, 0.0, 0.0, 1.0], "situation_preset_type": "bright maps"},
+    {"color": [1.0, 1.0, 1.0, 1.0], "situation_preset_type": "dark maps"},
+    {"color": [0.0, 1.0, 1.0, 1.0], "situation_preset_type": "hot maps"},
+    {"color": [0.74, 0.74, 0.74, 1.0], "situation_preset_type": "terrain final"},
+    # Data quality
+    {"color": [0.89, 0.10, 0.11, 1.0], "situation_preset_type": "error"},
+    {"color": [1.0, 1.0, 0.20, 1.0], "situation_preset_type": "warning"},
+    {"color": [1.0, 0.50, 0.0, 1.0], "situation_preset_type": "suspect data"},
+    {"color": [0.30, 0.69, 0.29, 1.0], "situation_preset_type": "masked data"},
+    {"color": [1.0, 0.0, 1.0, 1.0], "situation_preset_type": "debugging"},
+    # Background/context
+    {"color": [0.55, 0.55, 0.55, 1.0], "situation_preset_type": "light background"},
+    {"color": [0.33, 0.33, 0.33, 1.0], "situation_preset_type": "dark background"},
+    {"color": [0.94, 0.94, 0.94, 1.0], "situation_preset_type": "publication light"},
+    {"color": [0.15, 0.15, 0.15, 1.0], "situation_preset_type": "publication dark"},
+]
+
 
 def buttons(name):
     return [
@@ -79,6 +105,12 @@ def buttons(name):
             "click": f"{name}.invert = !{name}.invert",
             "tip": (f"'Toggle to ' + ({name}.invert ? 'Normal Preset' : 'Invert Preset')"),
             "active": f"{name}.invert",
+        },
+        {
+            "icon": "mdi-crosshairs-question",
+            "tip": "'NaN Color'",
+            "active": "false",
+            "nan_menu": True,
         },
         {"separator": True},
         {
@@ -171,6 +203,62 @@ class ColorMapEditor(v3.VCard):
                                                     f" === '{cat_value}'",
                                                 ),
                                             )
+                                v3.VTooltip(
+                                    text=(b["tip"],),
+                                    activator="parent",
+                                    location="bottom",
+                                )
+                        elif b.get("nan_menu"):
+                            with html.Div():
+                                with v3.VMenu(
+                                    v_model=f"{name}.show_nan_menu",
+                                    close_on_content_click=True,
+                                    location="bottom",
+                                ):
+                                    with html.Template(v_slot_activator="{ props: nanProps }"):
+                                        btn_kwargs["v_bind"] = "nanProps"
+                                        btn_kwargs["variant"] = "'text'"
+                                        btn_kwargs["color"] = "undefined"
+                                        v3.VBtn(**btn_kwargs)
+                                    with v3.VList(density="compact", max_height="300"):
+                                        for nc in NAN_COLOR_OPTIONS:
+                                            rgba = nc["color"]
+                                            label = nc["situation_preset_type"]
+                                            r255 = int(rgba[0] * 255)
+                                            g255 = int(rgba[1] * 255)
+                                            b255 = int(rgba[2] * 255)
+                                            a_val = rgba[3]
+                                            if a_val == 0:
+                                                swatch_style = (
+                                                    "width:16px; height:16px; "
+                                                    "border-radius:50%; "
+                                                    "border: 1px solid #999; "
+                                                    "margin-right: 8px; "
+                                                    "background: repeating-conic-gradient("
+                                                    "#ccc 0% 25%, #fff 0% 50%) "
+                                                    "50%/8px 8px;"
+                                                )
+                                            else:
+                                                swatch_style = (
+                                                    f"width:16px; height:16px; "
+                                                    f"border-radius:50%; "
+                                                    f"border: 1px solid #999; "
+                                                    f"margin-right: 8px; "
+                                                    f"background: rgb({r255},{g255},{b255});"
+                                                )
+                                            color_json = (
+                                                f"[{rgba[0]},{rgba[1]},{rgba[2]},{rgba[3]}]"
+                                            )
+                                            with v3.VListItem(
+                                                click=(f"{name}.nan_color = {color_json}"),
+                                            ):
+                                                with html.Template(
+                                                    v_slot_prepend=True,
+                                                ):
+                                                    html.Span(
+                                                        style=swatch_style,
+                                                    )
+                                                v3.VListItemTitle(label)
                                 v3.VTooltip(
                                     text=(b["tip"],),
                                     activator="parent",
