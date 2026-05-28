@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-05-28)
+
+### Features
+
+- Add NaN color dropdown to toolbar
+  ([`2d4f9e3`](https://github.com/Kitware/trame-colormaps/commit/2d4f9e3ed66d8f2be317e98fa4221987d74f389f))
+
+
 ## v1.2.3 (2026-05-28)
 
 ### Bug Fixes
