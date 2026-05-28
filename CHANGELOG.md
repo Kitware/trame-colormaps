@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.3 (2026-05-28)
+
+### Bug Fixes
+
+- **symlog**: Align epsilon dead zone with symlog transform
+  ([`b507f11`](https://github.com/Kitware/trame-colormaps/commit/b507f1112badb78800a7f136a921bc0f833c9cdb))
+
+
 ## v1.2.2 (2026-05-26)
 
 ### Bug Fixes
