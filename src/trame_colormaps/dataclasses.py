@@ -113,6 +113,7 @@ class ColormapConfig(StateDataModel):
     color_value_min: str = Sync(str, "0")
     color_value_max: str = Sync(str, "1")
     override_range: bool = Sync(bool, False)
+    cut_outside_range: bool = Sync(bool, False)
     diverging: bool = Sync(bool, False)
     epsilon: str = Sync(str, "0")
     abs_max: str = Sync(str, "")
@@ -803,12 +804,30 @@ class ColormapConfig(StateDataModel):
         self._apply_nan_color()
         self.mapper_change += 1
 
+    @watch("cut_outside_range", eager=True)
+    def _on_cut_outside_range_change(self, cut_outside_range):
+        """Toggle above/below range color mode on the active CTF(s)."""
+        self._apply_nan_color()
+        self.mapper_change += 1
+
     def _apply_nan_color(self):
-        """Set NaN color (RGBA) on all active CTFs."""
+        """Set NaN color (RGBA) and above/below range colors on all active CTFs."""
         c = self.nan_color
         if not c or len(c) < 4:
             c = [0.0, 0.0, 0.0, 0.0]
         r, g, b, a = float(c[0]), float(c[1]), float(c[2]), float(c[3])
-        self._ctf.SetNanColorRGBA(r, g, b, a)
+        cut = bool(self.cut_outside_range)
+        for ctf in self._active_ctfs():
+            ctf.SetNanColorRGBA(r, g, b, a)
+            ctf.SetUseAboveRangeColor(cut)
+            ctf.SetUseBelowRangeColor(cut)
+            if cut:
+                ctf.SetAboveRangeColor(r, g, b)
+                ctf.SetBelowRangeColor(r, g, b)
+
+    def _active_ctfs(self):
+        """Return list of active CTFs (main + symlog render CTF if present)."""
+        ctfs = [self._ctf]
         if hasattr(self, "_symlog_ctf") and self._symlog_ctf:
-            self._symlog_ctf.SetNanColorRGBA(r, g, b, a)
+            ctfs.append(self._symlog_ctf)
+        return ctfs

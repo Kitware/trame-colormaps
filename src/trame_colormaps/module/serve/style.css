@@ -1,5 +1,5 @@
 :root {
-  --tcmap-editor-size: 360px;
+  --tcmap-editor-size: 420px;
 }
 
 .tcmap-editor {
@@ -22,6 +22,17 @@
 
 .tcmap-editor-search {
   max-width: 120px;
+}
+
+.tcmap-editor-search .v-field__input {
+  padding: 2px 4px;
+  min-height: 0;
+  font-size: 0.8rem;
+}
+
+.tcmap-editor-search .v-field {
+  padding-inline-start: 4px !important;
+  padding-inline-end: 4px !important;
 }
 
 .tcmap-img-preset {
