@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-05-29)
+
+### Features
+
+- Add cut outside range mode (scissors button)
+  ([`b4defb5`](https://github.com/Kitware/trame-colormaps/commit/b4defb526fb08301f40d96e1ca8eb80a60253cdc))
+
+
 ## v1.3.0 (2026-05-28)
 
 ### Features
