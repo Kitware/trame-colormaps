@@ -113,7 +113,7 @@ The control panel has three sections, top to bottom:
 
 The toolbar has three areas, left to right:
 
-- **Icon buttons** — Eight buttons separated into three groups by vertical
+- **Icon buttons** — Nine buttons separated into three groups by vertical
   dividers. Active toggles show a primary-colored square outline; the icon
   itself stays black. The NaN color button opens a dropdown instead of
   toggling. Details on each button below.
@@ -140,6 +140,7 @@ The toolbar has three areas, left to right:
 | | | | | |
 | 7 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/gradient-horizontal.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Discrete | Switches between continuous gradient and discrete color banding. Exposes band count in *Settings panel*. |
 | 8 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/pencil.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Custom Range | Toggles between data-driven range and manual Min/Max inputs. Disabled in Δ mode. Cannot be active at the same time as Δ Difference. |
+| 9 | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/scissors-cutting.svg" width="24"> | <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/scissors-cutting.svg" width="24" style="border: 2px solid #1867C0; border-radius: 4px; padding: 2px;"> | Cut Outside Range | Switches between clamp mode (out-of-range values get endpoint color) and cut mode (out-of-range values get NaN color). Disabled unless Custom Range or Δ mode is active. |
 
 Empty rows in the table indicate the vertical separator dividers between
 button groups.
@@ -149,6 +150,8 @@ button groups.
 - **Δ Difference** is disabled when Scale is Log or when Custom Range is on.
   You can always turn Δ Difference *off*.
 - **Custom Range** is disabled when Δ Difference is on.
+- **Cut Outside Range** is disabled when neither Custom Range nor Δ
+  Difference is active.
 - **Category dropdown** is disabled when Δ Difference is on (presets forced
   to Diverging). When Δ is turned off, category resets to Sequential.
 
@@ -171,50 +174,54 @@ on both the main CTF and any render CTF (e.g. symlog).
 
 #### Scale Modes
 
-<table>
-<tr>
-<td width="33%" align="center"><img src="docs/images/clicked-linear.png" width="100%" style="border: 1px solid black;"><br><em>Linear</em></td>
-<td width="33%" align="center"><img src="docs/images/clicked-log.png" width="100%" style="border: 1px solid black;"><br><em>Log</em></td>
-<td width="33%" align="center"><img src="docs/images/clicked-symlog.png" width="100%" style="border: 1px solid black;"><br><em>SymLog</em></td>
-</tr>
-</table>
+The Scale button cycles through three modes. The colorbar and tick labels
+update to match the active scale:
 
-In all three screenshots, Colorblind Safe, Invert, Custom Range, and
-Discrete are active (outlined). The category is set to Cyclic via the
-dropdown, and the search field contains "V":
-
-- **Category** — Cyclic selected from dropdown; *Preset list* shows only
-  cyclic presets (vikO, brocO, corkO, …).
-- **Colorblind Safe** — Further limits to colorblind-safe cyclic presets.
-- **Invert** — Preset swatches and colorbar render reversed.
-- **Custom Range** — *Settings panel* shows editable **Min** and **Max** fields.
-- **Discrete** — *Settings panel* shows band count. Label adapts: "Colors
-  per tick interval" (Linear) or "Colors per order of magnitude" (Log/SymLog).
-- **Search** — Text field contains "V"; a clear button (✕) appears.
-
-The only difference between the three images is the **Scale** icon, which
-cycles through Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">), Log (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/math-log.svg" width="16">), and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">).
-The colorbar tick labels switch between decimal (Linear) and scientific
-notation (Log/SymLog).
+- **Linear** — evenly spaced ticks, decimal labels. Colorbar image is a
+  direct mapping of the preset. Discrete label reads "Colors per tick
+  interval."
+- **Log** — decade-based ticks, scientific notation labels. Colorbar image
+  is resampled through the log transform so more visual space is given to
+  lower magnitudes. Not available in Δ mode. Discrete label reads "Colors
+  per order of magnitude."
+- **SymLog** — symmetric log around zero, decade ticks adaptively thinned
+  near zero, scientific notation labels. Colorbar image is resampled
+  through the symlog transform. In Δ mode, the epsilon dead zone aligns
+  with the symlog tick marks. Discrete label reads "Colors per order of
+  magnitude."
 
 #### Δ Difference Mode
 
-<table>
-<tr>
-<td width="50%" align="center"><img src="docs/images/clicked-delta-linear.png" width="100%" style="border: 1px solid black;"><br><em>Δ Linear</em></td>
-<td width="50%" align="center"><img src="docs/images/clicked-delta-symlog.png" width="100%" style="border: 1px solid black;"><br><em>Δ SymLog</em></td>
-</tr>
-</table>
+When Δ Difference is active:
 
-When Δ Difference is active (outlined with primary):
-
-- **Preset list** is forced to diverging-only presets (vik shown here).
-- **Scale** only toggles between Linear (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/stairs.svg" width="16">) and SymLog (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/sine-wave.svg" width="16">) — Log is
-  not available.
+- **Preset list** is forced to diverging-only presets.
+- **Scale** only toggles between Linear and SymLog — Log is not available.
 - **Settings panel** replaces Min/Max with **|max|** (symmetric range
   centered at zero) and **ε tolerance** (dead zone around zero).
-- **Custom Range** button is disabled — range is always driven by |max|.
+- **Custom Range** is disabled — range is driven by |max|.
 - **Category** dropdown is disabled — presets locked to Diverging.
+- **Cut Outside Range** is available — out-of-range values can use the
+  NaN color instead of endpoint clamping.
+
+#### Cut Outside Range
+
+The Cut button (<img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/scissors-cutting.svg" width="16">)
+toggles between two modes for values outside the color range:
+
+- **Clamp (default)** — out-of-range values are assigned the nearest
+  endpoint color. This is VTK's default behavior.
+- **Cut** — out-of-range values are assigned the NaN color (set via the
+  NaN Color dropdown). With the default transparent NaN color, out-of-range
+  regions become invisible.
+
+Cut mode is only available when **Custom Range** or **Δ Difference** is
+active — these are the modes where the color range may intentionally
+exclude part of the data. When neither is active, the button is disabled
+because the range covers the full data extent.
+
+Internally, cut mode uses `vtkColorTransferFunction.SetUseAboveRangeColor()`
+and `SetUseBelowRangeColor()` with the current NaN color RGB. Changing the
+NaN color automatically updates the above/below range colors.
 
 ## Public API
 
@@ -521,6 +528,7 @@ subclass. Fields fall into three groups:
 | `color_value_min` | `str` | `"0"` | Manual range min (string for text field) |
 | `color_value_max` | `str` | `"1"` | Manual range max (string for text field) |
 | `override_range` | `bool` | `False` | Use manual range instead of data range |
+| `cut_outside_range` | `bool` | `False` | Cut mode: out-of-range values use NaN color instead of endpoint color |
 | `nan_color` | `list[float]` | `[0,0,0,0]` | RGBA color for NaN/missing values (transparent by default) |
 | **Derived (computed internally, read by UI)** ||||
 | `color_range` | `tuple[float, float]` | `(0, 1)` | Active min/max color range |

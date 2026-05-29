@@ -138,6 +138,9 @@ class TestDefaults:
         assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
         assert config._ctf.GetNanOpacity() == 0.0
 
+    def test_cut_outside_range_default(self, config):
+        assert config.cut_outside_range is False
+
 
 # =====================================================================
 # Mutation
@@ -618,3 +621,43 @@ class TestNanColor:
         config._apply_nan_color()
         assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
         assert config._ctf.GetNanOpacity() == 0.0
+
+
+# =====================================================================
+# Cut Outside Range
+# =====================================================================
+
+
+class TestCutOutsideRange:
+    def test_cut_enables_above_below_range(self, config):
+        config.nan_color = [1.0, 0.0, 1.0, 1.0]
+        config.cut_outside_range = True
+        config._apply_nan_color()
+        assert config._ctf.GetUseAboveRangeColor() == 1
+        assert config._ctf.GetUseBelowRangeColor() == 1
+        assert config._ctf.GetAboveRangeColor() == pytest.approx((1.0, 0.0, 1.0))
+        assert config._ctf.GetBelowRangeColor() == pytest.approx((1.0, 0.0, 1.0))
+
+    def test_clamp_disables_above_below_range(self, config):
+        config.cut_outside_range = False
+        config._apply_nan_color()
+        assert config._ctf.GetUseAboveRangeColor() == 0
+        assert config._ctf.GetUseBelowRangeColor() == 0
+
+    def test_cut_propagates_to_symlog_ctf(self, config):
+        from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
+
+        config._symlog_ctf = vtkColorTransferFunction()
+        config.nan_color = [0.89, 0.10, 0.11, 1.0]
+        config.cut_outside_range = True
+        config._apply_nan_color()
+        assert config._symlog_ctf.GetUseAboveRangeColor() == 1
+        assert config._symlog_ctf.GetUseBelowRangeColor() == 1
+        assert config._symlog_ctf.GetAboveRangeColor() == pytest.approx((0.89, 0.10, 0.11))
+
+    def test_cut_uses_nan_color(self, config):
+        config.nan_color = [0.0, 1.0, 0.0, 0.5]
+        config.cut_outside_range = True
+        config._apply_nan_color()
+        assert config._ctf.GetAboveRangeColor() == pytest.approx((0.0, 1.0, 0.0))
+        assert config._ctf.GetBelowRangeColor() == pytest.approx((0.0, 1.0, 0.0))

@@ -130,6 +130,21 @@ def buttons(name):
             "active": f"!{name}.diverging && {name}.override_range",
             "disabled": f"{name}.diverging",
         },
+        {
+            "icon": "mdi-scissors-cutting",
+            "click": (
+                f"({name}.override_range || {name}.diverging)"
+                f" && ({name}.cut_outside_range = !{name}.cut_outside_range)"
+            ),
+            "tip": (
+                f"!{name}.override_range && !{name}.diverging"
+                f" ? 'Cut mode requires Custom Range or Δ mode'"
+                f" : 'Toggle to ' + ({name}.cut_outside_range"
+                f" ? 'Clamp (endpoint colors)' : 'Cut (NaN color)')"
+            ),
+            "active": f"{name}.cut_outside_range",
+            "disabled": f"!{name}.override_range && !{name}.diverging",
+        },
     ]
 
 
@@ -157,10 +172,10 @@ class ColorMapEditor(v3.VCard):
         with self:
             # --- Toolbar row: icon buttons + search + close ---
             with v3.VCardItem(classes="py-1 px-2"):
-                with html.Div(classes="d-flex align-center ga-1"):
+                with html.Div(classes="d-flex align-center", style="gap: 1px;"):
                     for b in buttons(name):
                         if b.get("separator"):
-                            v3.VDivider(vertical=True, classes="mx-1 my-auto", length="20")
+                            v3.VDivider(vertical=True, classes="mx-0 my-auto", length="20")
                             continue
                         btn_kwargs = dict(
                             icon=b["icon"],
@@ -212,7 +227,7 @@ class ColorMapEditor(v3.VCard):
                             with html.Div():
                                 with v3.VMenu(
                                     v_model=f"{name}.show_nan_menu",
-                                    close_on_content_click=True,
+                                    close_on_content_click=False,
                                     location="bottom",
                                 ):
                                     with html.Template(v_slot_activator="{ props: nanProps }"):
@@ -274,7 +289,7 @@ class ColorMapEditor(v3.VCard):
                                     location="bottom",
                                 )
 
-                    v3.VSpacer()
+                    html.Div(style="width: 4px; flex-shrink: 0;")
                     v3.VTextField(
                         v_model=f"{name}.search",
                         clearable=True,

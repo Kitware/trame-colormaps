@@ -16,9 +16,9 @@ class TestButtons:
         result = buttons("cfg")
         assert isinstance(result, list)
 
-    def test_ten_entries(self):
+    def test_eleven_entries(self):
         result = buttons("cfg")
-        assert len(result) == 10
+        assert len(result) == 11
 
     def test_each_has_icon_click_tip(self):
         for btn in buttons("cfg"):
@@ -113,6 +113,18 @@ class TestButtons:
         assert btn.get("nan_menu") is True
         assert btn["icon"] == "mdi-crosshairs-question"
         assert btn["active"] == "false"
+
+    def test_cut_outside_range_button(self):
+        btn = buttons("c")[10]
+        assert btn["icon"] == "mdi-scissors-cutting"
+        assert "cut_outside_range" in btn["click"]
+        assert "cut_outside_range" in btn["active"]
+
+    def test_cut_disabled_without_override_or_diverging(self):
+        btn = buttons("c")[10]
+        assert "disabled" in btn
+        assert "override_range" in btn["disabled"]
+        assert "diverging" in btn["disabled"]
 
     def test_palette_button_is_menu(self):
         btn = buttons("c")[3]
