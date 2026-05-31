@@ -169,8 +169,8 @@ swatch circle and a situation label. Options are grouped:
 | **Background/context** | light background, dark background, publication light, publication dark |
 
 The default is **transparent** (`rgba(0,0,0,0)`), meaning NaN cells are
-invisible. The selected color is applied via `vtkColorTransferFunction.SetNanColorRGBA()`
-on both the main CTF and any render CTF (e.g. symlog).
+invisible. The selected color is applied via `vtkLookupTable.SetNanColor()`
+on the render LUT (see [NaN Transparency and `ForceOpaqueOn()`](#nan-transparency-and-forceopaqueon)).
 
 #### Scale Modes
 
@@ -219,9 +219,31 @@ active — these are the modes where the color range may intentionally
 exclude part of the data. When neither is active, the button is disabled
 because the range covers the full data extent.
 
-Internally, cut mode uses `vtkColorTransferFunction.SetUseAboveRangeColor()`
-and `SetUseBelowRangeColor()` with the current NaN color RGB. Changing the
+Internally, cut mode uses `vtkLookupTable.SetUseAboveRangeColor()`
+and `SetUseBelowRangeColor()` with the current NaN color RGBA. Changing the
 NaN color automatically updates the above/below range colors.
+
+## NaN Transparency and `ForceOpaqueOn()`
+
+`ColormapConfig` uses a `vtkLookupTable` (LUT) for rendering so that NaN
+and out-of-range values correctly receive an alpha channel (e.g. alpha=0
+for transparency). However, when VTK detects that any special color
+(NaN, above-range, below-range) has alpha < 1.0, it routes the **entire
+actor** through the translucent rendering pass. This makes all cells —
+including fully opaque ones — appear semi-transparent due to depth-peeling
+artifacts.
+
+The fix is a single call on your actor:
+
+```python
+actor.ForceOpaqueOn()
+```
+
+This keeps the actor in the opaque rendering pass where cells with
+alpha=1.0 render normally. NaN and cut-outside-range cells still receive
+the NaN color RGB but their alpha=0 is ignored by the opaque pass, so
+they appear as the NaN RGB color (black by default) rather than being
+transparent.
 
 ## Public API
 
@@ -561,7 +583,7 @@ subclass. Fields fall into three groups:
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `server` | *required* | Trame server instance (first positional arg) |
-| `mapper` | `None` | VTK mapper — the CTF is set as its lookup table |
+| `mapper` | `None` | VTK mapper — a `vtkLookupTable` sampled from the internal CTF is set as its lookup table |
 | `data_array_fn` | `None` | Callable returning the VTK data array for range computation |
 
 ## Configurable Parameters

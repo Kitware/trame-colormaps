@@ -11,6 +11,7 @@ import math
 import numpy as np
 from trame.app.dataclass import ServerOnly, StateDataModel, Sync, get_instance, watch
 from vtkmodules.util.numpy_support import vtk_to_numpy
+from vtkmodules.vtkCommonCore import vtkLookupTable
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
 
 from trame_colormaps.core.presets import (
@@ -145,14 +146,13 @@ class ColormapConfig(StateDataModel):
     show_nan_menu: bool = Sync(bool, False)
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
-        # Create and own the CTF
+        # Create and own the CTF (used internally for building colormaps)
         self._ctf = vtkColorTransferFunction()
-        self._ctf.SetNanColorRGBA(0.0, 0.0, 0.0, 0.0)
         self._mapper = mapper
         self._get_data_array = data_array_fn
+        self._lut = None
 
         if self._mapper:
-            self._mapper.SetLookupTable(self._ctf)
             self._mapper.SetUseLookupTableScalarRange(True)
 
         # Saved state for restoring when leaving diverging mode
@@ -782,16 +782,17 @@ class ColormapConfig(StateDataModel):
         )
 
         # For log, symlog (or any discrete mode), rebuild a separate CTF
-        # so the mapper gets the correct points.
+        # so the render LUT gets the transformed points.
         if log_scale in ("symlog", "log") or (discrete_log and log_scale == "linear"):
             pts = get_rgb_points(self._ctf)
             render_ctf = vtkColorTransferFunction()
             for i in range(0, len(pts), 4):
                 render_ctf.AddRGBPoint(pts[i], pts[i + 1], pts[i + 2], pts[i + 3])
             self._symlog_ctf = render_ctf  # prevent GC
-            self._mapper.SetLookupTable(render_ctf)
+            self._build_lut_from_ctf(render_ctf)
         else:
-            self._mapper.SetLookupTable(self._ctf)
+            self._symlog_ctf = None
+            self._build_lut_from_ctf(self._ctf)
 
         self._mapper.SetScalarRange(self.color_range)
         self._apply_nan_color()
@@ -811,23 +812,36 @@ class ColormapConfig(StateDataModel):
         self.mapper_change += 1
 
     def _apply_nan_color(self):
-        """Set NaN color (RGBA) and above/below range colors on all active CTFs."""
+        """Set NaN color (RGBA) and above/below range colors on the render LUT."""
         c = self.nan_color
         if not c or len(c) < 4:
             c = [0.0, 0.0, 0.0, 0.0]
         r, g, b, a = float(c[0]), float(c[1]), float(c[2]), float(c[3])
         cut = bool(self.cut_outside_range)
-        for ctf in self._active_ctfs():
-            ctf.SetNanColorRGBA(r, g, b, a)
-            ctf.SetUseAboveRangeColor(cut)
-            ctf.SetUseBelowRangeColor(cut)
+        if self._lut is not None:
+            self._lut.SetNanColor(r, g, b, a)
+            self._lut.SetUseAboveRangeColor(cut)
+            self._lut.SetUseBelowRangeColor(cut)
             if cut:
-                ctf.SetAboveRangeColor(r, g, b)
-                ctf.SetBelowRangeColor(r, g, b)
+                self._lut.SetAboveRangeColor(r, g, b, a)
+                self._lut.SetBelowRangeColor(r, g, b, a)
+            self._lut.BuildSpecialColors()
 
-    def _active_ctfs(self):
-        """Return list of active CTFs (main + symlog render CTF if present)."""
-        ctfs = [self._ctf]
-        if hasattr(self, "_symlog_ctf") and self._symlog_ctf:
-            ctfs.append(self._symlog_ctf)
-        return ctfs
+    def _build_lut_from_ctf(self, ctf):
+        """Sample a CTF into a vtkLookupTable and assign it to the mapper."""
+        n = self.n_colors
+        vmin, vmax = ctf.GetRange()
+        lut = vtkLookupTable()
+        lut.SetNumberOfTableValues(n)
+        lut.SetRange(vmin, vmax)
+        lut.SetAlpha(1.0)
+        lut.Build()
+        for i in range(n):
+            t = vmin + (vmax - vmin) * i / (n - 1) if n > 1 else vmin
+            rgb = [0.0, 0.0, 0.0]
+            ctf.GetColor(t, rgb)
+            lut.SetTableValue(i, rgb[0], rgb[1], rgb[2], 1.0)
+        lut.SetNanColor(0.0, 0.0, 0.0, 0.0)
+        lut.BuildSpecialColors()
+        self._lut = lut
+        self._mapper.SetLookupTable(lut)

@@ -134,10 +134,6 @@ class TestDefaults:
     def test_show_nan_menu_default(self, config):
         assert config.show_nan_menu is False
 
-    def test_nan_color_applied_to_ctf_at_init(self, config):
-        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
-        assert config._ctf.GetNanOpacity() == 0.0
-
     def test_cut_outside_range_default(self, config):
         assert config.cut_outside_range is False
 
@@ -589,38 +585,34 @@ class TestPresetSets:
 
 
 class TestNanColor:
-    def test_apply_nan_color_sets_ctf(self, config):
+    def test_apply_nan_color_sets_lut(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = [1.0, 0.0, 1.0, 1.0]
         config._apply_nan_color()
-        assert config._ctf.GetNanColor() == pytest.approx((1.0, 0.0, 1.0))
-        assert config._ctf.GetNanOpacity() == 1.0
+        assert config._lut.GetNanColor() == pytest.approx((1.0, 0.0, 1.0, 1.0))
 
     def test_apply_nan_color_transparent(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = [0.0, 0.0, 0.0, 0.0]
         config._apply_nan_color()
-        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
-        assert config._ctf.GetNanOpacity() == 0.0
-
-    def test_apply_nan_color_propagates_to_symlog_ctf(self, config):
-        from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
-
-        config._symlog_ctf = vtkColorTransferFunction()
-        config.nan_color = [0.89, 0.10, 0.11, 1.0]
-        config._apply_nan_color()
-        assert config._symlog_ctf.GetNanColor() == pytest.approx((0.89, 0.10, 0.11))
-        assert config._symlog_ctf.GetNanOpacity() == 1.0
+        assert config._lut.GetNanColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
 
     def test_apply_nan_color_handles_short_list(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = [1.0, 0.0]
         config._apply_nan_color()
-        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
-        assert config._ctf.GetNanOpacity() == 0.0
+        assert config._lut.GetNanColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
 
     def test_apply_nan_color_handles_none(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = None
         config._apply_nan_color()
-        assert config._ctf.GetNanColor() == (0.0, 0.0, 0.0)
-        assert config._ctf.GetNanOpacity() == 0.0
+        assert config._lut.GetNanColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
+
+    def test_apply_nan_color_noop_without_lut(self, config):
+        config._lut = None
+        config.nan_color = [1.0, 0.0, 0.0, 0.5]
+        config._apply_nan_color()  # should not raise
 
 
 # =====================================================================
@@ -630,34 +622,97 @@ class TestNanColor:
 
 class TestCutOutsideRange:
     def test_cut_enables_above_below_range(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = [1.0, 0.0, 1.0, 1.0]
         config.cut_outside_range = True
         config._apply_nan_color()
-        assert config._ctf.GetUseAboveRangeColor() == 1
-        assert config._ctf.GetUseBelowRangeColor() == 1
-        assert config._ctf.GetAboveRangeColor() == pytest.approx((1.0, 0.0, 1.0))
-        assert config._ctf.GetBelowRangeColor() == pytest.approx((1.0, 0.0, 1.0))
+        assert config._lut.GetUseAboveRangeColor() == 1
+        assert config._lut.GetUseBelowRangeColor() == 1
+        assert config._lut.GetAboveRangeColor() == pytest.approx((1.0, 0.0, 1.0, 1.0))
+        assert config._lut.GetBelowRangeColor() == pytest.approx((1.0, 0.0, 1.0, 1.0))
 
     def test_clamp_disables_above_below_range(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.cut_outside_range = False
         config._apply_nan_color()
-        assert config._ctf.GetUseAboveRangeColor() == 0
-        assert config._ctf.GetUseBelowRangeColor() == 0
-
-    def test_cut_propagates_to_symlog_ctf(self, config):
-        from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
-
-        config._symlog_ctf = vtkColorTransferFunction()
-        config.nan_color = [0.89, 0.10, 0.11, 1.0]
-        config.cut_outside_range = True
-        config._apply_nan_color()
-        assert config._symlog_ctf.GetUseAboveRangeColor() == 1
-        assert config._symlog_ctf.GetUseBelowRangeColor() == 1
-        assert config._symlog_ctf.GetAboveRangeColor() == pytest.approx((0.89, 0.10, 0.11))
+        assert config._lut.GetUseAboveRangeColor() == 0
+        assert config._lut.GetUseBelowRangeColor() == 0
 
     def test_cut_uses_nan_color(self, config):
+        config._build_lut_from_ctf(config._ctf)
         config.nan_color = [0.0, 1.0, 0.0, 0.5]
         config.cut_outside_range = True
         config._apply_nan_color()
-        assert config._ctf.GetAboveRangeColor() == pytest.approx((0.0, 1.0, 0.0))
-        assert config._ctf.GetBelowRangeColor() == pytest.approx((0.0, 1.0, 0.0))
+        assert config._lut.GetAboveRangeColor() == pytest.approx((0.0, 1.0, 0.0, 0.5))
+        assert config._lut.GetBelowRangeColor() == pytest.approx((0.0, 1.0, 0.0, 0.5))
+
+
+# =====================================================================
+# LUT Rendering (vtkLookupTable)
+# =====================================================================
+
+
+class TestLutRendering:
+    def test_build_lut_from_ctf_creates_lut(self, config):
+        from vtkmodules.vtkCommonCore import vtkLookupTable
+
+        config._build_lut_from_ctf(config._ctf)
+        assert config._lut is not None
+        assert isinstance(config._lut, vtkLookupTable)
+
+    def test_build_lut_from_ctf_sets_mapper_lut(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        assert config._mapper.GetLookupTable() is config._lut
+
+    def test_lut_table_values_have_alpha_one(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        n = config._lut.GetNumberOfTableValues()
+        for i in range(n):
+            rgba = config._lut.GetTableValue(i)
+            assert rgba[3] == pytest.approx(1.0), f"Entry {i} alpha={rgba[3]}"
+
+    def test_lut_nan_color_has_alpha_zero(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.nan_color = [0.0, 0.0, 0.0, 0.0]
+        config._apply_nan_color()
+        assert config._lut.GetNanColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
+
+    def test_lut_nan_color_custom_rgba(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.nan_color = [1.0, 0.0, 1.0, 0.5]
+        config._apply_nan_color()
+        assert config._lut.GetNanColor() == pytest.approx((1.0, 0.0, 1.0, 0.5))
+
+    def test_lut_above_below_range_has_alpha(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.nan_color = [0.0, 0.0, 0.0, 0.0]
+        config.cut_outside_range = True
+        config._apply_nan_color()
+        assert config._lut.GetAboveRangeColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
+        assert config._lut.GetBelowRangeColor() == pytest.approx((0.0, 0.0, 0.0, 0.0))
+
+    def test_lut_maps_nan_with_alpha_zero(self, config):
+        from vtkmodules.vtkCommonCore import vtkDoubleArray
+
+        config._build_lut_from_ctf(config._ctf)
+        config.nan_color = [0.0, 0.0, 0.0, 0.0]
+        config._apply_nan_color()
+        arr = vtkDoubleArray()
+        arr.InsertNextValue(float("nan"))
+        colors = config._lut.MapScalars(arr, 0, 0)
+        nc = colors.GetNumberOfComponents()
+        alpha = colors.GetValue(nc - 1)
+        assert alpha == 0, f"NaN alpha should be 0, got {alpha}"
+
+    def test_lut_maps_valid_with_alpha_255(self, config):
+        from vtkmodules.vtkCommonCore import vtkDoubleArray
+
+        config._build_lut_from_ctf(config._ctf)
+        vmin, vmax = config._ctf.GetRange()
+        mid = (vmin + vmax) / 2.0
+        arr = vtkDoubleArray()
+        arr.InsertNextValue(mid)
+        colors = config._lut.MapScalars(arr, 0, 0)
+        nc = colors.GetNumberOfComponents()
+        alpha = colors.GetValue(nc - 1)
+        assert alpha == 255, f"Valid value alpha should be 255, got {alpha}"
