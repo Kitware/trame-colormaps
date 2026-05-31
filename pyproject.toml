@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trame-colormaps"
-version = "1.4.1"
+version = "1.4.2"
 description = "Self-contained colormap module for VTK color transfer functions in Trame apps"
 readme = "README.md"
 license = {text = "Apache Software License"}

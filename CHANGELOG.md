@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.2 (2026-05-31)
+
+### Bug Fixes
+
+- Use vtkLookupTable for NaN alpha support
+  ([`f164e4d`](https://github.com/Kitware/trame-colormaps/commit/f164e4d80c7a8c7abf5a05b9518b511d05f803e6))
+
+
 ## v1.4.1 (2026-05-31)
 
 ### Bug Fixes
