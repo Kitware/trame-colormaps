@@ -133,6 +133,7 @@ class WaveletColorMapDemo(TrameApp):
 
         actor = vtkActor()
         actor.SetMapper(mapper)
+        actor.ForceOpaqueOn()
 
         # --- Renderer ---
         renderer = vtkRenderer()
