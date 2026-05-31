@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.1 (2026-05-31)
+
+### Bug Fixes
+
+- Pass n_ticks instead of n_colors in preset click handler
+  ([`c6dcc10`](https://github.com/Kitware/trame-colormaps/commit/c6dcc107286a1d51553a75da094bd65b2fe7d8b2))
+
+
 ## v1.4.0 (2026-05-29)
 
 ### Features
