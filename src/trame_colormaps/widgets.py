@@ -389,7 +389,7 @@ class ColorMapEditor(v3.VCard):
                 f"{name}.use_log_scale,"
                 f"{name}.discrete_log,"
                 f"{name}.n_discrete_colors,"
-                f"{name}.n_colors"
+                f"{name}.n_ticks"
                 "]"
             )
             _v_for = f"entry in ({name}.invert ? {name}.luts_inverted : {name}.luts_normal)"
