@@ -117,3 +117,25 @@
   white-space: nowrap;
   padding: 2px;
 }
+
+.tcmap-nan-swatch .v-list-item__prepend {
+  margin-inline-end: 8px;
+}
+
+.tcmap-nan-swatch .v-list-item__spacer {
+  display: none;
+}
+
+.tcmap-nan-swatch .v-icon {
+  color: var(--nan-icon-color) !important;
+  -webkit-text-stroke: 1px #333;
+  paint-order: stroke fill;
+}
+
+.tcmap-nan-checkerboard .v-icon {
+  color: transparent !important;
+  background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50%/6px 6px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1px #333;
+}
