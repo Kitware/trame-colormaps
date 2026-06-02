@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.3 (2026-06-02)
+
+### Bug Fixes
+
+- NaN color dropdown closes on selection and add swatches
+  ([`62163a3`](https://github.com/Kitware/trame-colormaps/commit/62163a3430b7f5d83a961c83fdded64cb1283850))
+
+
 ## v1.4.2 (2026-05-31)
 
 ### Bug Fixes
