@@ -163,10 +163,10 @@ swatch circle and a situation label. Options are grouped:
 
 | Group | Options |
 |-------|---------|
-| **Default** | transparent, general |
-| **Colormap types** | sequential maps, diverging maps, categorical maps, grayscale maps, bright maps, dark maps, hot maps, terrain final |
-| **Data quality** | error, warning, suspect data, masked data, debugging |
-| **Background/context** | light background, dark background, publication light, publication dark |
+| **Default** | Transparent, General |
+| **Colormap types** | Sequential maps, Diverging maps, Categorical maps, Grayscale maps, Bright maps, Dark maps, Hot maps, Terrain maps |
+| **Data quality** | Error, Warning, Suspect data, Masked data, Debugging |
+| **Background/context** | Light background, Dark background, Publication light, Publication dark |
 
 The default is **transparent** (`rgba(0,0,0,0)`), meaning NaN cells are
 invisible. The selected color is applied via `vtkLookupTable.SetNanColor()`
@@ -612,6 +612,20 @@ Tick marks are computed identically for discrete and continuous modes:
 - **Symlog**: powers of 10 filtered by visual position spacing — ticks far from zero (where the symlog transform expands the scale) are shown at every decade, while ticks near zero (where the transform compresses values) are adaptively thinned to prevent overlap. Zero is always shown when it falls within the data range and away from edges.
 
 The adaptive spacing uses the symlog-transformed position of each candidate tick: only ticks that are at least `100/n` percentage points apart in visual space are kept. This naturally produces a nonlinear stride — larger gaps near zero, smaller gaps at extremes.
+
+#### `linthresh` (linear threshold)
+
+`linthresh` defines the boundary between the linear and logarithmic regions
+of the symlog transform: `sign(v) × log₁₀(1 + |v| / linthresh)`. Values
+with `|v| < linthresh` are treated quasi-linearly, while values with
+`|v| ≥ linthresh` are spaced logarithmically.
+
+`ColormapConfig` computes `linthresh` automatically from the data array
+via `calculate_linthresh()` — it is the smallest absolute non-zero value
+in the array (excluding true machine-zeros). This ensures the log region
+begins exactly where the data's smallest meaningful magnitude starts.
+
+If no data array is available, `linthresh` defaults to `1.0`.
 
 ### `core/transforms.py` — function parameters
 

@@ -177,7 +177,7 @@ class TestNanColorOptions:
 
     def test_first_is_transparent(self):
         first = NAN_COLOR_OPTIONS[0]
-        assert first["situation_preset_type"] == "transparent"
+        assert first["situation_preset_type"] == "Transparent"
         assert first["color"] == [0.0, 0.0, 0.0, 0.0]
 
     def test_each_has_color_and_label(self):

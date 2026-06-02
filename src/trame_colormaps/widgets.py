@@ -12,28 +12,28 @@ __all__ = [
 
 NAN_COLOR_OPTIONS = [
     # Default
-    {"color": [0.0, 0.0, 0.0, 0.0], "situation_preset_type": "transparent"},
-    {"color": [0.75, 0.75, 0.75, 1.0], "situation_preset_type": "general"},
+    {"color": [0.0, 0.0, 0.0, 0.0], "situation_preset_type": "Transparent"},
+    {"color": [0.75, 0.75, 0.75, 1.0], "situation_preset_type": "General"},
     # Colormap types
-    {"color": [0.85, 0.85, 0.85, 1.0], "situation_preset_type": "sequential maps"},
-    {"color": [0.60, 0.60, 0.60, 1.0], "situation_preset_type": "diverging maps"},
-    {"color": [0.80, 0.80, 0.80, 1.0], "situation_preset_type": "categorical maps"},
-    {"color": [0.22, 0.49, 0.72, 1.0], "situation_preset_type": "grayscale maps"},
-    {"color": [0.0, 0.0, 0.0, 1.0], "situation_preset_type": "bright maps"},
-    {"color": [1.0, 1.0, 1.0, 1.0], "situation_preset_type": "dark maps"},
-    {"color": [0.0, 1.0, 1.0, 1.0], "situation_preset_type": "hot maps"},
-    {"color": [0.74, 0.74, 0.74, 1.0], "situation_preset_type": "terrain final"},
+    {"color": [0.85, 0.85, 0.85, 1.0], "situation_preset_type": "Sequential maps"},
+    {"color": [0.60, 0.60, 0.60, 1.0], "situation_preset_type": "Diverging maps"},
+    {"color": [0.80, 0.80, 0.80, 1.0], "situation_preset_type": "Categorical maps"},
+    {"color": [0.22, 0.49, 0.72, 1.0], "situation_preset_type": "Grayscale maps"},
+    {"color": [0.0, 0.0, 0.0, 1.0], "situation_preset_type": "Bright maps"},
+    {"color": [1.0, 1.0, 1.0, 1.0], "situation_preset_type": "Dark maps"},
+    {"color": [0.0, 1.0, 1.0, 1.0], "situation_preset_type": "Hot maps"},
+    {"color": [0.74, 0.74, 0.74, 1.0], "situation_preset_type": "Terrain maps"},
     # Data quality
-    {"color": [0.89, 0.10, 0.11, 1.0], "situation_preset_type": "error"},
-    {"color": [1.0, 1.0, 0.20, 1.0], "situation_preset_type": "warning"},
-    {"color": [1.0, 0.50, 0.0, 1.0], "situation_preset_type": "suspect data"},
-    {"color": [0.30, 0.69, 0.29, 1.0], "situation_preset_type": "masked data"},
-    {"color": [1.0, 0.0, 1.0, 1.0], "situation_preset_type": "debugging"},
+    {"color": [0.89, 0.10, 0.11, 1.0], "situation_preset_type": "Error"},
+    {"color": [1.0, 1.0, 0.20, 1.0], "situation_preset_type": "Warning"},
+    {"color": [1.0, 0.50, 0.0, 1.0], "situation_preset_type": "Suspect data"},
+    {"color": [0.30, 0.69, 0.29, 1.0], "situation_preset_type": "Masked data"},
+    {"color": [1.0, 0.0, 1.0, 1.0], "situation_preset_type": "Debugging"},
     # Background/context
-    {"color": [0.55, 0.55, 0.55, 1.0], "situation_preset_type": "light background"},
-    {"color": [0.33, 0.33, 0.33, 1.0], "situation_preset_type": "dark background"},
-    {"color": [0.94, 0.94, 0.94, 1.0], "situation_preset_type": "publication light"},
-    {"color": [0.15, 0.15, 0.15, 1.0], "situation_preset_type": "publication dark"},
+    {"color": [0.55, 0.55, 0.55, 1.0], "situation_preset_type": "Light background"},
+    {"color": [0.33, 0.33, 0.33, 1.0], "situation_preset_type": "Dark background"},
+    {"color": [0.94, 0.94, 0.94, 1.0], "situation_preset_type": "Publication light"},
+    {"color": [0.15, 0.15, 0.15, 1.0], "situation_preset_type": "Publication dark"},
 ]
 
 
@@ -243,37 +243,24 @@ class ColorMapEditor(v3.VCard):
                                             g255 = int(rgba[1] * 255)
                                             b255 = int(rgba[2] * 255)
                                             a_val = rgba[3]
-                                            if a_val == 0:
-                                                swatch_style = (
-                                                    "width:16px; height:16px; "
-                                                    "border-radius:50%; "
-                                                    "border: 1px solid #999; "
-                                                    "margin-right: 8px; "
-                                                    "background: repeating-conic-gradient("
-                                                    "#ccc 0% 25%, #fff 0% 50%) "
-                                                    "50%/8px 8px;"
-                                                )
-                                            else:
-                                                swatch_style = (
-                                                    f"width:16px; height:16px; "
-                                                    f"border-radius:50%; "
-                                                    f"border: 1px solid #999; "
-                                                    f"margin-right: 8px; "
-                                                    f"background: rgb({r255},{g255},{b255});"
-                                                )
                                             color_json = (
                                                 f"[{rgba[0]},{rgba[1]},{rgba[2]},{rgba[3]}]"
                                             )
-                                            with v3.VListItem(
-                                                click=(f"{name}.nan_color = {color_json}"),
-                                            ):
-                                                with html.Template(
-                                                    v_slot_prepend=True,
-                                                ):
-                                                    html.Span(
-                                                        style=swatch_style,
-                                                    )
-                                                v3.VListItemTitle(label)
+                                            icon_color = f"rgb({r255},{g255},{b255})"
+                                            item_classes = "tcmap-nan-swatch" + (
+                                                " tcmap-nan-checkerboard" if a_val == 0 else ""
+                                            )
+                                            v3.VListItem(
+                                                title=label,
+                                                value=label,
+                                                prepend_icon="mdi-circle",
+                                                classes=item_classes,
+                                                style=f"--nan-icon-color: {icon_color};",
+                                                click=(
+                                                    f"{name}.nan_color = {color_json};"
+                                                    f" {name}.show_nan_menu = false"
+                                                ),
+                                            )
                                 v3.VTooltip(
                                     text=(b["tip"],),
                                     activator="parent",
