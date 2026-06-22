@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-06-22)
+
+### Features
+
+- More controls and dynamic size handling
+  ([`ad3bbe3`](https://github.com/Kitware/trame-colormaps/commit/ad3bbe3bd06996cfc7150edc2d3b83fec20770b4))
+
+
 ## v1.4.3 (2026-06-02)
 
 ### Bug Fixes
