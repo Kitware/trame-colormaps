@@ -1,5 +1,6 @@
 :root {
   --tcmap-editor-size: 420px;
+  --tcmap-editor-search-width: 120px;
 }
 
 .tcmap-editor {
@@ -21,7 +22,7 @@
 }
 
 .tcmap-editor-search {
-  max-width: 120px;
+  max-width: var(--tcmap-editor-search-width);
 }
 
 .tcmap-editor-search .v-field__input {

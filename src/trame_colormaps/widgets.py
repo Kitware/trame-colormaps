@@ -165,8 +165,8 @@ def _fmt_expr(name, idx):
 
 
 class ColorMapEditor(v3.VCard):
-    def __init__(self, name):
-        super().__init__(classes="tcmap-editor")
+    def __init__(self, name, show_close_button=True, **kwargs):
+        super().__init__(**{"classes": "tcmap-editor d-flex flex-column", **kwargs})
         self.server.enable_module(module)
 
         with self:
@@ -277,6 +277,7 @@ class ColorMapEditor(v3.VCard):
                                 )
 
                     html.Div(style="width: 4px; flex-shrink: 0;")
+                    v3.VSpacer()
                     v3.VTextField(
                         v_model=f"{name}.search",
                         clearable=True,
@@ -290,13 +291,14 @@ class ColorMapEditor(v3.VCard):
                         classes="tcmap-editor-search",
                         reverse=True,
                     )
-                    v3.VBtn(
-                        icon="mdi-close",
-                        size="small",
-                        variant="text",
-                        classes="tcmap-editor-icon",
-                        click=f"{name}.menu=false",
-                    )
+                    if show_close_button:
+                        v3.VBtn(
+                            icon="mdi-close",
+                            size="small",
+                            variant="text",
+                            classes="tcmap-editor-icon",
+                            click=f"{name}.menu=false",
+                        )
 
             # --- Discrete colors slider/input ---
             _discrete_label = (
@@ -387,19 +389,20 @@ class ColorMapEditor(v3.VCard):
                 f" && (!{name}.color_blind || entry.safe)"
             )
             v3.VDivider()
-            with v3.VList(density="compact", max_height="40vh"):
-                with v3.VListItem(
-                    v_for=_v_for,
-                    v_show=_v_show,
-                    key="entry.name",
-                    subtitle=("entry.name",),
-                    click=(self.update_color_preset, _click_args),
-                    active=(f"{name}.preset === entry.name",),
-                ):
-                    html.Img(
-                        src=("entry.url",),
-                        classes="rounded tcmap-img-preset",
-                    )
+            with html.Div(classes="flex-fill", style="overflow:auto;"):
+                with v3.VList(density="compact"):
+                    with v3.VListItem(
+                        v_for=_v_for,
+                        v_show=_v_show,
+                        key="entry.name",
+                        subtitle=("entry.name",),
+                        click=(self.update_color_preset, _click_args),
+                        active=(f"{name}.preset === entry.name",),
+                    ):
+                        html.Img(
+                            src=("entry.url",),
+                            classes="rounded tcmap-img-preset",
+                        )
 
     def update_color_preset(self, colormap_id, *args):
         color_map = get_instance(colormap_id)
@@ -408,20 +411,28 @@ class ColorMapEditor(v3.VCard):
 
 
 class HorizontalScalarBar(html.Div):
-    def __init__(self, name, popup_location="top", **kwargs):
+    def __init__(
+        self, name, popup_location="top", has_menu=True, editor_options=None, **kwargs
+    ):
+        if editor_options is None:
+            editor_options = {"style": "height: 50vh;"}
         super().__init__(
-            classes="tcmap-horizontal bg-blue-grey-darken-2 d-flex align-center",
+            **{
+                "classes": "tcmap-horizontal bg-blue-grey-darken-2 d-flex align-center",
+                **kwargs,
+            }
         )
         self.server.enable_module(module)
 
         with self:
-            with v3.VMenu(
-                v_model=f"{name}.menu",
-                activator="parent",
-                location=popup_location,
-                close_on_content_click=False,
-            ):
-                ColorMapEditor(name)
+            if has_menu:
+                with v3.VMenu(
+                    v_model=f"{name}.menu",
+                    activator="parent",
+                    location=popup_location,
+                    close_on_content_click=False,
+                ):
+                    ColorMapEditor(name, **editor_options)
 
             html.Div(
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null "
@@ -459,20 +470,30 @@ class HorizontalScalarBar(html.Div):
 
 
 class VerticalScalarBar(html.Div):
-    def __init__(self, name, popup_location="top", **kwargs):
+    def __init__(
+        self, name, popup_location="top", has_menu=True, editor_options=None, **kwargs
+    ):
+        if editor_options is None:
+            editor_options = {"style": "height: 50vh;"}
         super().__init__(
-            classes=("tcmap-vertical bg-blue-grey-darken-2 d-flex flex-column align-center"),
+            **{
+                "classes": (
+                    "tcmap-vertical bg-blue-grey-darken-2 d-flex flex-column align-center"
+                ),
+                **kwargs,
+            }
         )
         self.server.enable_module(module)
 
         with self:
-            with v3.VMenu(
-                v_model=f"{name}.menu",
-                activator="parent",
-                location=popup_location,
-                close_on_content_click=False,
-            ):
-                ColorMapEditor(name)
+            if has_menu:
+                with v3.VMenu(
+                    v_model=f"{name}.menu",
+                    activator="parent",
+                    location=popup_location,
+                    close_on_content_click=False,
+                ):
+                    ColorMapEditor(name, **editor_options)
 
             # Max label at top
             html.Div(
