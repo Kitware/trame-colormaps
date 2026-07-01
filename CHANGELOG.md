@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.6.0 (2026-07-01)
+
+### Bug Fixes
+
+- Resolve semantic-release detached HEAD issue
+  ([`7df181c`](https://github.com/Kitware/trame-colormaps/commit/7df181cb655ef7648acf2c30195b7fa81caf64ae))
+
+### Features
+
+- Add WhViBlGrYeOrRe colormap from NCL
+  ([`48de14c`](https://github.com/Kitware/trame-colormaps/commit/48de14ce9d0320a13c41d442826c9bf331218578))
+
+
 ## v1.5.0 (2026-06-22)
 
 ### Features
