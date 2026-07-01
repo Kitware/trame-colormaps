@@ -19,4 +19,9 @@ Sources and processing scripts:
 
 - default_presets.json
   Curated default subset used by this library.
+
+- NCL colormaps (e.g., WhViBlGrYeOrRe)
+  Source: https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml
+  License: Public Domain
+  Processing: 0–255 integer RGB → 0–1 float, linearly spaced x values
 """
