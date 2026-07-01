@@ -64,8 +64,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          persist-credentials: true
-          ref: main
 
       - name: Python Semantic Release
         id: release
