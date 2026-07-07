@@ -5461,7 +5461,7 @@
     "Name": "cgx",
     "Source": "http://www.calculix.de/ (values via PyVista PR #8402)",
     "License": "Public Domain",
-    "Category": "Rainbow",
+    "Category": "Sequential",
     "RGBPoints": [
       0.0, 0.50, 0.0, 1.0,
       0.1, 0.00, 0.0, 0.8,
