@@ -662,7 +662,7 @@ class TestLutRendering:
 
     def test_build_lut_from_ctf_sets_mapper_lut(self, config):
         config._build_lut_from_ctf(config._ctf)
-        assert config._mapper.GetLookupTable() is config._lut
+        assert next(iter(config._mappers)).GetLookupTable() is config._lut
 
     def test_lut_table_values_have_alpha_one(self, config):
         config._build_lut_from_ctf(config._ctf)
