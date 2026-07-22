@@ -10,6 +10,7 @@ import math
 
 import numpy as np
 from trame.app.dataclass import ServerOnly, StateDataModel, Sync, get_instance, watch
+from vtkmodules.numpy_interface.dataset_adapter import VTKNoneArray
 from vtkmodules.util.numpy_support import vtk_to_numpy
 from vtkmodules.vtkCommonCore import vtkLookupTable
 from vtkmodules.vtkRenderingCore import vtkColorTransferFunction
@@ -146,14 +147,13 @@ class ColormapConfig(StateDataModel):
     show_nan_menu: bool = Sync(bool, False)
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
+        self._mappers = set()
+        self.register_mapper(mapper)
+
         # Create and own the CTF (used internally for building colormaps)
         self._ctf = vtkColorTransferFunction()
-        self._mapper = mapper
         self._get_data_array = data_array_fn
         self._lut = None
-
-        if self._mapper:
-            self._mapper.SetUseLookupTableScalarRange(True)
 
         # Saved state for restoring when leaving diverging mode
         self._saved_active_presets = None
@@ -294,7 +294,7 @@ class ColormapConfig(StateDataModel):
         if not self._get_data_array:
             return
         data_array = self._get_data_array()
-        if not data_array:
+        if data_array is None or isinstance(data_array, VTKNoneArray):
             return
         data_range = data_array.GetRange()
         abs_max_val = max(abs(data_range[0]), abs(data_range[1]))
@@ -409,6 +409,9 @@ class ColormapConfig(StateDataModel):
     @watch("override_range", "color_range", eager=True)
     def _on_range_change(self, *_):
         """Reactive handler for override_range or color_range changes."""
+        if not self._mappers:
+            # skip exception at startup when no mapper available
+            return
         self.update_color_range()
 
     @watch("active_presets", eager=True)
@@ -547,6 +550,13 @@ class ColormapConfig(StateDataModel):
         self.color_ticks = ticks
 
     # --- Public API ---
+    def register_mapper(self, mapper):
+        if mapper:
+            mapper.SetUseLookupTableScalarRange(True)
+            self._mappers.add(mapper)
+
+    def unregister_mapper(self, mapper):
+        self._mappers.discard(mapper)
 
     def set_data_array(self, variable_name, data_array_fn, scalar_mode="cell"):
         """Switch the coloring to a different data array at runtime.
@@ -560,18 +570,19 @@ class ColormapConfig(StateDataModel):
             data_array_fn: Callable returning the new VTK data array (or None).
             scalar_mode: ``"cell"`` (default), ``"point"``, or ``"default"``.
         """
-        if not self._mapper:
+        if not self._mappers:
             msg = "No mapper available on dataclass"
             raise ValueError(msg)
 
         self._get_data_array = data_array_fn
-        self._mapper.SetScalarVisibility(1)
-        if scalar_mode == "point":
-            self._mapper.SetScalarModeToUsePointFieldData()
-        elif scalar_mode == "cell":
-            self._mapper.SetScalarModeToUseCellFieldData()
-        if scalar_mode in ("point", "cell"):
-            self._mapper.SelectColorArray(variable_name)
+        for mapper in self._mappers:
+            mapper.SetScalarVisibility(1)
+            if scalar_mode == "point":
+                mapper.SetScalarModeToUsePointFieldData()
+            elif scalar_mode == "cell":
+                mapper.SetScalarModeToUseCellFieldData()
+                if scalar_mode in ("point", "cell"):
+                    mapper.SelectColorArray(variable_name)
         self.update_color_range()
         self.update_color_preset(
             self.preset,
@@ -590,7 +601,7 @@ class ColormapConfig(StateDataModel):
         array returned by data_array_fn.  When True, the existing manual
         range is kept and only rescaled onto the CTF.
         """
-        if not self._mapper:
+        if not self._mappers:
             msg = "No mapper available on dataclass"
             raise ValueError(msg)
 
@@ -608,16 +619,18 @@ class ColormapConfig(StateDataModel):
                 return
 
             rescale_ctf(self._ctf, *self.color_range)
-        else:
+        elif self._get_data_array:
             data_array = self._get_data_array()
-            if data_array:
-                data_range = data_array.GetRange()
-                self.color_range = data_range
-                self.color_value_min = str(data_range[0])
-                self.color_value_max = str(data_range[1])
-                self.color_value_min_valid = True
-                self.color_value_max_valid = True
-                rescale_ctf(self._ctf, *data_range)
+            if data_array is None or isinstance(data_array, VTKNoneArray):
+                return
+
+            data_range = data_array.GetRange()
+            self.color_range = data_range
+            self.color_value_min = str(data_range[0])
+            self.color_value_max = str(data_range[1])
+            self.color_value_min_valid = True
+            self.color_value_max_valid = True
+            rescale_ctf(self._ctf, *data_range)
 
         self.update_color_preset(
             self.preset,
@@ -657,9 +670,9 @@ class ColormapConfig(StateDataModel):
                 or per decade (log/symlog).
             n_ticks: Desired number of tick marks on the colorbar.
         """
-        if not self._mapper:
-            msg = "No mapper available on dataclass"
-            raise ValueError(msg)
+        # if not self._mappers:
+        #     msg = "No mapper available on dataclass"
+        #     raise ValueError(msg)
 
         self.preset = name
 
@@ -794,7 +807,8 @@ class ColormapConfig(StateDataModel):
             self._symlog_ctf = None
             self._build_lut_from_ctf(self._ctf)
 
-        self._mapper.SetScalarRange(self.color_range)
+        for mapper in self._mappers:
+            mapper.SetScalarRange(self.color_range)
         self._apply_nan_color()
 
         self.mapper_change += 1
@@ -844,4 +858,5 @@ class ColormapConfig(StateDataModel):
         lut.SetNanColor(0.0, 0.0, 0.0, 0.0)
         lut.BuildSpecialColors()
         self._lut = lut
-        self._mapper.SetLookupTable(lut)
+        for mapper in self._mappers:
+            mapper.SetLookupTable(lut)

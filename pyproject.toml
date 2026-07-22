@@ -27,11 +27,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "numpy",
     "trame>=3",
     "trame-dataclass>=2",
     "trame-vuetify>=3.2",
-    "vtk",
 ]
 
 [project.urls]
@@ -44,6 +42,10 @@ dev = [
     "pre-commit",
     "pytest",
     "ruff",
+]
+all = [
+    "vtk",
+    "numpy",
 ]
 
 [tool.pytest.ini_options]
