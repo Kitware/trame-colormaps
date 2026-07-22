@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.6.1 (2026-07-22)
+
+### Bug Fixes
+
+- Add support for multiple mappers
+  ([`4d6419f`](https://github.com/Kitware/trame-colormaps/commit/4d6419f403f022a9ad00e3efdc333cf854f46585))
+
+### Continuous Integration
+
+- Add missing dependencies
+  ([`1d3034e`](https://github.com/Kitware/trame-colormaps/commit/1d3034e4526029ed0eb59040a6fb164b951c2f26))
+
+- Only trigger release job on push
+  ([`3290179`](https://github.com/Kitware/trame-colormaps/commit/32901792bb8ea5b239f7e6bfd03bf593ae383df2))
+
+### Testing
+
+- Fix mapper access
+  ([`28f4414`](https://github.com/Kitware/trame-colormaps/commit/28f44145284fbe20fdbb3aba1faf74745dff5039))
+
+
 ## v1.6.0 (2026-07-01)
 
 ### Bug Fixes
