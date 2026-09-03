@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.7.0 (2026-09-03)
+
+### Features
+
+- Add independent bands ([#27](https://github.com/Kitware/trame-colormaps/pull/27),
+  [`a89a683`](https://github.com/Kitware/trame-colormaps/commit/a89a68307cde43e82e63a398bc56ec0c059bd587))
+
+
 ## v1.6.1 (2026-07-22)
 
 ### Bug Fixes
