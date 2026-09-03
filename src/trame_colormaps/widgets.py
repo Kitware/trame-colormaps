@@ -494,7 +494,9 @@ class HorizontalScalarBar(html.Div):
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null "
                 f"? '' + {_fmt_expr(name, 0)} : '' }}}}",
                 classes="text-caption px-2 text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
+
             with html.Div(classes="tcmap-h-img-container rounded"):
                 # Bottom independent band = values below minimum
                 html.Div(
@@ -516,6 +518,22 @@ class HorizontalScalarBar(html.Div):
                     html.Img(
                         src=(f"{name}.lut_img_h",),
                         draggable=False,
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[0] != null "
+                        f"? '' + {_fmt_expr(name, 0)} : '' }}}}",
+                        classes=(
+                            "tcmap-h-end-label tcmap-h-end-label-min text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                        f"? {_fmt_expr(name, 1)} : '' }}}}",
+                        classes=(
+                            "tcmap-h-end-label tcmap-h-end-label-max text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
                     )
                     with html.Div(classes="tcmap-ticks-container"):
                         with html.Div(
@@ -555,9 +573,10 @@ class HorizontalScalarBar(html.Div):
                 )
 
             html.Div(
-                f"{{{{ {name}.color_range && {name}.color_range[1] != null"
-                f" ? {_fmt_expr(name, 1)} : '' }}}}",
+                f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                f"? {_fmt_expr(name, 1)} : '' }}}}",
                 classes="text-caption px-2 text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
 
 
@@ -589,9 +608,10 @@ class VerticalScalarBar(html.Div):
 
             # Max label at top
             html.Div(
-                f"{{{{ {name}.color_range && {name}.color_range[1] != null"
-                f" ? {_fmt_expr(name, 1)} : '' }}}}",
+                f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                f"? {_fmt_expr(name, 1)} : '' }}}}",
                 classes="tcmap-vertical-labels text-caption text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
             # Vertical LUT image stretched to fill
             with html.Div(classes="tcmap-v-img-container"):
@@ -615,6 +635,23 @@ class VerticalScalarBar(html.Div):
                     html.Img(
                         src=(f"{name}.lut_img_v",),
                         draggable=False,
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                        f"? {_fmt_expr(name, 1)} : '' }}}}",
+                        classes=(
+                            "tcmap-v-end-label tcmap-v-end-label-max text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[0] != null "
+                        f"? {_fmt_expr(name, 0)} : '' }}}}",
+                        classes=(
+                            "tcmap-v-end-label tcmap-v-end-label-min text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
                     )
                     with html.Div(classes="tcmap-ticks-container"):
                         with html.Div(
@@ -661,4 +698,5 @@ class VerticalScalarBar(html.Div):
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null"
                 f" ? {_fmt_expr(name, 0)} : '' }}}}",
                 classes="tcmap-vertical-labels text-caption text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
