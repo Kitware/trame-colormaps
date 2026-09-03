@@ -493,28 +493,64 @@ class HorizontalScalarBar(html.Div):
                 classes="text-caption px-2 text-no-wrap",
             )
             with html.Div(classes="tcmap-h-img-container rounded"):
-                html.Img(
-                    src=(f"{name}.lut_img_h",),
-                    draggable=False,
+                # Bottom independent band = values below minimum
+                html.Div(
+                    classes="tcmap-independent-band-h",
+                    v_if=(
+                        f"{name}.independent_bands === 'bottom'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_bottom_color[0] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[1] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[2] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[3]}});`",
+                    ),
                 )
-                with html.Div(classes="tcmap-ticks-container"):
-                    with html.Div(
-                        v_for=f"(tick, i) in {name}.color_ticks",
-                        key="i",
-                        classes="tcmap-tick-container",
-                        style=(
-                            "`top:0;left:${tick.position}%;flex-direction:column;transform:translateX(-50%);`",
-                        ),
-                    ):
-                        html.Div(
-                            classes="tcmap-tick-line-h",
-                            style=("`background:${tick.color};`",),
-                        )
-                        html.Span(
-                            "{{ tick.label }}",
-                            classes="tcmap-tick-label",
-                            style=("`color:${tick.color};`",),
-                        )
+
+                with html.Div(classes="tcmap-h-lut-container"):
+                    html.Img(
+                        src=(f"{name}.lut_img_h",),
+                        draggable=False,
+                    )
+                    with html.Div(classes="tcmap-ticks-container"):
+                        with html.Div(
+                            v_for=f"(tick, i) in {name}.color_ticks",
+                            key="i",
+                            classes="tcmap-tick-container",
+                            style=(
+                                "`top:0;left:${tick.position}%;"
+                                "flex-direction:column;"
+                                "transform:translateX(-50%);`",
+                            ),
+                        ):
+                            html.Div(
+                                classes="tcmap-tick-line-h",
+                                style=("`background:${tick.color};`",),
+                            )
+                            html.Span(
+                                "{{ tick.label }}",
+                                classes="tcmap-tick-label",
+                                style=("`color:${tick.color};`",),
+                            )
+
+                # Top independent band = values above maximum
+                html.Div(
+                    classes="tcmap-independent-band-h",
+                    v_if=(
+                        f"{name}.independent_bands === 'top'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_top_color[0] * 255}}, "
+                        f"${{{name}.independent_band_top_color[1] * 255}}, "
+                        f"${{{name}.independent_band_top_color[2] * 255}}, "
+                        f"${{{name}.independent_band_top_color[3]}});`",
+                    ),
+                )
+
             html.Div(
                 f"{{{{ {name}.color_range && {name}.color_range[1] != null"
                 f" ? {_fmt_expr(name, 1)} : '' }}}}",
@@ -556,34 +592,67 @@ class VerticalScalarBar(html.Div):
             )
             # Vertical LUT image stretched to fill
             with html.Div(classes="tcmap-v-img-container"):
-                html.Img(
-                    src=(f"{name}.lut_img_v",),
-                    draggable=False,
+                # Top independent band = values above maximum
+                html.Div(
+                    classes="tcmap-independent-band-v",
+                    v_if=(
+                        f"{name}.independent_bands === 'top'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_top_color[0] * 255}}, "
+                        f"${{{name}.independent_band_top_color[1] * 255}}, "
+                        f"${{{name}.independent_band_top_color[2] * 255}}, "
+                        f"${{{name}.independent_band_top_color[3]}});`",
+                    ),
                 )
-                # Tick overlay
-                with html.Div(classes="tcmap-ticks-container"):
-                    with html.Div(
-                        v_for=f"(tick, i) in {name}.color_ticks",
-                        key="i",
-                        classes="tcmap-tick-container",
-                        style=(
-                            "`top:${100 - tick.position}%;left:0;"
-                            "flex-direction:row;transform:translateY(-50%);`",
-                        ),
-                    ):
-                        html.Div(
-                            classes="tcmap-tick-line-v",
-                            style=("`background:${tick.color};`",),
-                        )
-                        html.Span(
-                            "{{ tick.label }}",
-                            classes="tcmap-tick-label",
+
+                with html.Div(classes="tcmap-v-lut-container"):
+                    html.Img(
+                        src=(f"{name}.lut_img_v",),
+                        draggable=False,
+                    )
+                    with html.Div(classes="tcmap-ticks-container"):
+                        with html.Div(
+                            v_for=f"(tick, i) in {name}.color_ticks",
+                            key="i",
+                            classes="tcmap-tick-container",
                             style=(
-                                "`color: ${tick.color};"
-                                "writing-mode:vertical-lr;"
-                                "transform: rotate(180deg);`",
+                                "`top:${100 - tick.position}%;left:0;"
+                                "flex-direction:row;transform:translateY(-50%);`",
                             ),
-                        )
+                        ):
+                            html.Div(
+                                classes="tcmap-tick-line-v",
+                                style=("`background:${tick.color};`",),
+                            )
+                            html.Span(
+                                "{{ tick.label }}",
+                                classes="tcmap-tick-label",
+                                style=(
+                                    "`color: ${tick.color};"
+                                    "writing-mode:vertical-lr;"
+                                    "transform: rotate(180deg);`",
+                                ),
+                            )
+
+                # Bottom independent band = values below minimum
+                html.Div(
+                    classes="tcmap-independent-band-v",
+                    v_if=(
+                        f"{name}.independent_bands === 'bottom'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_bottom_color[0] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[1] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[2] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[3]}});`",
+                    ),
+                )
+
             # Min label at bottom
             html.Div(
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null"

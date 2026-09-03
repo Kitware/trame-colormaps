@@ -746,10 +746,13 @@ class TestIndependentBands:
         assert config._lut.GetUseAboveRangeColor() == 1
         assert config._lut.GetUseBelowRangeColor() == 1
 
-    def test_band_color(self, config):
+    def test_band_colors(self, config):
         config._build_lut_from_ctf(config._ctf)
-        config.independent_band_color = [0.5, 0.5, 0.5, 1.0]
-        config.independent_bands = "top"
+
+        config.independent_band_bottom_color = [0.3, 0.3, 0.3, 1.0]
+        config.independent_band_top_color = [0.7, 0.7, 0.7, 1.0]
+        config.independent_bands = "both"
         config._apply_nan_color()
 
-        assert config._lut.GetAboveRangeColor() == pytest.approx((0.5, 0.5, 0.5, 1.0))
+        assert config._lut.GetBelowRangeColor() == pytest.approx((0.3, 0.3, 0.3, 1.0))
+        assert config._lut.GetAboveRangeColor() == pytest.approx((0.7, 0.7, 0.7, 1.0))

@@ -137,7 +137,8 @@ class ColormapConfig(StateDataModel):
 
     # --- NaN / out-of-range colors ---
     nan_color: list[float] = Sync(list, [0.0, 0.0, 0.0, 0.0])
-    independent_band_color: list[float] = Sync(list, [0.5, 0.5, 0.5, 1.0])
+    independent_band_bottom_color: list[float] = Sync(list, [0.3, 0.3, 0.3, 1.0])
+    independent_band_top_color: list[float] = Sync(list, [0.7, 0.7, 0.7, 1.0])
 
     # --- UI widget state (control panel popup) ---
     menu: bool = Sync(bool, False)
@@ -828,7 +829,12 @@ class ColormapConfig(StateDataModel):
         self._apply_nan_color()
         self.mapper_change += 1
 
-    @watch("independent_bands", "independent_band_color", eager=True)
+    @watch(
+        "independent_bands",
+        "independent_band_bottom_color",
+        "independent_band_top_color",
+        eager=True,
+    )
     def _on_independent_bands_change(self, *_):
         """Toggle independent top/bottom out-of-range bands."""
         self._apply_nan_color()
@@ -841,10 +847,15 @@ class ColormapConfig(StateDataModel):
             c = [0.0, 0.0, 0.0, 0.0]
         r, g, b, a = map(float, c)
 
-        band_color = self.independent_band_color
-        if not band_color or len(band_color) < 4:
-            band_color = [0.5, 0.5, 0.5, 1.0]
-        br, bg, bb, ba = map(float, band_color)
+        bottom_color = self.independent_band_bottom_color
+        if not bottom_color or len(bottom_color) < 4:
+            bottom_color = [0.3, 0.3, 0.3, 1.0]
+        bottom_r, bottom_g, bottom_b, bottom_a = map(float, bottom_color)
+
+        top_color = self.independent_band_top_color
+        if not top_color or len(top_color) < 4:
+            top_color = [0.7, 0.7, 0.7, 1.0]
+        top_r, top_g, top_b, top_a = map(float, top_color)
 
         cut = bool(self.cut_outside_range)
         bands = self.independent_bands
@@ -865,10 +876,15 @@ class ColormapConfig(StateDataModel):
                 self._lut.SetUseBelowRangeColor(use_below)
 
                 if use_above:
-                    self._lut.SetAboveRangeColor(br, bg, bb, ba)
+                    self._lut.SetAboveRangeColor(top_r, top_g, top_b, top_a)
 
                 if use_below:
-                    self._lut.SetBelowRangeColor(br, bg, bb, ba)
+                    self._lut.SetBelowRangeColor(
+                        bottom_r,
+                        bottom_g,
+                        bottom_b,
+                        bottom_a,
+                    )
 
             self._lut.BuildSpecialColors()
 
