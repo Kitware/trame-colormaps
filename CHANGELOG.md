@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.7.1 (2026-09-03)
+
+### Bug Fixes
+
+- Add CGX colormap (based on PyVista) ([#26](https://github.com/Kitware/trame-colormaps/pull/26),
+  [`3341e09`](https://github.com/Kitware/trame-colormaps/commit/3341e090287949483437e2654a7073688e4d6767))
+
+
 ## v1.7.0 (2026-09-03)
 
 ### Features
