@@ -131,10 +131,19 @@ def buttons(name):
             "disabled": f"{name}.diverging",
         },
         {
+            "icon": "mdi-arrow-expand-vertical",
+            "tip": "'Independent Bands'",
+            "active": f"{name}.independent_bands !== 'none'",
+            "disabled": f"!{name}.override_range && !{name}.diverging",
+            "show": f"{name}.enable_independent_bands",
+            "independent_bands_menu": True,
+        },
+        {
             "icon": "mdi-scissors-cutting",
             "click": (
                 f"({name}.override_range || {name}.diverging)"
                 f" && ({name}.cut_outside_range = !{name}.cut_outside_range)"
+                f" && ({name}.independent_bands = 'none')"
             ),
             "tip": (
                 f"!{name}.override_range && !{name}.diverging"
@@ -218,6 +227,53 @@ class ColorMapEditor(v3.VCard):
                                                     f" === '{cat_value}'",
                                                 ),
                                             )
+                                v3.VTooltip(
+                                    text=(b["tip"],),
+                                    activator="parent",
+                                    location="bottom",
+                                )
+                        elif b.get("independent_bands_menu"):
+                            with html.Div(
+                                v_if=b.get("show"),
+                            ):
+                                with v3.VMenu(
+                                    v_model=f"{name}.show_independent_bands_menu",
+                                    location="bottom",
+                                ):
+                                    with html.Template(v_slot_activator="{ props: bandProps }"):
+                                        btn_kwargs["v_bind"] = "bandProps"
+                                        btn_kwargs["variant"] = "'text'"
+                                        btn_kwargs["color"] = "undefined"
+                                        v3.VBtn(**btn_kwargs)
+
+                                    with v3.VList(density="compact"):
+                                        for value, label in [
+                                            ("none", "None"),
+                                            ("top", "Top"),
+                                            ("bottom", "Bottom"),
+                                            ("both", "Top and Bottom"),
+                                        ]:
+                                            cut_reset = (
+                                                f" {name}.cut_outside_range = false;"
+                                                if value != "none"
+                                                else ""
+                                            )
+
+                                            v3.VListItem(
+                                                title=label,
+                                                value=value,
+                                                active=(
+                                                    f"{name}.independent_bands === '{value}'"
+                                                ),
+                                                click=(
+                                                    f"{name}.independent_bands"
+                                                    f" = '{value}';"
+                                                    f"{cut_reset}"
+                                                    f" {name}.show_independent_bands_menu"
+                                                    " = false"
+                                                ),
+                                            )
+
                                 v3.VTooltip(
                                     text=(b["tip"],),
                                     activator="parent",
@@ -438,34 +494,89 @@ class HorizontalScalarBar(html.Div):
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null "
                 f"? '' + {_fmt_expr(name, 0)} : '' }}}}",
                 classes="text-caption px-2 text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
+
             with html.Div(classes="tcmap-h-img-container rounded"):
-                html.Img(
-                    src=(f"{name}.lut_img_h",),
-                    draggable=False,
+                # Bottom independent band = values below minimum
+                html.Div(
+                    classes="tcmap-independent-band-h",
+                    v_if=(
+                        f"{name}.independent_bands === 'bottom'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_bottom_color[0] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[1] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[2] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[3]}});`",
+                    ),
                 )
-                with html.Div(classes="tcmap-ticks-container"):
-                    with html.Div(
-                        v_for=f"(tick, i) in {name}.color_ticks",
-                        key="i",
-                        classes="tcmap-tick-container",
-                        style=(
-                            "`top:0;left:${tick.position}%;flex-direction:column;transform:translateX(-50%);`",
+
+                with html.Div(classes="tcmap-h-lut-container"):
+                    html.Img(
+                        src=(f"{name}.lut_img_h",),
+                        draggable=False,
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[0] != null "
+                        f"? '' + {_fmt_expr(name, 0)} : '' }}}}",
+                        classes=(
+                            "tcmap-h-end-label tcmap-h-end-label-min text-caption text-no-wrap"
                         ),
-                    ):
-                        html.Div(
-                            classes="tcmap-tick-line-h",
-                            style=("`background:${tick.color};`",),
-                        )
-                        html.Span(
-                            "{{ tick.label }}",
-                            classes="tcmap-tick-label",
-                            style=("`color:${tick.color};`",),
-                        )
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                        f"? {_fmt_expr(name, 1)} : '' }}}}",
+                        classes=(
+                            "tcmap-h-end-label tcmap-h-end-label-max text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+                    with html.Div(classes="tcmap-ticks-container"):
+                        with html.Div(
+                            v_for=f"(tick, i) in {name}.color_ticks",
+                            key="i",
+                            classes="tcmap-tick-container",
+                            style=(
+                                "`top:0;left:${tick.position}%;"
+                                "flex-direction:column;"
+                                "transform:translateX(-50%);`",
+                            ),
+                        ):
+                            html.Div(
+                                classes="tcmap-tick-line-h",
+                                style=("`background:${tick.color};`",),
+                            )
+                            html.Span(
+                                "{{ tick.label }}",
+                                classes="tcmap-tick-label",
+                                style=("`color:${tick.color};`",),
+                            )
+
+                # Top independent band = values above maximum
+                html.Div(
+                    classes="tcmap-independent-band-h",
+                    v_if=(
+                        f"{name}.independent_bands === 'top'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_top_color[0] * 255}}, "
+                        f"${{{name}.independent_band_top_color[1] * 255}}, "
+                        f"${{{name}.independent_band_top_color[2] * 255}}, "
+                        f"${{{name}.independent_band_top_color[3]}});`",
+                    ),
+                )
+
             html.Div(
-                f"{{{{ {name}.color_range && {name}.color_range[1] != null"
-                f" ? {_fmt_expr(name, 1)} : '' }}}}",
+                f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                f"? {_fmt_expr(name, 1)} : '' }}}}",
                 classes="text-caption px-2 text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
 
 
@@ -497,43 +608,95 @@ class VerticalScalarBar(html.Div):
 
             # Max label at top
             html.Div(
-                f"{{{{ {name}.color_range && {name}.color_range[1] != null"
-                f" ? {_fmt_expr(name, 1)} : '' }}}}",
+                f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                f"? {_fmt_expr(name, 1)} : '' }}}}",
                 classes="tcmap-vertical-labels text-caption text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )
             # Vertical LUT image stretched to fill
             with html.Div(classes="tcmap-v-img-container"):
-                html.Img(
-                    src=(f"{name}.lut_img_v",),
-                    draggable=False,
+                # Top independent band = values above maximum
+                html.Div(
+                    classes="tcmap-independent-band-v",
+                    v_if=(
+                        f"{name}.independent_bands === 'top'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_top_color[0] * 255}}, "
+                        f"${{{name}.independent_band_top_color[1] * 255}}, "
+                        f"${{{name}.independent_band_top_color[2] * 255}}, "
+                        f"${{{name}.independent_band_top_color[3]}});`",
+                    ),
                 )
-                # Tick overlay
-                with html.Div(classes="tcmap-ticks-container"):
-                    with html.Div(
-                        v_for=f"(tick, i) in {name}.color_ticks",
-                        key="i",
-                        classes="tcmap-tick-container",
-                        style=(
-                            "`top:${100 - tick.position}%;left:0;"
-                            "flex-direction:row;transform:translateY(-50%);`",
+
+                with html.Div(classes="tcmap-v-lut-container"):
+                    html.Img(
+                        src=(f"{name}.lut_img_v",),
+                        draggable=False,
+                    )
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[1] != null "
+                        f"? {_fmt_expr(name, 1)} : '' }}}}",
+                        classes=(
+                            "tcmap-v-end-label tcmap-v-end-label-max text-caption text-no-wrap"
                         ),
-                    ):
-                        html.Div(
-                            classes="tcmap-tick-line-v",
-                            style=("`background:${tick.color};`",),
-                        )
-                        html.Span(
-                            "{{ tick.label }}",
-                            classes="tcmap-tick-label",
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+
+                    html.Div(
+                        f"{{{{ {name}.color_range && {name}.color_range[0] != null "
+                        f"? {_fmt_expr(name, 0)} : '' }}}}",
+                        classes=(
+                            "tcmap-v-end-label tcmap-v-end-label-min text-caption text-no-wrap"
+                        ),
+                        v_if=f"{name}.independent_bands !== 'none'",
+                    )
+                    with html.Div(classes="tcmap-ticks-container"):
+                        with html.Div(
+                            v_for=f"(tick, i) in {name}.color_ticks",
+                            key="i",
+                            classes="tcmap-tick-container",
                             style=(
-                                "`color: ${tick.color};"
-                                "writing-mode:vertical-lr;"
-                                "transform: rotate(180deg);`",
+                                "`top:${100 - tick.position}%;left:0;"
+                                "flex-direction:row;transform:translateY(-50%);`",
                             ),
-                        )
+                        ):
+                            html.Div(
+                                classes="tcmap-tick-line-v",
+                                style=("`background:${tick.color};`",),
+                            )
+                            html.Span(
+                                "{{ tick.label }}",
+                                classes="tcmap-tick-label",
+                                style=(
+                                    "`color: ${tick.color};"
+                                    "writing-mode:vertical-lr;"
+                                    "transform: rotate(180deg);`",
+                                ),
+                            )
+
+                # Bottom independent band = values below minimum
+                html.Div(
+                    classes="tcmap-independent-band-v",
+                    v_if=(
+                        f"{name}.independent_bands === 'bottom'"
+                        f" || {name}.independent_bands === 'both'"
+                    ),
+                    style=(
+                        f"`background: rgba("
+                        f"${{{name}.independent_band_bottom_color[0] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[1] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[2] * 255}}, "
+                        f"${{{name}.independent_band_bottom_color[3]}});`",
+                    ),
+                )
+
             # Min label at bottom
             html.Div(
                 f"{{{{ {name}.color_range && {name}.color_range[0] != null"
                 f" ? {_fmt_expr(name, 0)} : '' }}}}",
                 classes="tcmap-vertical-labels text-caption text-no-wrap",
+                v_if=f"{name}.independent_bands === 'none'",
             )

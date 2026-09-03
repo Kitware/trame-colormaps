@@ -16,24 +16,28 @@ class TestButtons:
         result = buttons("cfg")
         assert isinstance(result, list)
 
-    def test_eleven_entries(self):
+    def test_twelve_entries(self):
         result = buttons("cfg")
-        assert len(result) == 11
+        assert len(result) == 12
 
     def test_each_has_icon_click_tip(self):
         for btn in buttons("cfg"):
             if btn.get("separator"):
                 continue
             assert "icon" in btn
-            # nan_menu and category menu don't have click
-            if not btn.get("nan_menu") and not btn.get("menu"):
+            # Menu buttons don't have click
+            if (
+                not btn.get("nan_menu")
+                and not btn.get("menu")
+                and not btn.get("independent_bands_menu")
+            ):
                 assert "click" in btn
             assert "tip" in btn
 
     def test_name_interpolation(self):
         """All click/tip strings should contain the given name."""
         for btn in buttons("myConfig"):
-            if btn.get("separator") or btn.get("nan_menu"):
+            if btn.get("separator") or btn.get("nan_menu") or btn.get("independent_bands_menu"):
                 continue
             assert "myConfig" in btn["click"]
             assert "myConfig" in btn["tip"]
@@ -114,8 +118,16 @@ class TestButtons:
         assert btn["icon"] == "mdi-crosshairs-question"
         assert btn["active"] == "false"
 
-    def test_cut_outside_range_button(self):
+    def test_independent_bands_button(self):
         btn = buttons("c")[10]
+        assert btn["icon"] == "mdi-arrow-expand-vertical"
+        assert btn["independent_bands_menu"] is True
+        assert btn["active"] == "c.independent_bands !== 'none'"
+        assert btn["disabled"] == "!c.override_range && !c.diverging"
+        assert btn["show"] == "c.enable_independent_bands"
+
+    def test_cut_outside_range_button(self):
+        btn = buttons("c")[11]
         assert btn["icon"] == "mdi-scissors-cutting"
         assert "cut_outside_range" in btn["click"]
         assert "cut_outside_range" in btn["active"]
