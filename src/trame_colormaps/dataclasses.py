@@ -137,9 +137,7 @@ class ColormapConfig(StateDataModel):
 
     # --- NaN / out-of-range colors ---
     nan_color: list[float] = Sync(list, [0.0, 0.0, 0.0, 0.0])
-    independent_band_color: list[float] = Sync(
-        list, [0.5, 0.5, 0.5, 1.0]
-    )
+    independent_band_color: list[float] = Sync(list, [0.5, 0.5, 0.5, 1.0])
 
     # --- UI widget state (control panel popup) ---
     menu: bool = Sync(bool, False)
@@ -149,6 +147,7 @@ class ColormapConfig(StateDataModel):
     show_categories: bool = Sync(bool, False)
     selected_categories: str = Sync(str, "sequential")
     show_nan_menu: bool = Sync(bool, False)
+    show_independent_bands_menu: bool = Sync(bool, False)
 
     def __init__(self, *args, mapper=None, data_array_fn=None, **kwargs):
         self._mappers = set()

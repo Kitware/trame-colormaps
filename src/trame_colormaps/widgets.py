@@ -131,10 +131,18 @@ def buttons(name):
             "disabled": f"{name}.diverging",
         },
         {
+            "icon": "mdi-arrow-expand-vertical",
+            "tip": "'Independent Bands'",
+            "active": f"{name}.independent_bands !== 'none'",
+            "disabled": f"!{name}.override_range && !{name}.diverging",
+            "independent_bands_menu": True,
+        },
+        {
             "icon": "mdi-scissors-cutting",
             "click": (
                 f"({name}.override_range || {name}.diverging)"
                 f" && ({name}.cut_outside_range = !{name}.cut_outside_range)"
+                f" && ({name}.independent_bands = 'none')"
             ),
             "tip": (
                 f"!{name}.override_range && !{name}.diverging"
@@ -218,6 +226,51 @@ class ColorMapEditor(v3.VCard):
                                                     f" === '{cat_value}'",
                                                 ),
                                             )
+                                v3.VTooltip(
+                                    text=(b["tip"],),
+                                    activator="parent",
+                                    location="bottom",
+                                )
+                        elif b.get("independent_bands_menu"):
+                            with html.Div():
+                                with v3.VMenu(
+                                    v_model=f"{name}.show_independent_bands_menu",
+                                    location="bottom",
+                                ):
+                                    with html.Template(v_slot_activator="{ props: bandProps }"):
+                                        btn_kwargs["v_bind"] = "bandProps"
+                                        btn_kwargs["variant"] = "'text'"
+                                        btn_kwargs["color"] = "undefined"
+                                        v3.VBtn(**btn_kwargs)
+
+                                    with v3.VList(density="compact"):
+                                        for value, label in [
+                                            ("none", "None"),
+                                            ("top", "Top"),
+                                            ("bottom", "Bottom"),
+                                            ("both", "Top and Bottom"),
+                                        ]:
+                                            cut_reset = (
+                                                f" {name}.cut_outside_range = false;"
+                                                if value != "none"
+                                                else ""
+                                            )
+
+                                            v3.VListItem(
+                                                title=label,
+                                                value=value,
+                                                active=(
+                                                    f"{name}.independent_bands === '{value}'"
+                                                ),
+                                                click=(
+                                                    f"{name}.independent_bands"
+                                                    f" = '{value}';"
+                                                    f"{cut_reset}"
+                                                    f" {name}.show_independent_bands_menu"
+                                                    " = false"
+                                                ),
+                                            )
+
                                 v3.VTooltip(
                                     text=(b["tip"],),
                                     activator="parent",
