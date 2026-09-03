@@ -64,24 +64,28 @@ class WaveletColorMapDemo(TrameApp):
             self.server,
             mapper=self.mapper,
             data_array_fn=self.get_data_array,
+            enable_independent_bands=True,
         ).set_data_array("RTData", self.get_data_array, "point")
 
         self.right = colormaps.ColormapConfig(
             self.server,
             mapper=self.mapper,
             data_array_fn=self.get_data_array,
+            enable_independent_bands=True,
         ).set_data_array("RTData", self.get_data_array, "point")
 
         self.left = colormaps.ColormapConfig(
             self.server,
             mapper=self.mapper,
             data_array_fn=self.get_data_array,
+            enable_independent_bands=True,
         ).set_data_array("RTData", self.get_data_array, "point")
 
         self.bottom = colormaps.ColormapConfig(
             self.server,
             mapper=self.mapper,
             data_array_fn=self.get_data_array,
+            enable_independent_bands=True,
         ).set_data_array("RTData", self.get_data_array, "point")
 
         # Auto render when mapper update

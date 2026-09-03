@@ -720,6 +720,7 @@ class TestLutRendering:
 
 class TestIndependentBands:
     def test_default_is_none(self, config):
+        assert config.enable_independent_bands is False
         assert config.independent_bands == "none"
 
     def test_top(self, config):

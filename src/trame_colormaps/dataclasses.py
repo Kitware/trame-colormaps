@@ -116,6 +116,7 @@ class ColormapConfig(StateDataModel):
     color_value_max: str = Sync(str, "1")
     override_range: bool = Sync(bool, False)
     cut_outside_range: bool = Sync(bool, False)
+    enable_independent_bands: bool = Sync(bool, False)
     independent_bands: str = Sync(str, "none")
     diverging: bool = Sync(bool, False)
     epsilon: str = Sync(str, "0")

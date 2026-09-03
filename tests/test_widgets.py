@@ -124,6 +124,7 @@ class TestButtons:
         assert btn["independent_bands_menu"] is True
         assert btn["active"] == "c.independent_bands !== 'none'"
         assert btn["disabled"] == "!c.override_range && !c.diverging"
+        assert btn["show"] == "c.enable_independent_bands"
 
     def test_cut_outside_range_button(self):
         btn = buttons("c")[11]

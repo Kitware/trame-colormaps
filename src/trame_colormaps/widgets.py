@@ -135,6 +135,7 @@ def buttons(name):
             "tip": "'Independent Bands'",
             "active": f"{name}.independent_bands !== 'none'",
             "disabled": f"!{name}.override_range && !{name}.diverging",
+            "show": f"{name}.enable_independent_bands",
             "independent_bands_menu": True,
         },
         {
@@ -232,7 +233,9 @@ class ColorMapEditor(v3.VCard):
                                     location="bottom",
                                 )
                         elif b.get("independent_bands_menu"):
-                            with html.Div():
+                            with html.Div(
+                                v_if=b.get("show"),
+                            ):
                                 with v3.VMenu(
                                     v_model=f"{name}.show_independent_bands_menu",
                                     location="bottom",
