@@ -116,6 +116,7 @@ class ColormapConfig(StateDataModel):
     color_value_max: str = Sync(str, "1")
     override_range: bool = Sync(bool, False)
     cut_outside_range: bool = Sync(bool, False)
+    independent_bands: str = Sync(str, "none")
     diverging: bool = Sync(bool, False)
     epsilon: str = Sync(str, "0")
     abs_max: str = Sync(str, "")
@@ -134,8 +135,11 @@ class ColormapConfig(StateDataModel):
     luts_normal: list = Sync(list, list)
     luts_inverted: list = Sync(list, list)
 
-    # --- NaN color ---
+    # --- NaN / out-of-range colors ---
     nan_color: list[float] = Sync(list, [0.0, 0.0, 0.0, 0.0])
+    independent_band_color: list[float] = Sync(
+        list, [0.5, 0.5, 0.5, 1.0]
+    )
 
     # --- UI widget state (control panel popup) ---
     menu: bool = Sync(bool, False)
@@ -825,20 +829,48 @@ class ColormapConfig(StateDataModel):
         self._apply_nan_color()
         self.mapper_change += 1
 
+    @watch("independent_bands", "independent_band_color", eager=True)
+    def _on_independent_bands_change(self, *_):
+        """Toggle independent top/bottom out-of-range bands."""
+        self._apply_nan_color()
+        self.mapper_change += 1
+
     def _apply_nan_color(self):
-        """Set NaN color (RGBA) and above/below range colors on the render LUT."""
+        """Set NaN and out-of-range colors on the render LUT."""
         c = self.nan_color
         if not c or len(c) < 4:
             c = [0.0, 0.0, 0.0, 0.0]
-        r, g, b, a = float(c[0]), float(c[1]), float(c[2]), float(c[3])
+        r, g, b, a = map(float, c)
+
+        band_color = self.independent_band_color
+        if not band_color or len(band_color) < 4:
+            band_color = [0.5, 0.5, 0.5, 1.0]
+        br, bg, bb, ba = map(float, band_color)
+
         cut = bool(self.cut_outside_range)
+        bands = self.independent_bands
+
         if self._lut is not None:
             self._lut.SetNanColor(r, g, b, a)
-            self._lut.SetUseAboveRangeColor(cut)
-            self._lut.SetUseBelowRangeColor(cut)
+
             if cut:
+                self._lut.SetUseAboveRangeColor(True)
+                self._lut.SetUseBelowRangeColor(True)
                 self._lut.SetAboveRangeColor(r, g, b, a)
                 self._lut.SetBelowRangeColor(r, g, b, a)
+            else:
+                use_above = bands in ("top", "both")
+                use_below = bands in ("bottom", "both")
+
+                self._lut.SetUseAboveRangeColor(use_above)
+                self._lut.SetUseBelowRangeColor(use_below)
+
+                if use_above:
+                    self._lut.SetAboveRangeColor(br, bg, bb, ba)
+
+                if use_below:
+                    self._lut.SetBelowRangeColor(br, bg, bb, ba)
+
             self._lut.BuildSpecialColors()
 
     def _build_lut_from_ctf(self, ctf):

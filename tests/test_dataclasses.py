@@ -716,3 +716,41 @@ class TestLutRendering:
         nc = colors.GetNumberOfComponents()
         alpha = colors.GetValue(nc - 1)
         assert alpha == 255, f"Valid value alpha should be 255, got {alpha}"
+
+class TestIndependentBands:
+    def test_default_is_none(self, config):
+        assert config.independent_bands == "none"
+
+    def test_top(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.independent_bands = "top"
+        config._apply_nan_color()
+
+        assert config._lut.GetUseAboveRangeColor() == 1
+        assert config._lut.GetUseBelowRangeColor() == 0
+
+    def test_bottom(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.independent_bands = "bottom"
+        config._apply_nan_color()
+
+        assert config._lut.GetUseAboveRangeColor() == 0
+        assert config._lut.GetUseBelowRangeColor() == 1
+
+    def test_both(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.independent_bands = "both"
+        config._apply_nan_color()
+
+        assert config._lut.GetUseAboveRangeColor() == 1
+        assert config._lut.GetUseBelowRangeColor() == 1
+
+    def test_band_color(self, config):
+        config._build_lut_from_ctf(config._ctf)
+        config.independent_band_color = [0.5, 0.5, 0.5, 1.0]
+        config.independent_bands = "top"
+        config._apply_nan_color()
+
+        assert config._lut.GetAboveRangeColor() == pytest.approx(
+            (0.5, 0.5, 0.5, 1.0)
+        )
