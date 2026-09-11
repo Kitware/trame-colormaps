@@ -1,4 +1,4 @@
-# trame-colormaps
+# trame-colormaps ![](https://kitware.github.io/trame/downloads/trame-colormaps.svg)
 
 Self-contained colormap module for managing VTK color transfer
 functions, colorbar rendering, and interactive preset controls in Trame apps.
