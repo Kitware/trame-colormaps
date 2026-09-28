@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.7.2 (2026-09-28)
+
+### Bug Fixes
+
+- **dataclasses**: Select the color array for point data too
+  ([`3a3aeed`](https://github.com/Kitware/trame-colormaps/commit/3a3aeed2e22d787c95a6653a5fbbdbb3c4b3f004))
+
+### Documentation
+
+- Update download badge url
+  ([`565446c`](https://github.com/Kitware/trame-colormaps/commit/565446c054e1b2e11463b0aec0c6c622b0899551))
+
+
 ## v1.7.1 (2026-09-03)
 
 ### Bug Fixes
