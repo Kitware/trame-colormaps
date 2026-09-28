@@ -586,8 +586,8 @@ class ColormapConfig(StateDataModel):
                 mapper.SetScalarModeToUsePointFieldData()
             elif scalar_mode == "cell":
                 mapper.SetScalarModeToUseCellFieldData()
-                if scalar_mode in ("point", "cell"):
-                    mapper.SelectColorArray(variable_name)
+            if scalar_mode in ("point", "cell"):
+                mapper.SelectColorArray(variable_name)
         self.update_color_range()
         self.update_color_preset(
             self.preset,

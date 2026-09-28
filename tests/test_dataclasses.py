@@ -198,6 +198,21 @@ class TestMapperWiring:
         cfg.set_data_array("TestData", lambda: new_arr, "cell")
         assert cfg.color_range == (10.0, 30.0)
 
+    @pytest.mark.parametrize(
+        ("scalar_mode", "expected_mode"),
+        [("point", "UsePointFieldData"), ("cell", "UseCellFieldData")],
+    )
+    def test_set_data_array_selects_color_array(self, scalar_mode, expected_mode):
+        server = get_server(f"test_dc_select_{scalar_mode}_{id(object())}")
+        mappers = [vtkPolyDataMapper(), vtkPolyDataMapper()]
+        data_arr = _make_data_array([0.0, 1.0], name="Selected")
+        cfg = ColormapConfig(server, mapper=mappers[0], data_array_fn=lambda: data_arr)
+        cfg.register_mapper(mappers[1])
+        cfg.set_data_array("Selected", lambda: data_arr, scalar_mode)
+        for mapper in mappers:
+            assert mapper.GetScalarModeAsString() == expected_mode
+            assert mapper.GetArrayName() == "Selected"
+
     def test_mapper_change_increments(self, wired):
         cfg, _, _ = wired
         before = cfg.mapper_change
